@@ -9,21 +9,27 @@ import SettingPage from "./pages/settings/SettingPage";
 import ProfilePage from "./pages/settings/ProfilePage";
 import WalletPage from "./pages/settings/WalletPage";
 import UpgradePage from "./pages/settings/UpgradePage";
+import LoginPage from "./pages/LoginPage";
+import ShowNavbar from "./components/navBar/ShowNavbar";
+import SignUpPage from "./pages/SignUpPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   return (
     <>
       <BrowserRouter>
-        <NavBar />
+        <ShowNavbar>
+          <NavBar />
+        </ShowNavbar>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/tutor-list" element={<TutorListPage />} />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/about" element={<AboutPage />} />
 
-          {/* <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/reset" element={<ResetPasswordPage />} /> */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/reset" element={<ResetPasswordPage />} />
 
           <Route path="/settings" element={<SettingPage />}>
             <Route path="profile" element={<ProfilePage />} />
