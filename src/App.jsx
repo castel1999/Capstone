@@ -13,6 +13,7 @@ import LoginPage from "./pages/LoginPage";
 import ShowNavbar from "./components/navBar/ShowNavbar";
 import SignUpPage from "./pages/SignUpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import Chat from "./components/chat/Chat";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <BrowserRouter>
         <ShowNavbar>
           <NavBar />
+          <Chat/>
         </ShowNavbar>
         <Routes>
           <Route path="/" element={<HomePage />} />
