@@ -14,6 +14,7 @@ import ShowNavbar from "./components/navBar/ShowNavbar";
 import SignUpPage from "./pages/SignUpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Chat from "./components/chat/Chat";
+import TutorDetail from "./pages/TutorDetail";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         </ShowNavbar>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/tutor-detail/:id" element={<TutorDetail/>}/>
           <Route path="/tutor-list" element={<TutorListPage />} />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/about" element={<AboutPage />} />
