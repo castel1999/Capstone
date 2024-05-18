@@ -26,7 +26,7 @@ const NavBar = () => {
   }
 
   return (
-    <div className="w-screen bg-white">
+    <div className="bg-white">
       <div className="flex justify-between items-center px-7 py-3">
         <div className="flex flex-row justify-center items-center gap-5">
           <Link to="/">

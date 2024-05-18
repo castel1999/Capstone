@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NavBar from "./components/navBar/NavBar";
 import HomePage from "./pages/HomePage";
-import TutorListPage from "./pages/TutorListPage";
+import TutorListPage from "./pages/tutorList/TutorListPage";
 import CoursePage from "./pages/CoursePage";
 import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";

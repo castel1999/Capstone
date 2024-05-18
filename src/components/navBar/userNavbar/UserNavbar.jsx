@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import ava from "../../../assets/ava.png";
+import ava from "../../../assets/DefaultAva.png";
 import notify from "../../../assets/notify.png";
 import { CiHeart } from "react-icons/ci";
 import { CiWallet } from "react-icons/ci";
