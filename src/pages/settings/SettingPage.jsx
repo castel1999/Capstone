@@ -28,7 +28,7 @@ const SettingPage = () => {
         <div>
           <SideBar data={data} />
         </div>
-        <div>
+        <div className="flex-1">
           <Outlet context={data} />
         </div>
       </div>
