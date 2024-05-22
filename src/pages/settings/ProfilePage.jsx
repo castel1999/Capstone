@@ -20,18 +20,18 @@ const ProfilePage = () => {
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
-  const [avatarURL, setAvatarURL] = useState(data?.avatar);
+  const [avatarURL, setAvatarURL] = useState(data?.imageUrl);
 
   const phoneRegExp =
     /^(?:\+84|0)(?:[1-9][0-9]{8}|(?:2|3|4|5|6|7|8|9)[0-9]{7,8})$/;
 
   const validationSchema = Yup.object().shape({
-    username: Yup.string().required("Vui lòng nhập họ tên"),
-    dob: Yup.string().required("Vui lòng chọn ngày tháng năm sinh"),
+    fullName: Yup.string().required("Vui lòng nhập họ tên"),
+    dateOfBirth: Yup.string().required("Vui lòng chọn ngày tháng năm sinh"),
     email: Yup.string()
       .email("Không đúng định dạng email")
       .required("Vui lòng nhập email"),
-    phone: Yup.string().matches(
+    phoneNumber: Yup.string().matches(
       phoneRegExp,
       "Số điện thoại không đúng định dạng"
     ),
@@ -40,10 +40,10 @@ const ProfilePage = () => {
   const formOptions = {
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      username: data?.username,
-      dob: data?.dob.split("T")[0],
+      fullName: data?.fullName,
+      dateOfBirth: data?.dateOfBirth.split("T")[0],
       email: data?.email,
-      phone: data?.phone,
+      phoneNumber: data?.phoneNumber,
     },
   };
 
@@ -85,11 +85,11 @@ const ProfilePage = () => {
   }, [file]);
 
   useEffect(() => {
-    setValue("avatar", avatarURL);
+    setValue("imageUrl", avatarURL);
   }, [avatarURL, setValue]);
 
   const onSubmit = (formData) => {
-    const completeData = { ...formData, avatar: avatarURL };
+    const completeData = { ...formData, imageUrl: avatarURL };
     console.log(completeData);
   };
 
@@ -138,34 +138,36 @@ const ProfilePage = () => {
         </div>
 
         <div className="flex flex-col gap-4 max-w-[600px]">
-          {/* username */}
+          {/* fullName */}
           <div className="flex flex-col gap-2 relative">
-            <label htmlFor="username" className="font-bold">
+            <label htmlFor="fullName" className="font-bold">
               Họ và tên
             </label>
             <input
-              id="username"
+              id="fullName"
               type="text"
               className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("username")}
+              {...register("fullName")}
             />
-            {errors.username && (
-              <ErrorPopup message={errors.username?.message} />
+            {errors.fullName && (
+              <ErrorPopup message={errors.fullName?.message} />
             )}
           </div>
 
           {/* DOB */}
           <div className="flex flex-col gap-2 relative">
-            <label htmlFor="dob" className="font-bold">
+            <label htmlFor="dateOfBirth" className="font-bold">
               Ngày sinh
             </label>
             <input
-              id="dob"
+              id="dateOfBirth"
               type="date"
               className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("dob")}
+              {...register("dateOfBirth")}
             />
-            {errors.dob && <ErrorPopup message={errors.dob?.message} />}
+            {errors.dateOfBirth && (
+              <ErrorPopup message={errors.dateOfBirth?.message} />
+            )}
           </div>
 
           {/* Email */}
@@ -183,16 +185,18 @@ const ProfilePage = () => {
 
           {/* Phone */}
           <div className="flex flex-col gap-2 relative">
-            <label htmlFor="phone" className="font-bold">
+            <label htmlFor="phoneNumber" className="font-bold">
               Số điện thoại
             </label>
             <input
-              id="phone"
+              id="phoneNumber"
               type="tel"
               className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("phone")}
+              {...register("phoneNumber")}
             />
-            {errors.phone && <ErrorPopup message={errors.phone?.message} />}
+            {errors.phoneNumber && (
+              <ErrorPopup message={errors.phoneNumber?.message} />
+            )}
           </div>
 
           <div>

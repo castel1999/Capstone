@@ -13,10 +13,13 @@ import LoginPage from "./pages/LoginPage";
 import ShowNavbar from "./components/navBar/ShowNavbar";
 import SignUpPage from "./pages/SignUpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./hooks/AuthContext"; // Import the AuthProvider
+import UnauthorizedPage from "./pages/UnauthorizedPage ";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <ShowNavbar>
           <NavBar />
@@ -31,16 +34,20 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/reset" element={<ResetPasswordPage />} />
 
-          <Route path="/settings" element={<SettingPage />}>
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="wallet" element={<WalletPage />} />
-            <Route path="upgrade" element={<UpgradePage />} />
+          {/* Protected Routes */}
+          <Route element={<PrivateRoute allowedRoles={["Students", "Tutor"]} />}>
+            <Route path="/settings" element={<SettingPage />}>
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="wallet" element={<WalletPage />} />
+              <Route path="upgrade" element={<UpgradePage />} />
+            </Route>
           </Route>
 
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 }
 

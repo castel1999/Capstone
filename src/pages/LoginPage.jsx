@@ -10,10 +10,17 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import ErrorPopup from "../utils/ErrorPopup";
-
+import * as apiClient from "../api/UserAPI";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Cookies from "js-cookie";
+import { useAuth } from "../hooks/AuthContext";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
+  const queryClient = useQueryClient();
 
   // form validation rules
   const validationSchema = Yup.object().shape({
@@ -32,7 +39,6 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm(formOptions);
 
-  const onSubmit = (data) => console.log(data);
   const handleOnClick = (e) => {
     e.preventDefault();
     console.log("GOOGLE");
@@ -41,6 +47,28 @@ const LoginPage = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const mutation = useMutation({
+    mutationFn: apiClient.login,
+    onSuccess: async (data) => {
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("userID", data.userId);
+      localStorage.setItem("role", data.role);
+
+      
+      setUser({ role: data.role, userId: data.userId });
+      await queryClient.invalidateQueries("getCurrentUser");
+
+      navigate("/");
+    },
+    onError: (error) => {
+      console.log(error.message);
+    },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    mutation.mutate(data);
+  });
 
   return (
     <div className="flex justify-center items-center h-screen bg-theme">
@@ -107,7 +135,6 @@ const LoginPage = () => {
                 className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
                 {...register("password")}
               />
-
               <div
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
@@ -124,15 +151,28 @@ const LoginPage = () => {
             )}
           </div>
           {/* Submit btn */}
-          <div className="flex justify-center">
-            <button
-              onClick={handleSubmit(onSubmit)}
-              type="submit"
-              className="transition ease-in-out delay-150 border-2 border-black rounded-lg text-black py-2 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300"
-            >
-              Đăng nhập
-            </button>
-          </div>
+          {mutation.isPending ? (
+            <div className="flex justify-center">
+              <button
+                onClick={handleSubmit(onSubmit)}
+                type="submit"
+                className=" border-2 border-black rounded-lg py-2 px-4 mb-4 -translate-x-[-6px] -translate-y-[-6px] shadow-none bg-theme text-white duration-300"
+              >
+                loading
+              </button>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <button
+                onClick={handleSubmit(onSubmit)}
+                type="submit"
+                className="transition ease-in-out delay-150 border-2 border-black rounded-lg text-black py-2 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300"
+              >
+                Đăng nhập
+              </button>
+            </div>
+          )}
+
           <div className="text-center">
             <Link
               to="/reset"

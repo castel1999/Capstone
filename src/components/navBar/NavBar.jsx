@@ -10,7 +10,7 @@ import TutorNavbar from "./tutorNavbar/TutorNavbar";
 const NavBar = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["myData"],
-    queryFn: UserAPI.signIn,
+    queryFn: UserAPI.getCurrentUser,
   });
 
   if (isLoading) {
@@ -73,7 +73,7 @@ const NavBar = () => {
           <div>
             <Link className="">Đăng nhập</Link>
           </div>
-        ) : data.role === "user" ? (
+        ) : data.role === "student" ? (
           <div>
             <UserNavbar data={data} />
           </div>
