@@ -7,10 +7,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
     const userId = localStorage.getItem("userID");
-    if (token && role && userId) {
-      return { role, userId };
-    }
-    return null;
+    return token && role && userId ? { role, userId } : null;
   });
 
   useEffect(() => {
@@ -18,17 +15,11 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       const role = localStorage.getItem("role");
       const userId = localStorage.getItem("userID");
-      if (token && role && userId) {
-        setUser({ role, userId });
-      } else {
-        setUser(null);
-      }
+      setUser(token && role && userId ? { role, userId } : null);
     };
 
     window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   return (
@@ -38,6 +29,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
