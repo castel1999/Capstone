@@ -14,7 +14,7 @@ const TutorNavbar = ({data}) => {
       { id: 2, text: "Giáo viên Yêu thích", route: "/favorite" },
       { id: 3, text: "Đăng xuất", route: "/login" },
     ];
-    const noti = data.noti.map((item) => item);
+    const noti = data?.noti?.map((item) => item);
   
     const [openNoti, setOpenNoti] = useState(false);
   
