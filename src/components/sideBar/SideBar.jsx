@@ -2,6 +2,11 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 
 const SideBar = ({ data }) => {
+  const logout = () => {
+    localStorage.clear();
+    location.reload();
+  };
+
   return (
     <div className="min-w-52 max-w-80">
       <div className="flex gap-4 ml-2">
@@ -16,7 +21,9 @@ const SideBar = ({ data }) => {
           <div className="font-bold text-clip overflow-hidden line-clamp-1 max-w-52">
             {data?.fullName}
           </div>
-          <div className="text-sm text-gray-400">{localStorage.getItem('role')}</div>
+          <div className="text-sm text-gray-400">
+            {localStorage.getItem("role")}
+          </div>
         </div>
       </div>
       <hr className="mt-3 mb-3 border-[1px] border-gray-200" />
@@ -55,7 +62,7 @@ const SideBar = ({ data }) => {
         </NavLink>
 
         <Link
-        onClick={()=>localStorage.clear()}
+          onClick={logout}
           to="/login"
           className="max-w-36 border rounded-lg p-3 bg-red-500 text-white text-center font-bold hover:opacity-80"
         >

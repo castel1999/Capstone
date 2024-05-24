@@ -13,9 +13,9 @@ import LoginPage from "./pages/LoginPage";
 import ShowNavbar from "./components/navBar/ShowNavbar";
 import SignUpPage from "./pages/SignUpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import { PrivateRoute, PublicRoute } from "./components/CustomRoutes";
 import Chat from "./components/chat/Chat";
 import TutorDetail from "./pages/TutorDetail";
-import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./hooks/AuthContext"; // Import the AuthProvider
 import UnauthorizedPage from "./pages/UnauthorizedPage ";
 
@@ -34,11 +34,12 @@ function App() {
           <Route path="/course" element={<CoursePage />} />
           <Route path="/about" element={<AboutPage />} />
 
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/reset" element={<ResetPasswordPage />} />
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/reset" element={<ResetPasswordPage />} />
+          </Route>
 
-          {/* Protected Routes */}
           <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
             <Route path="/settings" element={<SettingPage />}>
               <Route path="profile" element={<ProfilePage />} />
