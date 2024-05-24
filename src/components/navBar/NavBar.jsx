@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import ODTlogo from "../../assets/logo.png";
 import { useQuery } from "@tanstack/react-query";
@@ -8,10 +8,23 @@ import Loading from "../../utils/Loading";
 import TutorNavbar from "./tutorNavbar/TutorNavbar";
 
 const NavBar = () => {
+  const Logged = localStorage.getItem("userID") !== null;
+  const currUser = localStorage.getItem("role");
+  const [item, setItem] = useState(null);
+  console.log("Logged", Logged);
+  console.log("curr", currUser === "Student");
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["myData"],
     queryFn: UserAPI.getCurrentUser,
+    enabled: Logged, // Enable the query only if the user is logged in
   });
+
+  useEffect(() => {
+    if (data) {
+      setItem(data);
+    }
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -21,7 +34,7 @@ const NavBar = () => {
     );
   }
 
-  if (error) {
+  if (isError) {
     return <div>Error: {error.message}</div>;
   }
 
@@ -69,21 +82,26 @@ const NavBar = () => {
             Về chúng tôi
           </NavLink>
         </div>
-        {data && data?.role === "guest" ? (
-          <div>
-            <Link className="">Đăng nhập</Link>
-          </div>
-        ) : data.role === "student" ? (
-          <div>
-            <UserNavbar data={data} />
-          </div>
-        ) : (
+
+        {Logged ? (
+          currUser === "Student" ? (
             <div>
-            <TutorNavbar data={data} />
+              <UserNavbar data={item} />
+            </div>
+          ) : currUser === "Tutor" ? (
+            <div>
+              <TutorNavbar data={item} />
+            </div>
+          ) : null
+        ) : (
+          <div>
+            <Link className="" to="/login">
+              Đăng nhập
+            </Link>
           </div>
         )}
       </div>
-      <hr className="border"/>
+      <hr className="border" />
     </div>
   );
 };

@@ -35,7 +35,7 @@ function App() {
           <Route path="/reset" element={<ResetPasswordPage />} />
 
           {/* Protected Routes */}
-          <Route element={<PrivateRoute allowedRoles={["Students", "Tutor"]} />}>
+          <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
             <Route path="/settings" element={<SettingPage />}>
               <Route path="profile" element={<ProfilePage />} />
               <Route path="wallet" element={<WalletPage />} />
