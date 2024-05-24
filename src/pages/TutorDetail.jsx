@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import * as TutorApi from "../api/TutorApi";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import Timetable from "../components/timetable/Timetable";
 
 const TutorDetail = () => {
   const id = useParams().id;
@@ -104,13 +105,28 @@ const TutorDetail = () => {
         <div className="flex flex-col py-12">
           <div className="text-2xl font-semibold">Giới thiệu</div>
           <div className="flex flex-col gap-3">
-            <div className={(!isShowMore ? "text-base font-extralight whitespace-pre-wrap pt-8 h-[80%] line-clamp-4 text-ellipsis" : "text-base font-extralight whitespace-pre-wrap h-[80%] pt-8" )}>
+            <div
+              className={
+                !isShowMore
+                  ? "text-base font-extralight whitespace-pre-wrap pt-8 h-[80%] line-clamp-4 text-ellipsis"
+                  : "text-base font-extralight whitespace-pre-wrap h-[80%] pt-8"
+              }
+            >
               {data?.description}
             </div>
-            <div className="text-base w-fit font-semibold underline hover:text-theme cursor-pointer" onClick={() => setIsShowMore(!isShowMore)}>
+            <div
+              className="text-base w-fit font-semibold underline hover:text-theme cursor-pointer"
+              onClick={() => setIsShowMore(!isShowMore)}
+            >
               {!isShowMore ? "Show more" : "Show less"}
             </div>
           </div>
+        </div>
+
+        <div className="flex flex-col">
+          <div className="text-2xl font-semibold mb-4">Lịch trình</div>
+
+          <Timetable/>
         </div>
       </div>
       <div> </div>
