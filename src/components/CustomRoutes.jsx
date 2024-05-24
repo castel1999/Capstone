@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/AuthContext";
 
-const PrivateRoute = ({ allowedRoles }) => {
+export const PrivateRoute = ({ allowedRoles }) => {
   const { user } = useAuth();
 
   if (!user) {
@@ -16,4 +16,12 @@ const PrivateRoute = ({ allowedRoles }) => {
   return <Outlet />;
 };
 
-export default PrivateRoute;
+export const PublicRoute = () => {
+  const { user } = useAuth();
+
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
