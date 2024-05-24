@@ -8,7 +8,7 @@ import Loading from "../../utils/Loading";
 const SettingPage = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["myData"],
-    queryFn: UserAPI.signIn,
+    queryFn: UserAPI.getCurrentUser,
   });
 
   if (isLoading) {

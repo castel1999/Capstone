@@ -7,16 +7,16 @@ const SideBar = ({ data }) => {
       <div className="flex gap-4 ml-2">
         <div>
           <img
-            src={data?.avatar}
+            src={data?.imageUrl}
             alt=""
             className="object-cover size-12 rounded-full border-2 border-black"
           />
         </div>
         <div className="flex flex-col gap-[2px]">
           <div className="font-bold text-clip overflow-hidden line-clamp-1 max-w-52">
-            {data?.username}
+            {data?.fullName}
           </div>
-          <div className="text-sm text-gray-400">{data?.role}</div>
+          <div className="text-sm text-gray-400">{localStorage.getItem('role')}</div>
         </div>
       </div>
       <hr className="mt-3 mb-3 border-[1px] border-gray-200" />
@@ -55,6 +55,7 @@ const SideBar = ({ data }) => {
         </NavLink>
 
         <Link
+        onClick={()=>localStorage.clear()}
           to="/login"
           className="max-w-36 border rounded-lg p-3 bg-red-500 text-white text-center font-bold hover:opacity-80"
         >

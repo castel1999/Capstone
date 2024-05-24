@@ -10,19 +10,32 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import ErrorPopup from "../utils/ErrorPopup";
+import * as apiClient from "../api/UserAPI";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const navigate = useNavigate();
+
+  const phoneRegExp =
+    /^(?:\+84|0)(?:[1-9][0-9]{8}|(?:2|3|4|5|6|7|8|9)[0-9]{7,8})$/;
+
   // form validation rules
   const validationSchema = Yup.object().shape({
-    userName: Yup.string()
+    fullName: Yup.string()
       .required("Vui lòng nhập tên")
       .max(20, "Tối đa 20 ký tự"),
     email: Yup.string()
       .email("Không đúng định dạng email")
       .required("Vui lòng nhập email"),
+    dateOfBirth: Yup.string().required("Vui lòng chọn ngày tháng năm sinh"),
+    phoneNumber: Yup.string().matches(
+      phoneRegExp,
+      "Số điện thoại không đúng định dạng"
+    ),
     password: Yup.string()
       .required("Vui lòng nhập mật khẩu")
       .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
@@ -42,7 +55,6 @@ const SignUpPage = () => {
   const password = useRef({});
   password.current = watch("password", "");
 
-  const onSubmit = (data) => console.log(data);
   const handleOnClick = (e) => {
     e.preventDefault();
     console.log("GOOGLE");
@@ -54,6 +66,21 @@ const SignUpPage = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
+
+  const mutation = useMutation({
+    mutationFn: apiClient.register,
+    onSuccess: async () => {
+      navigate("/");
+    },
+    onError: (error) => {
+      console.log(error.message);
+    },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    mutation.mutate(data);
+    console.log(data);
+  });
 
   return (
     <div className="flex justify-center items-center h-screen bg-theme">
@@ -90,21 +117,21 @@ const SignUpPage = () => {
             <div className="mx-2 text-black">Hoặc</div>
             <hr className="w-2/4 my-2 border-[1px] border-black" />
           </div>
-          {/* Username */}
+          {/* fullName */}
           <div className="mb-2 relative">
             <label
-              htmlFor="uerName"
+              htmlFor="fullName"
               className="text-black text-sm font-bold mb-2"
             >
               Tên của bạn
             </label>
             <input
-              id="uerName"
+              id="fullName"
               className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("userName")}
+              {...register("fullName")}
             />
-            {errors.userName && (
-              <ErrorPopup message={errors.userName?.message} />
+            {errors.fullName && (
+              <ErrorPopup message={errors.fullName?.message} />
             )}
           </div>
           {/* Email */}
@@ -123,6 +150,35 @@ const SignUpPage = () => {
             />
             {errors.email && <ErrorPopup message={errors.email?.message} />}
           </div>
+
+          {/* DOB */}
+          <div className="flex flex-col gap-2 relative">
+            <label htmlFor="dob" className="font-bold">
+              Ngày sinh
+            </label>
+            <input
+              id="dob"
+              type="date"
+              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
+              {...register("dateOfBirth")}
+            />
+            {errors.dob && <ErrorPopup message={errors.dob?.message} />}
+          </div>
+
+          {/* Phone */}
+          <div className="flex flex-col gap-2 relative">
+            <label htmlFor="phone" className="font-bold">
+              Số điện thoại
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
+              {...register("phoneNumber")}
+            />
+            {errors.phone && <ErrorPopup message={errors.phone?.message} />}
+          </div>
+
           {/* Password */}
           <div className="mb-2 relative">
             <label
