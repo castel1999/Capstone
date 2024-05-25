@@ -17,11 +17,14 @@ import { PrivateRoute, PublicRoute } from "./components/CustomRoutes";
 import Chat from "./components/chat/Chat";
 import TutorDetail from "./pages/TutorDetail";
 import { AuthProvider } from "./hooks/AuthContext"; // Import the AuthProvider
-import UnauthorizedPage from "./pages/UnauthorizedPage ";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <AuthProvider>
+      <ToastContainer />
       <BrowserRouter>
         <ShowNavbar>
           <NavBar />

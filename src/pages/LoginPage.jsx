@@ -13,14 +13,14 @@ import ErrorPopup from "../utils/ErrorPopup";
 import * as apiClient from "../api/UserAPI";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Cookies from "js-cookie";
 import { useAuth } from "../hooks/AuthContext";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
   const { setUser } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // form validation rules
   const validationSchema = Yup.object().shape({
@@ -29,7 +29,11 @@ const LoginPage = () => {
       .required("Vui lòng nhập email"),
     password: Yup.string()
       .required("Vui lòng nhập mật khẩu")
-      .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+      .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
+      .matches(
+        /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).*$/,
+        "Phải có 1 ký tự viết hoa và 1 ký tự đặc biệt"
+      ),
   });
   const formOptions = { resolver: yupResolver(validationSchema) };
 
@@ -55,13 +59,14 @@ const LoginPage = () => {
       localStorage.setItem("userID", data.userId);
       localStorage.setItem("role", data.role);
 
-      
       setUser({ role: data.role, userId: data.userId });
       await queryClient.invalidateQueries("getCurrentUser");
 
-      navigate("/");
+      toast.success("Đăng nhập thành công!");
+      navigate("/tutor-list");
     },
     onError: (error) => {
+      toast.error("Đăng nhập thất bại!");
       console.log(error.message);
     },
   });
@@ -71,8 +76,8 @@ const LoginPage = () => {
   });
 
   return (
-    <div className="flex justify-center items-center h-screen bg-theme">
-      <div className="flex gap-5 bg-white rounded-lg p-3 relative">
+    <div className="absolute w-full h-full flex justify-center items-center bg-theme">
+      <div className="flex gap-5 bg-white rounded-lg p-3">
         <form className="mt-6 w-[440px] pl-5">
           <div className="w-fit">
             <Link to="/">
