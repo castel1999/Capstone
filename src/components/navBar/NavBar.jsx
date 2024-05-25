@@ -11,8 +11,6 @@ const NavBar = () => {
   const Logged = localStorage.getItem("userID") !== null;
   const currUser = localStorage.getItem("role");
   const [item, setItem] = useState(null);
-  console.log("Logged", Logged);
-  console.log("curr", currUser === "Student");
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["myData"],
@@ -39,7 +37,7 @@ const NavBar = () => {
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-white relative">
       <div className="flex justify-between items-center px-7 py-3">
         <div className="flex flex-row justify-center items-center gap-5">
           <Link to="/">
@@ -94,11 +92,12 @@ const NavBar = () => {
             </div>
           ) : null
         ) : (
-          <div>
-            <Link className="" to="/login">
-              Đăng nhập
-            </Link>
-          </div>
+          <Link
+            className="transition ease-in-out delay-150 border-2 border-black rounded-lg text-black py-2 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300"
+            to="/login"
+          >
+            Đăng nhập
+          </Link>
         )}
       </div>
       <hr className="border" />

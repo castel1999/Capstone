@@ -13,6 +13,7 @@ import ErrorPopup from "../utils/ErrorPopup";
 import * as apiClient from "../api/UserAPI";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,13 +33,16 @@ const SignUpPage = () => {
       .email("Không đúng định dạng email")
       .required("Vui lòng nhập email"),
     dateOfBirth: Yup.string().required("Vui lòng chọn ngày tháng năm sinh"),
-    phoneNumber: Yup.string().matches(
-      phoneRegExp,
-      "Số điện thoại không đúng định dạng"
-    ),
+    phoneNumber: Yup.string()
+      .required("Vui lòng nhập số điện thoại")
+      .matches(phoneRegExp, "Số điện thoại không đúng định dạng"),
     password: Yup.string()
       .required("Vui lòng nhập mật khẩu")
-      .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+      .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
+      .matches(
+        /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).*$/,
+        "Phải có 1 ký tự viết hoa và 1 ký tự đặc biệt"
+      ),
     confirmPassword: Yup.string()
       .required("Vui lòng nhập mật khẩu")
       .oneOf([Yup.ref("password")], "Mật khẩu không khớp"),
@@ -70,9 +74,11 @@ const SignUpPage = () => {
   const mutation = useMutation({
     mutationFn: apiClient.register,
     onSuccess: async () => {
+      toast.success("Đăng ký thành công!");
       navigate("/");
     },
     onError: (error) => {
+      toast.error("Đăng ký thất bại!");
       console.log(error.message);
     },
   });
@@ -83,8 +89,8 @@ const SignUpPage = () => {
   });
 
   return (
-    <div className="flex justify-center items-center h-screen bg-theme">
-      <div className="flex gap-5 bg-white rounded-lg p-3 relative">
+    <div className="flex justify-center items-center py-5 bg-theme">
+      <div className="flex gap-5 bg-white rounded-lg p-3">
         <form className=" w-[440px] pl-5">
           <div className="w-fit">
             <Link to="/">
@@ -152,8 +158,8 @@ const SignUpPage = () => {
           </div>
 
           {/* DOB */}
-          <div className="flex flex-col gap-2 relative">
-            <label htmlFor="dob" className="font-bold">
+          <div className="mb-2 relative">
+            <label htmlFor="dob" className="text-black text-sm font-bold mb-2">
               Ngày sinh
             </label>
             <input
@@ -162,12 +168,17 @@ const SignUpPage = () => {
               className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
               {...register("dateOfBirth")}
             />
-            {errors.dob && <ErrorPopup message={errors.dob?.message} />}
+            {errors.dateOfBirth && (
+              <ErrorPopup message={errors.dateOfBirth?.message} />
+            )}
           </div>
 
           {/* Phone */}
-          <div className="flex flex-col gap-2 relative">
-            <label htmlFor="phone" className="font-bold">
+          <div className="mb-2 relative">
+            <label
+              htmlFor="phone"
+              className="text-black text-sm font-bold mb-2"
+            >
               Số điện thoại
             </label>
             <input
@@ -176,7 +187,9 @@ const SignUpPage = () => {
               className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
               {...register("phoneNumber")}
             />
-            {errors.phone && <ErrorPopup message={errors.phone?.message} />}
+            {errors.phoneNumber && (
+              <ErrorPopup message={errors.phoneNumber?.message} />
+            )}
           </div>
 
           {/* Password */}
@@ -248,8 +261,12 @@ const SignUpPage = () => {
             </button>
           </div>
         </form>
-        <div className="">
-          <img src={loginBG} alt="" className="object-cover w-fit h-fit" />
+        <div>
+          <img
+            src={loginBG}
+            alt=""
+            className="object-cover w-fit h-full rounded-3xl "
+          />
         </div>
       </div>
     </div>
