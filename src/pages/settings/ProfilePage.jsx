@@ -41,7 +41,7 @@ const ProfilePage = () => {
     resolver: yupResolver(validationSchema),
     defaultValues: {
       fullName: data?.fullName,
-      dateOfBirth: data?.dateOfBirth.split("T")[0],
+      dateOfBirth: data?.dateOfBirth?.split("T")[0],
       email: data?.email,
       phoneNumber: data?.phoneNumber,
     },
