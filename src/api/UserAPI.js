@@ -26,7 +26,7 @@ export const login = async (data) => {
 };
 
 export const register = async (data) => {
-  const response = await fetch(`${BASE_API_LINK}/Account/register-account`, {
+  const response = await fetch(`${BASE_API_LINK}/Account/register`, {
     method: "POST",
 
     headers: {
@@ -44,9 +44,7 @@ export const register = async (data) => {
 
 export const getCurrentUser = async () => {
   const response = await fetch(
-    `${BASE_API_LINK}/Account/get-user-information?userID=${localStorage.getItem(
-      "userID"
-    )}`
+    `${BASE_API_LINK}/Account/get/${localStorage.getItem("userID")}`
   );
 
   const responseBody = await response.json();

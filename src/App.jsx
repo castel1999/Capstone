@@ -15,11 +15,14 @@ import SignUpPage from "./pages/SignUpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { PrivateRoute, PublicRoute } from "./components/CustomRoutes";
 import { AuthProvider } from "./hooks/AuthContext";
-import UnauthorizedPage from "./pages/UnauthorizedPage ";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <AuthProvider>
+      <ToastContainer />
       <BrowserRouter>
         <ShowNavbar>
           <NavBar />

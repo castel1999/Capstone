@@ -26,10 +26,10 @@ const SettingPage = () => {
     <div>
       <div className="flex gap-10 p-5">
         <div>
-          <SideBar data={data} />
+          <SideBar data={data?.value} />
         </div>
         <div className="flex-1">
-          <Outlet context={data} />
+          <Outlet context={data?.value} />
         </div>
       </div>
     </div>
