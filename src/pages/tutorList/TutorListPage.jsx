@@ -3,7 +3,7 @@ import React from "react";
 const TutorListPage = () => {
   return (
     <div>
-      alo
+      TutorListPage
     </div>
   );
 };

@@ -20,6 +20,7 @@ import { AuthProvider } from "./hooks/AuthContext"; // Import the AuthProvider
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ResetPassPage from "./pages/settings/ResetPassPage";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
           <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
             <Route path="/settings" element={<SettingPage />}>
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="reset-pass" element={<ResetPassPage />} />
               <Route path="wallet" element={<WalletPage />} />
               <Route path="upgrade" element={<UpgradePage />} />
             </Route>
