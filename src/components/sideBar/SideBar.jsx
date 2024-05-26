@@ -40,6 +40,17 @@ const SideBar = ({ data }) => {
         </NavLink>
 
         <NavLink
+          to="reset-pass"
+          className={({ isActive }) =>
+            isActive
+              ? "border-l-2 border-theme font-semibold text-theme pl-2"
+              : "transition ease-in-out delay-150 cursor-pointer pl-2 hover:border-l-2 hover:font-semibold hover:border-theme hover:text-theme hover:-translate-y-0 hover:scale-110 duration-300"
+          }
+        >
+          Đổi mật khẩu
+        </NavLink>
+
+        <NavLink
           to="wallet"
           className={({ isActive }) =>
             isActive
