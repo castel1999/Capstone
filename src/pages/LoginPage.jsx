@@ -126,6 +126,7 @@ const LoginPage = () => {
             {errors.email && <ErrorPopup message={errors.email?.message} />}
           </div>
           {/* Password */}
+          
           <div className="mb-8 relative">
             <label
               htmlFor="password"
