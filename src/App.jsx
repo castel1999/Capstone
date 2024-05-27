@@ -29,11 +29,11 @@ function App() {
       <BrowserRouter>
         <ShowNavbar>
           <NavBar />
-          <Chat/>
+          <Chat />
         </ShowNavbar>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/tutor-detail/:id" element={<TutorDetail/>}/>
+          <Route path="/tutor-detail/:id" element={<TutorDetail />} />
           <Route path="/tutor-list" element={<TutorListPage />} />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/about" element={<AboutPage />} />

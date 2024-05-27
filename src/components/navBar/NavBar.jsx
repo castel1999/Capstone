@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import * as UserAPI from "../../api/UserAPI";
 import UserNavbar from "./userNavbar/UserNavbar";
 import Loading from "../../utils/Loading";
-import TutorNavbar from "./tutorNavbar/TutorNavbar";
 
 const NavBar = () => {
   const Logged = localStorage.getItem("userID") !== null;
@@ -82,15 +81,9 @@ const NavBar = () => {
         </div>
 
         {Logged ? (
-          currUser === "Student" ? (
-            <div>
-              <UserNavbar data={item} />
-            </div>
-          ) : currUser === "Tutor" ? (
-            <div>
-              <TutorNavbar data={item} />
-            </div>
-          ) : null
+          <div>
+            <UserNavbar data={item} />
+          </div>
         ) : (
           <Link
             className="transition ease-in-out delay-150 border-2 border-black rounded-lg text-black py-2 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300"

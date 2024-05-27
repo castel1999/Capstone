@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import ErrorPopup from "../../utils/ErrorPopup";
+import * as UserAPI from "../../api/UserAPI";
 import {
   getDownloadURL,
   getStorage,
@@ -13,9 +14,11 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ProfilePage = () => {
   const data = useOutletContext();
+  const queryClient = useQueryClient();
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
@@ -88,9 +91,28 @@ const ProfilePage = () => {
     setValue("imageUrl", avatarURL);
   }, [avatarURL, setValue]);
 
+  const mutation = useMutation({
+    mutationFn: UserAPI.updateUserProfile,
+    onSuccess: async () => {
+      toast.success("Cập nhật thành công!");
+      await queryClient.invalidateQueries("getCurrentUser");
+      console.log("success");
+    },
+    onError: (error) => {
+      toast.error("Cập nhật thất bại!");
+      console.log(error.message);
+    },
+  });
+
   const onSubmit = (formData) => {
-    const completeData = { ...formData, imageUrl: avatarURL };
-    console.log(completeData);
+    const { email, ...rest } = formData;
+    const completeData = {
+      id: localStorage.getItem("userID"),
+      imageUrl: avatarURL,
+      ...rest,
+    };
+    mutation.mutate(completeData);
+    // console.log(completeData);
   };
 
   return (
@@ -176,8 +198,9 @@ const ProfilePage = () => {
               Địa chỉ email
             </label>
             <input
+              readOnly
               id="email"
-              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
+              className="cursor-default border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
               {...register("email")}
             />
             {errors.email && <ErrorPopup message={errors.email?.message} />}
