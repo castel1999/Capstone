@@ -54,3 +54,21 @@ export const getCurrentUser = async () => {
   }
   return responseBody;
 };
+
+export const updateUserProfile = async (data) => {
+  const response = await fetch(`${BASE_API_LINK}/Account/update`, {
+    method: "PUT",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};

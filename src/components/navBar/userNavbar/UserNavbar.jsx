@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import ava from "../../../assets/DefaultAva.png";
 import notify from "../../../assets/notify.png";
@@ -9,11 +9,17 @@ import { CiWallet } from "react-icons/ci";
 const UserNavbar = ({ data }) => {
   const [img, setImg] = useState(data?.avatar);
   const [openProfile, setOpenProfile] = useState(false);
-  const menus = [
-    { id: 1, text: "Trang cá Nhân", route: "/settings/profile" },
-    { id: 2, text: "Giáo viên Yêu thích", route: "/favorite" },
-    { id: 3, text: "Đăng xuất", route: "/login" },
+  const role = localStorage.getItem("role");
+  const studentMenu = [
+    { path: "Trang cá Nhân", route: "/settings/profile" },
+    { path: "Giáo viên Yêu thích", route: "/favorite" },
   ];
+  const TutorMenu = [{ path: "Trang cá Nhân", route: "/settings/profile" }];
+
+  let menu = [];
+  if (role === "Student") menu = studentMenu;
+  else if (role === "Tutor") menu = TutorMenu;
+
   const noti = data?.noti?.map((item) => item);
 
   const [openNoti, setOpenNoti] = useState(false);
@@ -39,8 +45,10 @@ const UserNavbar = ({ data }) => {
     }
   });
 
-  const handleClick = () => {
-    console.log("clcik");
+  const logout = () => {
+    localStorage.clear();
+    location.reload();
+    Navigate('/login')
   };
 
   return (
@@ -62,18 +70,25 @@ const UserNavbar = ({ data }) => {
             className="absolute bg-white p-3 w-52 shadow-lg right-3 top-24"
           >
             <ul>
-              {menus &&
-                menus?.map((menu) => (
+              {menu &&
+                menu?.map((menu, index) => (
                   <Link
                     to={menu.route}
                     onClick={() => setOpenProfile(false)}
                     className="p-2 text-lg cursor-pointer rounded-md hover:bg-theme hover:text-white block"
-                    key={menu.id}
+                    key={index}
                   >
-                    {menu.text}
+                    {menu.path}
                   </Link>
                 ))}
             </ul>
+            <Link
+              onClick={logout}
+              to="/login"
+              className="p-2 text-lg cursor-pointer rounded-md hover:bg-theme hover:text-white block"
+            >
+              Đăng xuất
+            </Link>
           </div>
         )}
       </div>
