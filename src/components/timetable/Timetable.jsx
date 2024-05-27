@@ -61,8 +61,8 @@ const Timetable = () => {
             <div
               className={
                 current.diff(calendarDate, "days") >= 0
-                  ? "px-4 py-2 border-r-2 border-[#dcdce5] bg-[#dcdce5] cursor-not-allowed"
-                  : "px-4 py-2 border-r-2 border-[#dcdce5] hover:bg-[#ebebf1] cursor-pointer bg-white"
+                  ? "px-4 py-2 border-r-2 border-[#dcdce5] bg-[#dcdce5] cursor-not-allowed rounded-s-lg"
+                  : "px-4 py-2 border-r-2 border-[#dcdce5] hover:bg-[#ebebf1] cursor-pointer bg-white rounded-s-lg"
               }
               onClick={() => moveToPreviousWeek()}
             >
@@ -76,7 +76,7 @@ const Timetable = () => {
               </svg>
             </div>
             <div
-              className="px-4 py-2 hover:bg-[#ebebf1] bg-white cursor-pointer"
+              className="px-4 py-2 hover:bg-[#ebebf1] bg-white cursor-pointer rounded-e-lg"
               onClick={() => moveToNextWeek()}
             >
               <svg
