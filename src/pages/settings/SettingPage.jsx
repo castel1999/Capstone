@@ -7,7 +7,7 @@ import Loading from "../../utils/Loading";
 
 const SettingPage = () => {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["myData"],
+    queryKey: ["getCurrentUser"],
     queryFn: UserAPI.getCurrentUser,
   });
 
