@@ -1,22 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as TutorApi from "../api/TutorApi";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import Timetable from "../components/timetable/Timetable";
+import {
+  Link,
+  Button,
+  Element,
+  Events,
+  animateScroll as scroll,
+  scrollSpy,
+} from "react-scroll";
 
 const TutorDetail = () => {
   const id = useParams().id;
   const [isShowMore, setIsShowMore] = useState(false);
+  const [resumetab, setResumetab] = useState("education");
+  const [section, setSection] = useState("introduction");
 
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["tutorDetail"],
     queryFn: TutorApi.getTutorDetail,
   });
-  console.log(data);
+
+  useEffect(() => {
+    Events.scrollEvent.register("begin", (to, element) => {
+      console.log("Scrolling begins to", to);
+    });
+
+    Events.scrollEvent.register("end", (to, element) => {
+      console.log("Scrolling ends to", to);
+      setSection(to); // This confirms the section has been scrolled to and visible
+    });
+
+    scrollSpy.update();
+
+    return () => {
+      Events.scrollEvent.remove("begin");
+      Events.scrollEvent.remove("end");
+    };
+  }, []);
 
   return (
-    <div className="flex flex-row mx-auto max-w-[90%]">
-      <div className="flex flex-col justify-between w-[55%]">
+    <div className="flex flex-row justify-between mx-auto max-w-[90%]">
+      <div className="flex flex-col w-[55%] h-[315px">
         <div className="flex flex-row py-[48px] gap-6 ">
           <img
             className="w-[160px] h-[160px] rounded-lg"
@@ -89,20 +116,70 @@ const TutorDetail = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-row text-base font-semibold border-2 rounded-lg border-black w-fit bg-white sticky top-[88px]">
-          <div className="px-5 py-2 border-r-2 border-black cursor-pointer rounded-s-lg">
+        <div className="flex flex-row w-[100%] text-base font-semibold border-2 rounded-lg border-black bg-white sticky top-[88px] z-40">
+          <Link
+            to="introduction"
+            duration={500}
+            offset={-140}
+            smooth={true}
+            spy={true}
+            onSetActive={() => setSection("introduction")}
+            className={
+              section === "introduction"
+                ? "flex justify-center px-5 py-2 border-r-2 border-black cursor-pointer flex-1 bg-[#FECE00] rounded-s-md"
+                : "flex justify-center px-5 py-2 border-r-2 border-black cursor-pointer flex-1"
+            }
+          >
             Giới thiệu
-          </div>
-          <div className="px-5 py-2 border-r-2 border-black cursor-pointer">
+          </Link>
+          <Link
+            to="schedule"
+            duration={500}
+            offset={-135}
+            smooth={true}
+            spy={true}
+            onSetActive={() => setSection("schedule")}
+            className={
+              section === "schedule"
+                ? "flex justify-center px-5 py-2 border-r-2 border-black cursor-pointer flex-1 bg-[#FECE00]"
+                : "flex justify-center px-5 py-2 border-r-2 border-black cursor-pointer flex-1"
+            }
+          >
             Lịch trình
-          </div>
-          <div className="px-5 py-2 border-r-2 border-black cursor-pointer">
+          </Link>
+          <Link
+            to="resume"
+            duration={500}
+            offset={-140}
+            smooth={true}
+            spy={true}
+            onSetActive={() => setSection("resume")}
+            className={
+              section === "resume"
+                ? "flex justify-center px-5 py-2 border-r-2 border-black cursor-pointer flex-1 bg-[#FECE00]"
+                : "flex justify-center px-5 py-2 border-r-2 border-black cursor-pointer flex-1"
+            }
+          >
             Resume
-          </div>
-          <div className="px-5 py-2 cursor-pointe rounded-e-lg">Trình độ</div>
+          </Link>
+          <Link
+            to="specialities"
+            duration={500}
+            offset={-140}
+            smooth={true}
+            spy={true}
+            onSetActive={() => setSection("specialities")}
+            className={
+              section === "specialities"
+                ? "flex justify-center px-5 py-2 cursor-pointer flex-1 bg-[#FECE00] rounded-e-md"
+                : "flex justify-center px-5 py-2 cursor-pointer flex-1"
+            }
+          >
+            Kỹ năng
+          </Link>
         </div>
 
-        <div className="flex flex-col py-12">
+        <div id="introduction" className="flex flex-col py-12">
           <div className="text-2xl font-semibold">Giới thiệu</div>
           <div className="flex flex-col gap-3">
             <div
@@ -123,13 +200,179 @@ const TutorDetail = () => {
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div id="schedule" className="flex flex-col">
           <div className="text-2xl font-semibold mb-4">Lịch trình</div>
+          <Timetable />
+        </div>
 
-          <Timetable/>
+        <div id="resume" className="flex flex-col py-12">
+          <div className="text-2xl font-semibold mb-4">Hồ sơ</div>
+          <div className="flex flex-col">
+            <div className="flex flex-row gap-2 border-b border-[#dcdce5]">
+              <div
+                className="flex flex-col"
+                onClick={() => setResumetab("education")}
+              >
+                <div className="flex justify-center items-center px-4 py-2 font-medium hover:bg-[#ebebf1] rounded-md cursor-pointer">
+                  Học vấn
+                </div>
+                <div
+                  className={
+                    resumetab === "education" ? "bg-theme w-full h-1" : ""
+                  }
+                />
+              </div>
+              <div
+                className="flex flex-col"
+                onClick={() => setResumetab("work")}
+              >
+                <div className="flex justify-center items-center px-4 py-2 font-medium hover:bg-[#ebebf1] rounded-md cursor-pointer">
+                  Kinh nghiệm làm việc
+                </div>
+                <div
+                  className={resumetab === "work" ? "bg-theme w-full h-1" : ""}
+                />
+              </div>
+              <div
+                className="flex flex-col"
+                onClick={() => setResumetab("certificate")}
+              >
+                <div className="flex justify-center items-center px-4 py-2 font-medium hover:bg-[#ebebf1] rounded-md cursor-pointer">
+                  Chứng chỉ
+                </div>
+                <div
+                  className={
+                    resumetab === "certificate" ? "bg-theme w-full h-1" : ""
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex flex-row pt-4 gap-6">
+                <div className="text-[#4d4c5c] font-normal">2015 — 2018</div>
+                <div className="flex flex-col gap-1">
+                  <div className="text-[#121117] font-normal">
+                    Drahomanov National Pedagogical University
+                  </div>
+                  <div className="text-[#4d4c5c] font-normal">
+                    Master’s degree
+                  </div>
+                  <div className="flex flex-row items-center text-[#067560] font-semibold gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                      className="h-4 w-4 fill-[#067560]"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M13.97 2.715a3 3 0 0 0-3.94 0l-1.142.995a3 3 0 0 1-1.43.688l-1.489.273a3 3 0 0 0-2.456 3.08l.065 1.513a3 3 0 0 1-.353 1.547l-.715 1.334a3 3 0 0 0 .877 3.842l1.223.892a3 3 0 0 1 .99 1.24l.597 1.391a3 3 0 0 0 3.55 1.71l1.46-.4a3 3 0 0 1 1.586 0l1.46.4a3 3 0 0 0 3.55-1.71l.598-1.39a3 3 0 0 1 .989-1.241l1.223-.892a3 3 0 0 0 .877-3.842l-.715-1.334a3 3 0 0 1-.353-1.547l.065-1.513a3 3 0 0 0-2.456-3.08l-1.49-.273a3 3 0 0 1-1.43-.688l-1.14-.995Zm1.878 6.815a1 1 0 0 0-1.696-1.06l-2.977 4.763L9.8 11.4a1 1 0 1 0-1.6 1.2l2.25 3a1 1 0 0 0 1.648-.07z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    Diploma verified
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row pt-4 gap-6">
+                <div className="text-[#4d4c5c] font-normal">2015 — 2018</div>
+                <div className="flex flex-col">
+                  <div className="text-[#121117] font-normal">
+                    Drahomanov National Pedagogical University
+                  </div>
+                  <div className="text-[#4d4c5c] font-normal">
+                    Master’s degree
+                  </div>
+                  <div className="flex flex-row items-center text-[#067560] font-semibold gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                      className="h-4 w-4 fill-[#067560]"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M13.97 2.715a3 3 0 0 0-3.94 0l-1.142.995a3 3 0 0 1-1.43.688l-1.489.273a3 3 0 0 0-2.456 3.08l.065 1.513a3 3 0 0 1-.353 1.547l-.715 1.334a3 3 0 0 0 .877 3.842l1.223.892a3 3 0 0 1 .99 1.24l.597 1.391a3 3 0 0 0 3.55 1.71l1.46-.4a3 3 0 0 1 1.586 0l1.46.4a3 3 0 0 0 3.55-1.71l.598-1.39a3 3 0 0 1 .989-1.241l1.223-.892a3 3 0 0 0 .877-3.842l-.715-1.334a3 3 0 0 1-.353-1.547l.065-1.513a3 3 0 0 0-2.456-3.08l-1.49-.273a3 3 0 0 1-1.43-.688l-1.14-.995Zm1.878 6.815a1 1 0 0 0-1.696-1.06l-2.977 4.763L9.8 11.4a1 1 0 1 0-1.6 1.2l2.25 3a1 1 0 0 0 1.648-.07z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    Diploma verified
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="specialities" className="flex flex-col ">
+          <div className="text-2xl font-semibold mb-4">Kỹ năng</div>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold text-[#121117]">
+                Conversational English
+              </div>
+              <div className="font-normal text-[#121117]">
+                If you speak English like a 'textbook' and feel dejected because
+                you lack fluency and eloquence, I am the guy to help you out. I
+                will set you on a path to eloquence far beyond your wildest
+                dreams. You will learn to speak and enunciate like a
+                well-educated American! And yes, eloquence is a skill that can
+                be coached, trained, and mastered. My method is entirely
+                different from that of conventional teachers of English. I will
+                make you learn spoken English the same way you would if you
+                resided in an English-speaking environment. The lessons are 100%
+                conversational. You will acquire the language most naturally,
+                effortlessly, and confidently. As a perk, you will be paired
+                with an English speaker to practice on a daily basis. Get ready
+                to be blown away.
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold text-[#121117]">
+                Business English
+              </div>
+              <div className="font-normal text-[#121117]">
+                <p>
+                  My lesson plans are exclusively tailored to suit your needs
+                  and objectives, but will regularly include:
+                </p>
+                <p>- tips for your first job interview;</p>
+                <p>- meetings and communication strategies;</p>
+                <p>- tips for making successful presentations;</p>
+                <p>- business language fluency;</p>
+                <p>- diplomatic and direct language;</p>
+                <p>- understanding cultural differences;</p>
+                <p>- negotiation strategy;</p>
+                <p>- tips for conducting telephone and conference calls;</p>
+                <p>- dealing with problem people;</p>
+                <p>- working in multicultural teams;</p>
+                <p>- writing business communications.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div> </div>
+      <div className="sticky top-[88px] flex mt-[48px] flex-col w-[40%] h-fit p-6 border-2 border-black rounded-lg gap-6">
+        <div className="relative w-full overflow-hidden pt-[56.25%] rounded-md">
+          <iframe
+            className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
+            src="https://www.youtube.com/embed/phuiiNCxRMg?si=Sf0dc7lVBDz-SCjb"
+            title="YouTube video player"
+            frameborder="0"
+            allow=""
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div className="flex justify-center font-medium px-5 py-3 bg-[#F0631C] text-white shadow-buyButton rounded-lg border-2 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none duration-500">
+          Thuê ngay
+        </div>
+        <div className="flex justify-center font-medium px-5 py-3 bg-[#ffffff] text-black shadow-button rounded-lg border-2 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none duration-500">
+          Nhắn tin
+        </div>
+      </div>
     </div>
   );
 };

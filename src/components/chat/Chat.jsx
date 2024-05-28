@@ -13,7 +13,7 @@ const Chat = () => {
   return (
     <>
       {logged ? (
-        <div className="fixed right-4 bottom-4">
+        <div className="fixed right-4 bottom-4 z-[50]">
           {!showChat ? (
             <div
               className="h-fit w-fit rounded-lg cursor-pointer border-solid border-2 border-black shadow-button hover:translate-x-1 hover:translate-y-1 hover:shadow-none ease-out duration-500"
