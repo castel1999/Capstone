@@ -7,7 +7,9 @@ import { CiHeart } from "react-icons/ci";
 import { CiWallet } from "react-icons/ci";
 
 const UserNavbar = ({ data }) => {
-  const [img, setImg] = useState(data?.avatar);
+  const [img, setImg] = useState(data?.imageUrl);
+
+  console.log("img", data?.imageUrl);
   const [openProfile, setOpenProfile] = useState(false);
   const role = localStorage.getItem("role");
   const studentMenu = [
@@ -48,7 +50,7 @@ const UserNavbar = ({ data }) => {
   const logout = () => {
     localStorage.clear();
     location.reload();
-    Navigate('/login')
+    Navigate("/login");
   };
 
   return (
@@ -59,7 +61,7 @@ const UserNavbar = ({ data }) => {
           <img
             ref={profileImgRef}
             onClick={() => setOpenProfile(!openProfile)}
-            src={img ? img : ava}
+            src={data?.imageUrl}
             alt="Avatar"
             className="object-cover size-8 rounded-md cursor-pointer"
           />

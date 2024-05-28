@@ -12,7 +12,7 @@ const NavBar = () => {
   const [item, setItem] = useState(null);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["myData"],
+    queryKey: ["getCurrentUser"],
     queryFn: UserAPI.getCurrentUser,
     enabled: Logged, // Enable the query only if the user is logged in
   });
@@ -82,7 +82,7 @@ const NavBar = () => {
 
         {Logged ? (
           <div>
-            <UserNavbar data={item} />
+            <UserNavbar data={item?.value} />
           </div>
         ) : (
           <Link
