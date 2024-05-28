@@ -31,7 +31,7 @@ const Timetable = () => {
   };
 
   return (
-    <div className="w-full flex flex-col pb-14">
+    <div className="w-full flex flex-col">
       <div className="w-full bg-[#F4F4F8] flex flex-row justify-between rounded-lg">
         <div
           className={
@@ -61,8 +61,8 @@ const Timetable = () => {
             <div
               className={
                 current.diff(calendarDate, "days") >= 0
-                  ? "px-4 py-2 border-r-2 border-[#dcdce5] bg-[#dcdce5] cursor-not-allowed rounded-s-lg"
-                  : "px-4 py-2 border-r-2 border-[#dcdce5] hover:bg-[#ebebf1] cursor-pointer bg-white rounded-s-lg"
+                  ? "px-4 py-2 border-r-2 border-[#dcdce5] bg-[#dcdce5] cursor-not-allowed rounded-s-md"
+                  : "px-4 py-2 border-r-2 border-[#dcdce5] hover:bg-[#ebebf1] cursor-pointer bg-white rounded-s-md"
               }
               onClick={() => moveToPreviousWeek()}
             >
@@ -76,7 +76,7 @@ const Timetable = () => {
               </svg>
             </div>
             <div
-              className="px-4 py-2 hover:bg-[#ebebf1] bg-white cursor-pointer rounded-e-lg"
+              className="px-4 py-2 hover:bg-[#ebebf1] bg-white cursor-pointer rounded-e-md"
               onClick={() => moveToNextWeek()}
             >
               <svg
@@ -99,7 +99,7 @@ const Timetable = () => {
 
       <div className="flex flex-row pt-4 gap-2">
         {dayOfWeek?.map((day) => (
-          <div className="flex flex-col flex-1 border-t-4 border-[#ff7aac] py-4">
+          <div className="flex flex-col flex-1 border-t-4 border-theme py-4">
             <div className="flex justify-center text-gray-500">
               {day?.format("ddd")}
             </div>
