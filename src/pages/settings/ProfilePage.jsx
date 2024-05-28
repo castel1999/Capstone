@@ -1,11 +1,8 @@
 import { useRef, useState, useEffect } from "react";
-import logo from "../../assets/logo.png";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useOutletContext } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import ErrorPopup from "../../utils/ErrorPopup";
 import * as UserAPI from "../../api/UserAPI";
 import {
   getDownloadURL,
@@ -15,6 +12,7 @@ import {
 } from "firebase/storage";
 import { app } from "../../firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const data = useOutletContext();
@@ -96,11 +94,11 @@ const ProfilePage = () => {
     onSuccess: async () => {
       toast.success("Cập nhật thành công!");
       await queryClient.invalidateQueries("getCurrentUser");
-      console.log("success");
+      await queryClient.refetchQueries("myData");
     },
     onError: (error) => {
       toast.error("Cập nhật thất bại!");
-      console.log(error.message);
+      console.error(error.message);
     },
   });
 
@@ -112,7 +110,6 @@ const ProfilePage = () => {
       ...rest,
     };
     mutation.mutate(completeData);
-    // console.log(completeData);
   };
 
   return (

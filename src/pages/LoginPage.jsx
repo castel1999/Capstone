@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import loginBG from "../assets/loginBG.png";
 import { Link } from "react-router-dom";
-import { IoEyeOutline } from "react-icons/io5";
-import { IoEyeOffOutline } from "react-icons/io5";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
@@ -126,7 +125,7 @@ const LoginPage = () => {
             {errors.email && <ErrorPopup message={errors.email?.message} />}
           </div>
           {/* Password */}
-          
+
           <div className="mb-8 relative">
             <label
               htmlFor="password"

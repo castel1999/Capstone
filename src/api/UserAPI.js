@@ -1,8 +1,8 @@
 const BASE_API_LINK = import.meta.env.VITE_API_LINK;
 
-export const signIn = async () => {
+export const getTutor = async () => {
   const response = await fetch(
-    "https://6639d7581ae792804becf778.mockapi.io/User/1"
+    "https://6639d7581ae792804becf778.mockapi.io/Tutor"
   );
   return response.json();
 };
@@ -43,9 +43,12 @@ export const register = async (data) => {
 };
 
 export const getCurrentUser = async () => {
-  const response = await fetch(
-    `${BASE_API_LINK}/Account/get/${localStorage.getItem("userID")}`
-  );
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${BASE_API_LINK}/Account/get/${localStorage.getItem("userID")}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
 
   const responseBody = await response.json();
 
@@ -54,6 +57,7 @@ export const getCurrentUser = async () => {
   }
   return responseBody;
 };
+
 
 export const updateUserProfile = async (data) => {
   const response = await fetch(`${BASE_API_LINK}/Account/update`, {

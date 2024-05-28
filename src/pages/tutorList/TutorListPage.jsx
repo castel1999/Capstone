@@ -1,9 +1,16 @@
 import React from "react";
+import TutorListFilter from "./TutorListFilter";
+import TutorListContent from "./TutorListContent";
 
 const TutorListPage = () => {
   return (
     <div>
-      TutorListPage
+      <div>
+        <TutorListFilter />
+      </div>
+      <div className="flex flex-col gap-3">
+        <TutorListContent />
+      </div>
     </div>
   );
 };
