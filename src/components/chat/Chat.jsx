@@ -16,7 +16,7 @@ const Chat = () => {
         <div className="fixed right-4 bottom-4 z-[50]">
           {!showChat ? (
             <div
-              className="h-fit w-fit rounded-lg cursor-pointer border-solid border-2 border-black shadow-button hover:translate-x-1 hover:translate-y-1 hover:shadow-none ease-out duration-500"
+              className="h-fit w-fit rounded-lg bg-white cursor-pointer border-solid border-2 border-black shadow-button hover:translate-x-1 hover:translate-y-1 hover:shadow-none ease-out duration-500"
               onClick={() => setShowChat(true)}
             >
               <div className="h-full w-full px-[16px] py-[12px] relative">
