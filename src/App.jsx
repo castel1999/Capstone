@@ -21,6 +21,8 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ResetPassPage from "./pages/settings/ResetPassPage";
+import BecomeTutor from "./pages/BecomeTutor";
+import TutorRegistration from "./pages/tutorRegistration/TutorRegistration";
 
 function App() {
   return (
@@ -37,6 +39,7 @@ function App() {
           <Route path="/tutor-list" element={<TutorListPage />} />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/become-tutor" element={<BecomeTutor />} />
 
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<LoginPage />} />
@@ -51,6 +54,10 @@ function App() {
               <Route path="wallet" element={<WalletPage />} />
               <Route path="upgrade" element={<UpgradePage />} />
             </Route>
+          </Route>
+
+          <Route element={<PrivateRoute allowedRoles={["Student"]} />}>
+            <Route path="/tutor-registation" element={<TutorRegistration />} />
           </Route>
 
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
