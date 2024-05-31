@@ -4,11 +4,11 @@ import TutorListContent from "./TutorListContent";
 
 const TutorListPage = () => {
   return (
-    <div>
+    <div className="flex flex-row px-10 py-5">
       <div>
         <TutorListFilter />
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex-1">
         <TutorListContent />
       </div>
     </div>
