@@ -9,7 +9,6 @@ import Loading from "../../utils/Loading";
 const NavBar = () => {
   const Logged = localStorage.getItem("userID") !== null;
   const currUser = localStorage.getItem("role");
-  const [item, setItem] = useState(null);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["getCurrentUser"],
@@ -17,11 +16,6 @@ const NavBar = () => {
     enabled: Logged, // Enable the query only if the user is logged in
   });
 
-  useEffect(() => {
-    if (data) {
-      setItem(data);
-    }
-  }, [data]);
 
   if (isLoading) {
     return (
@@ -82,7 +76,7 @@ const NavBar = () => {
 
         {Logged ? (
           <div>
-            <UserNavbar data={item?.value} />
+            <UserNavbar data={data?.value} />
           </div>
         ) : (
           <Link

@@ -21,6 +21,9 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ResetPassPage from "./pages/settings/ResetPassPage";
+import MylessonPage from "./pages/myLesson/MylessonPage";
+import FavoritePage from "./pages/FavoritePage";
+        
 
 function App() {
   return (
@@ -51,6 +54,8 @@ function App() {
               <Route path="wallet" element={<WalletPage />} />
               <Route path="upgrade" element={<UpgradePage />} />
             </Route>
+            <Route path="/my-lessons" element={<MylessonPage />} />
+            <Route path="/favorite" element={<FavoritePage />} />
           </Route>
 
           <Route path="/unauthorized" element={<UnauthorizedPage />} />

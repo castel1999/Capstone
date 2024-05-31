@@ -17,7 +17,7 @@ const ShowNavbar = ({ children }) => {
   }, [location]);
 
   return (
-    <div className="sticky top-0 left-0 right-0">{showNavbar && children}</div>
+    <div className="sticky top-0 left-0 right-0 z-50">{showNavbar && children}</div>
   );
 };
 
