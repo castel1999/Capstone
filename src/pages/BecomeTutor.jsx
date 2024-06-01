@@ -66,13 +66,15 @@ const BecomeTutor = () => {
       </div>
 
       <div className="flex flex-row w-full bg-[#F0631C] rounded-lg border-2 border-black">
-        <div className="flex flex-col gap-3 w-1/2 px-16 py-24">
-          <div className="text-[54px] font-bold tracking-tighter leading-[68px]">
-            Kiếm tiền từ việc dạy online
-          </div>
-          <div className="text-[18px] ">
-            Kết nối với hàng nghìn học sinh trên khắp cả nước và dạy từ phòng
-            làm việc của bạn
+        <div className="flex flex-col justify-around gap-3 w-1/2 px-16 py-24">
+          <div>
+            <div className="text-[54px] font-bold tracking-tighter leading-[68px]">
+              Kiếm tiền từ việc dạy online
+            </div>
+            <div className="text-[18px] ">
+              Kết nối với hàng nghìn học sinh trên khắp cả nước và dạy từ phòng
+              làm việc của bạn
+            </div>
           </div>
           <NavLink
             to={currUser === null ? "/login" : "/tutor-registration"}
