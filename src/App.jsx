@@ -45,6 +45,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/reset" element={<ResetPasswordPage />} />
+            
           </Route>
 
           <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
@@ -57,7 +58,7 @@ function App() {
           </Route>
 
           <Route element={<PrivateRoute allowedRoles={["Student"]} />}>
-            <Route path="/tutor-registation" element={<TutorRegistration />} />
+            <Route path="/tutor-registration" element={<TutorRegistration />} />
           </Route>
 
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
