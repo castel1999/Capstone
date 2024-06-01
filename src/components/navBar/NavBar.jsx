@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import ODTlogo from "../../assets/logo.png";
 import { useQuery } from "@tanstack/react-query";
 import * as UserAPI from "../../api/UserAPI";
@@ -10,12 +10,13 @@ const NavBar = () => {
   const Logged = localStorage.getItem("userID") !== null;
   const currUser = localStorage.getItem("role");
 
+  const navigate = useNavigate();
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["getCurrentUser"],
     queryFn: UserAPI.getCurrentUser,
     enabled: Logged, // Enable the query only if the user is logged in
   });
-
 
   if (isLoading) {
     return (
@@ -26,7 +27,10 @@ const NavBar = () => {
   }
 
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    useEffect(() => {
+      localStorage.clear();
+      navigate("/login");
+    });
   }
 
   return (

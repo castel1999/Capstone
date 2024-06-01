@@ -1,8 +1,12 @@
 import React from "react";
 import * as UserAPI from "../../api/UserAPI";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const TutorListContent = () => {
+
+  const navigate = useNavigate();
+
   const {
     data = [],
     isLoading,
@@ -22,6 +26,10 @@ const TutorListContent = () => {
 
   if (isError) {
     return <div>Error: {error.message}</div>;
+  }
+
+  const handleRent = ()=>{
+    navigate('/tutor-detail/3')
   }
 
   return (
@@ -116,7 +124,8 @@ const TutorListContent = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-3 text-center mt-10">
-                  <div className="border-2 border-black rounded-lg p-3 text-white bg-theme cursor-pointer hover:opacity-90">
+                  <div onClick={handleRent} 
+                  className="border-2 border-black rounded-lg p-3 text-white bg-theme cursor-pointer hover:opacity-90">
                     Thuê
                   </div>
                   <div className="border-2 border-gray-400 rounded-lg p-3 hover:bg-gray-100 cursor-pointer">

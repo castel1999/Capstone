@@ -1,19 +1,18 @@
 import React, { useState } from "react";
-import logo from "../assets/logo.png";
-import loginBG from "../assets/loginBG.png";
-import { Link } from "react-router-dom";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
-import { IoMdArrowRoundBack } from "react-icons/io";
-import { FcGoogle } from "react-icons/fc";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import ErrorPopup from "../utils/ErrorPopup";
-import * as apiClient from "../api/UserAPI";
-import { useNavigate } from "react-router-dom";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { FcGoogle } from "react-icons/fc";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../hooks/AuthContext";
 import { toast } from "react-toastify";
+import * as apiClient from "../api/UserAPI";
+import { useAuth } from "../hooks/AuthContext";
+import ErrorPopup from "../utils/ErrorPopup";
+import logo from "../assets/logo.png";
+import loginBG from "../assets/loginBG.png";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +33,7 @@ const LoginPage = () => {
         "Phải có 1 ký tự viết hoa và 1 ký tự đặc biệt"
       ),
   });
+
   const formOptions = { resolver: yupResolver(validationSchema) };
 
   const {
@@ -65,7 +65,13 @@ const LoginPage = () => {
       navigate("/tutor-list");
     },
     onError: (error) => {
-      toast.error("Đăng nhập thất bại!");
+      if (error.status === 400) {
+        toast.error("Sai tên đăng nhập hoặc mật khẩu!");
+      } else if (error.status === 404) {
+        toast.error("Tài khoản không tồn tại!");
+      } else if (error.status === 500) {
+        toast.error("Lỗi máy chủ nội bộ!");
+      }
       console.log(error.message);
     },
   });
@@ -92,6 +98,7 @@ const LoginPage = () => {
           <button
             type="button"
             className="p-2 rounded-full text-white shadow-[0_4px_9px_-4px_#3b71ca]"
+            onClick={handleOnClick}
           >
             <FcGoogle />
           </button>
@@ -114,7 +121,6 @@ const LoginPage = () => {
           {errors.email && <ErrorPopup message={errors.email?.message} />}
         </div>
         {/* Password */}
-
         <div className="mb-8 relative">
           <label
             htmlFor="password"
@@ -154,13 +160,12 @@ const LoginPage = () => {
             Quên mật khẩu?
           </a>
         </div>
-
         {/* Submit btn */}
-        {mutation.isPending ? (
+        {mutation.isLoading ? (
           <div className="text-center md:text-left">
             <button
               className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider cursor-wait"
-              type="submit"
+              type="button"
               disabled
             >
               Loading...
@@ -170,14 +175,13 @@ const LoginPage = () => {
           <div className="text-center md:text-left">
             <button
               className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
-              type="submit"
-              onClick={handleSubmit(onSubmit)}
+              type="button"
+              onClick={onSubmit}
             >
               Đăng nhập
             </button>
           </div>
         )}
-
         <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
           Chưa có tài khoản?{" "}
           <Link
