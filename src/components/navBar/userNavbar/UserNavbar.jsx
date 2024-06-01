@@ -7,13 +7,11 @@ import { CiHeart } from "react-icons/ci";
 import { CiWallet } from "react-icons/ci";
 
 const UserNavbar = ({ data }) => {
-  const [img, setImg] = useState(data?.imageUrl);
-
-  console.log("img", data?.imageUrl);
   const [openProfile, setOpenProfile] = useState(false);
   const role = localStorage.getItem("role");
   const studentMenu = [
     { path: "Trang cá Nhân", route: "/settings/profile" },
+    { path: "Bài học của tôi", route: "/my-lessons" },
     { path: "Giáo viên Yêu thích", route: "/favorite" },
   ];
   const TutorMenu = [{ path: "Trang cá Nhân", route: "/settings/profile" }];
