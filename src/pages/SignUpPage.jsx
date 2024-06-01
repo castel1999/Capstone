@@ -89,187 +89,183 @@ const SignUpPage = () => {
   });
 
   return (
-    <div className="flex justify-center items-center py-5 bg-theme">
-      <div className="flex gap-5 bg-white rounded-lg p-3">
-        <form className=" w-[440px] pl-5">
-          <div className="w-fit">
-            <Link to="/">
-              <IoMdArrowRoundBack className="size-8 text-blue" />
-            </Link>
-          </div>
-          <img src={logo} alt="" className="mx-auto mb-4 w-20" />
-          <div className="text-center text-2xl font-bold mb-4 text-gray-800">
-            Tạo tài khoản miễn phí
-          </div>
-          <div className="text-center mb-4">
-            Bạn đã có tài khoản?{" "}
-            <Link
-              to="/login"
-              className="underline hover:text-theme font-semibold"
-            >
-              Đăng nhập
-            </Link>
-          </div>
-          {/* Login with Google */}
+    <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
+      <div className="md:w-1/3 max-w-sm flex flex-col justify-center gap-5">
+        <div className="mx-auto text-3xl font-bold">Đăng ký tài khoản</div>
+        <img
+          src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+          alt="Sample image"
+        />
+      </div>
+      <div className="md:w-1/3 max-w-sm">
+        <div className="text-center md:text-left">
+          <label className="mr-1 font-bold">Đăng nhập với</label>
           <button
-            onClick={handleOnClick}
-            className="flex justify-center items-center gap-2 border-2 border-black rounded-lg text-black py-2 px-4 mb-4 w-full hover:bg-theme hover:text-white"
+            type="button"
+            className="p-2 rounded-full text-white shadow-[0_4px_9px_-4px_#3b71ca]"
           >
-            <FcGoogle className="size-6" />
-            Tiếp tục với Google
+            <FcGoogle />
           </button>
-          <div className="flex justify-center items-center">
-            <hr className="w-2/4 my-2 border-[1px] border-black" />
-            <div className="mx-2 text-black">Hoặc</div>
-            <hr className="w-2/4 my-2 border-[1px] border-black" />
-          </div>
-          {/* fullName */}
-          <div className="mb-2 relative">
-            <label
-              htmlFor="fullName"
-              className="text-black text-sm font-bold mb-2"
-            >
-              Tên của bạn
-            </label>
-            <input
-              id="fullName"
-              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("fullName")}
-            />
-            {errors.fullName && (
-              <ErrorPopup message={errors.fullName?.message} />
-            )}
-          </div>
-          {/* Email */}
-          <div className="mb-2 relative">
-            <label
-              htmlFor="email"
-              className="text-black text-sm font-bold mb-2"
-            >
-              Địa chỉ email
-            </label>
-            <input
-              id="email"
-              type="email"
-              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("email")}
-            />
-            {errors.email && <ErrorPopup message={errors.email?.message} />}
-          </div>
+        </div>
+        <div className="my-5 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">
+          <p className="mx-4 mb-0 text-center font-semibold text-slate-500">
+            Hoặc
+          </p>
+        </div>
+        {/* fullName */}
+        <div className="mb-2 relative">
+          <label
+            htmlFor="fullName"
+            className="text-black text-sm font-bold mb-2"
+          >
+            Tên của bạn
+          </label>
+          <input
+            id="fullName"
+            className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600"
+            {...register("fullName")}
+          />
+          {errors.fullName && <ErrorPopup message={errors.fullName?.message} />}
+        </div>
+        {/* Email */}
+        <div className="mb-2 relative">
+          <label htmlFor="email" className="text-black text-sm font-bold mb-2">
+            Địa chỉ email
+          </label>
+          <input
+            id="email"
+            type="email"
+            className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600"
+            {...register("email")}
+          />
+          {errors.email && <ErrorPopup message={errors.email?.message} />}
+        </div>
 
-          {/* DOB */}
-          <div className="mb-2 relative">
-            <label htmlFor="dob" className="text-black text-sm font-bold mb-2">
-              Ngày sinh
-            </label>
-            <input
-              id="dob"
-              type="date"
-              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("dateOfBirth")}
-            />
-            {errors.dateOfBirth && (
-              <ErrorPopup message={errors.dateOfBirth?.message} />
-            )}
-          </div>
+        {/* DOB */}
+        <div className="mb-2 relative">
+          <label htmlFor="dob" className="text-black text-sm font-bold mb-2">
+            Ngày sinh
+          </label>
+          <input
+            id="dob"
+            type="date"
+            className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600"
+            {...register("dateOfBirth")}
+          />
+          {errors.dateOfBirth && (
+            <ErrorPopup message={errors.dateOfBirth?.message} />
+          )}
+        </div>
 
-          {/* Phone */}
-          <div className="mb-2 relative">
-            <label
-              htmlFor="phone"
-              className="text-black text-sm font-bold mb-2"
-            >
-              Số điện thoại
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("phoneNumber")}
-            />
-            {errors.phoneNumber && (
-              <ErrorPopup message={errors.phoneNumber?.message} />
-            )}
-          </div>
+        {/* Phone */}
+        <div className="mb-2 relative">
+          <label htmlFor="phone" className="text-black text-sm font-bold mb-2">
+            Số điện thoại
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600"
+            {...register("phoneNumber")}
+          />
+          {errors.phoneNumber && (
+            <ErrorPopup message={errors.phoneNumber?.message} />
+          )}
+        </div>
 
-          {/* Password */}
-          <div className="mb-2 relative">
-            <label
-              htmlFor="password"
-              className="text-black text-sm font-bold mb-2"
+        {/* Password */}
+        <div className="mb-2 relative">
+          <label
+            htmlFor="password"
+            className="text-black text-sm font-bold mb-2"
+          >
+            Mật khẩu
+          </label>
+          <div className="relative ">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600"
+              {...register("password")}
+            />
+            <div
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
             >
-              Mật khẩu
-            </label>
-            <div className="relative ">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-                {...register("password")}
-              />
-              <div
-                onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
-              >
-                {showPassword ? (
-                  <IoEyeOutline className="size-6" />
-                ) : (
-                  <IoEyeOffOutline className="size-6" />
-                )}
-              </div>
+              {showPassword ? (
+                <IoEyeOutline className="size-6" />
+              ) : (
+                <IoEyeOffOutline className="size-6" />
+              )}
             </div>
-            {errors.password && (
-              <ErrorPopup message={errors.password?.message} />
-            )}
           </div>
-          {/* Confirm Password */}
-          <div className="mb-8 relative">
-            <label
-              htmlFor="confirmPassword"
-              className="text-black text-sm font-bold mb-2"
+          {errors.password && <ErrorPopup message={errors.password?.message} />}
+        </div>
+        {/* Confirm Password */}
+        <div className="mb-8 relative">
+          <label
+            htmlFor="confirmPassword"
+            className="text-black text-sm font-bold mb-2"
+          >
+            Nhập lại mật khẩu
+          </label>
+          <div className="relative ">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600"
+              {...register("confirmPassword")}
+            />
+            <div
+              onClick={toggleConfirmPasswordVisibility}
+              className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
             >
-              Nhập lại mật khẩu
-            </label>
-            <div className="relative ">
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                className="border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-                {...register("confirmPassword")}
-              />
-              <div
-                onClick={toggleConfirmPasswordVisibility}
-                className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
-              >
-                {showConfirmPassword ? (
-                  <IoEyeOutline className="size-6" />
-                ) : (
-                  <IoEyeOffOutline className="size-6" />
-                )}
-              </div>
+              {showConfirmPassword ? (
+                <IoEyeOutline className="size-6" />
+              ) : (
+                <IoEyeOffOutline className="size-6" />
+              )}
             </div>
-            {errors.confirmPassword && (
-              <ErrorPopup message={errors.confirmPassword?.message} />
-            )}
           </div>
-          <div className="flex justify-center">
+          {errors.confirmPassword && (
+            <ErrorPopup message={errors.confirmPassword?.message} />
+          )}
+        </div>
+
+        {/* Submit btn */}
+        {mutation.isPending ? (
+          <div className="text-center md:text-left">
             <button
-              onClick={handleSubmit(onSubmit)}
-              className="transition ease-in-out delay-150 border-2 border-black rounded-lg text-black py-2 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300"
+              className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider cursor-wait"
+              type="submit"
+              disabled
             >
-              Tạo tài khoản
+              Loading...
             </button>
           </div>
-        </form>
-        <div>
-          <img
-            src={loginBG}
-            alt=""
-            className="object-cover w-fit h-full rounded-3xl "
-          />
+        ) : (
+          <div className="text-center md:text-left">
+            <button
+              className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
+              type="submit"
+              onClick={handleSubmit(onSubmit)}
+            >
+              Đăng ký
+            </button>
+          </div>
+        )}
+
+        <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
+          Đã có tài khoản?{" "}
+          <Link
+            className="text-red-600 hover:underline hover:underline-offset-4"
+            to="/login"
+          >
+            Đăng nhập
+          </Link>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
