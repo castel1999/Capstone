@@ -10,7 +10,6 @@ export const getTutor = async () => {
 export const login = async (data) => {
   const response = await fetch(`${BASE_API_LINK}/Auth/login-v2`, {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
     },
@@ -20,10 +19,14 @@ export const login = async (data) => {
   const responseBody = await response.json();
 
   if (!response.ok) {
-    throw new Error(responseBody.message);
+    const error = new Error(responseBody.message);
+    error.status = response.status; // Add status code to error object
+    throw error;
   }
+
   return responseBody;
 };
+
 
 export const register = async (data) => {
   const response = await fetch(`${BASE_API_LINK}/Account/register`, {
