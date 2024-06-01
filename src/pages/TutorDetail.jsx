@@ -5,8 +5,6 @@ import { useParams } from "react-router-dom";
 import Timetable from "../components/timetable/Timetable";
 import {
   Link,
-  Button,
-  Element,
   Events,
   animateScroll as scroll,
   scrollSpy,
