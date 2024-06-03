@@ -79,3 +79,24 @@ export const updateUserProfile = async (data) => {
   }
   return responseBody;
 };
+
+
+export const payment = async (data) => {
+  const response = await fetch(`${BASE_API_LINK}/Transaction/wallet`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(responseBody.message);
+    error.status = response.status; // Add status code to error object
+    throw error;
+  }
+
+  return responseBody;
+};
