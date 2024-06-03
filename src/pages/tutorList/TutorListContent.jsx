@@ -13,7 +13,7 @@ const TutorListContent = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["myData"],
+    queryKey: ["tutorListData"],
     queryFn: UserAPI.getTutor,
     staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     cacheTime: 10 * 60 * 1000, // Cache data for 10 minutes

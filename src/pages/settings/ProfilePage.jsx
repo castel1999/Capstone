@@ -94,7 +94,6 @@ const ProfilePage = () => {
     onSuccess: async () => {
       toast.success("Cập nhật thành công!");
       await queryClient.invalidateQueries("getCurrentUser");
-      await queryClient.refetchQueries("myData");
     },
     onError: (error) => {
       toast.error("Cập nhật thất bại!");
