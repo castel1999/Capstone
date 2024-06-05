@@ -137,14 +137,14 @@ const TutorRegistration = () => {
         </div>
       </div>
 
-      <div className="w-[45%]">
-        {stage === 1 ? (<About setIsStage1Completed={setIsStage1Completed}/>) : ''}
-        {stage === 2 ? (<Certification setIsStage1Completed={setIsStage3Completed}/>) : ''}
-        {stage === 3 ? (<Education setIsStage1Completed={setIsStage4Completed}/>) : ''}
-        {stage === 4 ? (<Description setIsStage1Completed={setIsStage5Completed}/>) : ''}
-        {stage === 5 ? (<Video setIsStage1Completed={setIsStage6Completed}/>) : ''}
-        {stage === 6 ? (<Availability setIsStage1Completed={setIsStage7Completed}/>) : ''}
-        {stage === 7 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted}/>) : ''}
+      <div className="w-[50%]">
+        {stage === 1 ? (<About setIsStage1Completed={setIsStage1Completed} setStage={setStage}/>) : ''}
+        {stage === 2 ? (<Certification setIsStage1Completed={setIsStage3Completed} setStage={setStage}/>) : ''}
+        {stage === 3 ? (<Education setIsStage1Completed={setIsStage4Completed} setStage={setStage}/>) : ''}
+        {stage === 4 ? (<Description setIsStage1Completed={setIsStage5Completed} setStage={setStage}/>) : ''}
+        {stage === 5 ? (<Video setIsStage1Completed={setIsStage6Completed} setStage={setStage}/>) : ''}
+        {stage === 6 ? (<Availability setIsStage1Completed={setIsStage7Completed} setStage={setStage}/>) : ''}
+        {stage === 7 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted} setStage={setStage}/>) : ''}
       </div>
     </div>
   );
