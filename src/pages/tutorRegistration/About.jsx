@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import question from "../../assets/question.png";
 import check from "../../assets/check.svg";
-import { Tooltip,} from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const About = (props) => {
   const setIsStage1Completed = props.setIsStage1Completed;
+  const setStage = props.setStage;
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [warning, setWarining] = useState(true);
+  const [warning, setWarining] = useState(false);
 
   const HtmlTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -19,6 +20,10 @@ const About = (props) => {
     }
   };
 
+  const handleSubmit = () => {
+    console.log(1)
+    setStage(2)
+  }
 
   return (
     <div className="flex flex-col p-12 gap-6">
@@ -120,7 +125,11 @@ const About = (props) => {
                 : "flex cursor-pointer mt-3 w-full bg-white font-semibold justify-center border-2 border-black rounded-lg py-3 hover:bg-[rgba(18,17,23,.06)]"
             }
           >
-            {profilePhoto === null ? (<div>Tải ảnh</div>) : (<div>Tải ảnh mới</div>)}
+            {profilePhoto === null ? (
+              <div>Tải ảnh</div>
+            ) : (
+              <div>Tải ảnh mới</div>
+            )}
             <input
               type="file"
               id="profilePhoto"
@@ -160,10 +169,12 @@ const About = (props) => {
           />
         </div>
         <div className="flex flex-row-reverse">
-          <input
-            className="cursor-pointer px-6 py-3 border-2 border-black rounded-lg font-semibold bg-theme hover:bg-[#7E5FF4] text-white"
-            value="Lưu và tiếp tục"
-          />
+          <div
+            onClick={handleSubmit}
+            className="px-6 py-2 border-2 border-black rounded-md bg-theme hover:bg-[#7E5FF4] text-white font-semibold cursor-pointer"
+          >
+            Lưu và tiếp tục
+          </div>
         </div>
       </form>
     </div>
