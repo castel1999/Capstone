@@ -9,10 +9,11 @@ import defaultAvatar from "../../assets/default-avatar.jpg";
 const Chat = () => {
   const [showChat, setShowChat] = useState(false);
   const logged = localStorage.getItem("userID") !== null;
+  const role = localStorage.getItem("role");
 
   return (
     <>
-      {logged ? (
+      {logged && role !== "Admin" && role !== "Moderator" ? (
         <div className="fixed right-4 bottom-4 z-[50]">
           {!showChat ? (
             <div

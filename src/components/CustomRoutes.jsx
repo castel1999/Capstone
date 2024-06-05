@@ -25,3 +25,15 @@ export const PublicRoute = () => {
 
   return <Outlet />;
 };
+
+
+export const ExceptAdminModRoute = ({ exceptRoles }) => {
+  const { user } = useAuth();
+
+
+  if (exceptRoles && exceptRoles.includes(user.role)) {
+    return <Navigate to="/about" replace />;
+  }
+
+  return <Outlet />;
+};

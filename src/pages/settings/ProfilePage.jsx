@@ -188,20 +188,6 @@ const ProfilePage = () => {
             )}
           </div>
 
-          {/* Email */}
-          <div className="flex flex-col gap-2 relative">
-            <label htmlFor="email" className="font-bold">
-              Địa chỉ email
-            </label>
-            <input
-              readOnly
-              id="email"
-              className="cursor-default border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("email")}
-            />
-            {errors.email && <ErrorPopup message={errors.email?.message} />}
-          </div>
-
           {/* Phone */}
           <div className="flex flex-col gap-2 relative">
             <label htmlFor="phoneNumber" className="font-bold">

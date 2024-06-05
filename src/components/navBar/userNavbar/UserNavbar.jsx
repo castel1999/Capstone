@@ -92,47 +92,51 @@ const UserNavbar = ({ data }) => {
           </div>
         )}
       </div>
-
-      {/* notifi */}
-      <div className="flex flex-col items-center ">
-        <div className="relative">
-          <img
-            ref={notiImgRef}
-            onClick={() => setOpenNoti(!openNoti)}
-            src={notify}
-            alt="Notify"
-            className="object-cover size-6 rounded-md cursor-pointer"
-          />
-        </div>
-        {openNoti && (
-          <div
-            ref={notiMenuRef}
-            className="absolute bg-white p-3  shadow-lg right-3 top-24"
-          >
-            <ul className="">
-              {noti &&
-                noti?.map((item) => (
-                  <li
-                    onClick={() => setOpenNoti(false)}
-                    className="p-2 text-lg cursor-pointer rounded-md hover:bg-theme hover:text-white w-[400px]"
-                    key={item.id}
-                  >
-                    <div className="line-clamp-1">{item.mess}</div>
-                  </li>
-                ))}
-            </ul>
+      {role === "Admin" || role === "Moderator" ? (
+        ""
+      ) : (
+        <div className="flex flex-row-reverse justify-center items-center gap-4">
+          <div className="flex flex-col items-center ">
+            <div className="relative">
+              <img
+                ref={notiImgRef}
+                onClick={() => setOpenNoti(!openNoti)}
+                src={notify}
+                alt="Notify"
+                className="object-cover size-6 rounded-md cursor-pointer"
+              />
+            </div>
+            {openNoti && (
+              <div
+                ref={notiMenuRef}
+                className="absolute bg-white p-3  shadow-lg right-3 top-24"
+              >
+                <ul className="">
+                  {noti &&
+                    noti?.map((item) => (
+                      <li
+                        onClick={() => setOpenNoti(false)}
+                        className="p-2 text-lg cursor-pointer rounded-md hover:bg-theme hover:text-white w-[400px]"
+                        key={item.id}
+                      >
+                        <div className="line-clamp-1">{item.mess}</div>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <Link to="/favorite">
-        <CiHeart className="size-6 object-cover self-center hover:text-theme cursor-pointer" />
-      </Link>
+          <Link to="/favorite">
+            <CiHeart className="size-6 object-cover self-center hover:text-theme cursor-pointer" />
+          </Link>
 
-      <div className="flex justify-center items-center gap-2 cursor-pointer hover:text-theme">
-        <CiWallet className="size-6 object-cover self-center" />
-        <div>200$</div>
-      </div>
+          <div className="flex justify-center items-center gap-2 cursor-pointer hover:text-theme">
+            <CiWallet className="size-6 object-cover self-center" />
+            <div>200$</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
