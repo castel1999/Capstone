@@ -35,7 +35,7 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-          <div className="">About</div>
+          <div className="">Thông tin cá nhân</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -51,7 +51,8 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-          <div className="">Photo</div>
+
+          <div className="">Chứng chỉ</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -67,8 +68,7 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-
-          <div className="">Certification</div>
+          <div className="">Kinh nghiệm</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -84,7 +84,7 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-          <div className="">Education</div>
+          <div className="">Mô tả</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -100,7 +100,8 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-          <div className="">Description</div>
+
+          <div className="">Video</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -116,8 +117,7 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-
-          <div className="">Video</div>
+          <div className="">Thời gian biểu</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -126,42 +126,25 @@ const TutorRegistration = () => {
         >
           {stage < 7 ? (
             <div className="flex justify-center items-center h-8 w-8">7</div>
-          ) : stage === 7 ? (
+          ) : stage === 7? (
             <div className="flex justify-center items-center h-8 w-8 bg-black text-white rounded-md">
               7
             </div>
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-          <div className="">Availability</div>
-          <img className="h-3 w-3" src={rightArrow} />
-        </div>
-        <div
-          className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(8)}
-        >
-          {stage < 8 ? (
-            <div className="flex justify-center items-center h-8 w-8">8</div>
-          ) : stage === 8 ? (
-            <div className="flex justify-center items-center h-8 w-8 bg-black text-white rounded-md">
-              8
-            </div>
-          ) : (
-            <img className="h-8 w-8 bg-black rounded-md" src={check} />
-          )}
-          <div className="">Pricing</div>
+          <div className="">Giá cả</div>
         </div>
       </div>
 
-      <div className="w-2/5">
+      <div className="w-[45%]">
         {stage === 1 ? (<About setIsStage1Completed={setIsStage1Completed}/>) : ''}
-        {stage === 2 ? (<Photo setIsStage1Completed={setIsStage2Completed}/>) : ''}
-        {stage === 3 ? (<Certification setIsStage1Completed={setIsStage3Completed}/>) : ''}
-        {stage === 4 ? (<Education setIsStage1Completed={setIsStage4Completed}/>) : ''}
-        {stage === 5 ? (<Description setIsStage1Completed={setIsStage5Completed}/>) : ''}
-        {stage === 6 ? (<Video setIsStage1Completed={setIsStage6Completed}/>) : ''}
-        {stage === 7 ? (<Availability setIsStage1Completed={setIsStage7Completed}/>) : ''}
-        {stage === 8 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted}/>) : ''}
+        {stage === 2 ? (<Certification setIsStage1Completed={setIsStage3Completed}/>) : ''}
+        {stage === 3 ? (<Education setIsStage1Completed={setIsStage4Completed}/>) : ''}
+        {stage === 4 ? (<Description setIsStage1Completed={setIsStage5Completed}/>) : ''}
+        {stage === 5 ? (<Video setIsStage1Completed={setIsStage6Completed}/>) : ''}
+        {stage === 6 ? (<Availability setIsStage1Completed={setIsStage7Completed}/>) : ''}
+        {stage === 7 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted}/>) : ''}
       </div>
     </div>
   );
