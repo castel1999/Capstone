@@ -13,6 +13,7 @@ import {
 import { app } from "../../firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import ErrorPopup from "../../utils/ErrorPopup";
 
 const ProfilePage = () => {
   const data = useOutletContext();
