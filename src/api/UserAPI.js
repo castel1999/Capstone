@@ -100,3 +100,43 @@ export const payment = async (data) => {
 
   return responseBody;
 };
+
+export const getOTP = async (data) => {
+  const response = await fetch(`${BASE_API_LINK}/Mail/otp/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(responseBody.message);
+    error.status = response.status; // Add status code to error object
+    throw error;
+  }
+
+  return responseBody;
+};
+
+export const confirmOTP = async (data) => {
+  const response = await fetch(`${BASE_API_LINK}/Auth/confirm`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(responseBody.message);
+    error.status = response.status; // Add status code to error object
+    throw error;
+  }
+
+  return responseBody;
+};

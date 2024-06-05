@@ -75,7 +75,7 @@ const SignUpPage = () => {
     mutationFn: apiClient.register,
     onSuccess: async () => {
       toast.success("Đăng ký thành công!");
-      navigate("/");
+      navigate("/login");
     },
     onError: (error) => {
       toast.error("Đăng ký thất bại!");

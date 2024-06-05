@@ -27,71 +27,74 @@ const NavBar = () => {
   }
 
   if (isError) {
-    useEffect(() => {
-      localStorage.clear();
-      navigate("/login");
-    });
+    localStorage.clear();
+    location.reload();
+    navigate("/login");
   }
 
   return (
     <div className="bg-white relative">
       <div className="flex justify-between items-center px-7 py-3">
-        <div className="flex flex-row justify-center items-center gap-5">
-          <Link to="/">
-            <img
-              src={ODTlogo}
-              alt="ODTlogo"
-              className="size-16 object-cover cursor-pointer self-center "
-            />
-          </Link>
-          <NavLink
-            to="/tutor-list"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
-                : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
-            }
-          >
-            Học với gia sư
-          </NavLink>
-
-          <NavLink
-            to="/course"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
-                : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
-            }
-          >
-            Học theo lộ trình
-          </NavLink>
-
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
-                : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
-            }
-          >
-            Về chúng tôi
-          </NavLink>
-
-          {currUser === "Tutor" ? (
-            ""
-          ) : (
+        {currUser === "Admin" || currUser === "Moderator" ? (
+          <div>{`Hi, ${currUser}: ${data?.value.fullName}`} </div>
+        ) : (
+          <div className="flex flex-row justify-center items-center gap-5">
+            <Link to="/">
+              <img
+                src={ODTlogo}
+                alt="ODTlogo"
+                className="size-16 object-cover cursor-pointer self-center "
+              />
+            </Link>
             <NavLink
-              to="/become-tutor"
+              to="/tutor-list"
               className={({ isActive }) =>
                 isActive
                   ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
                   : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
               }
             >
-              Trở thành gia sư
+              Học với gia sư
             </NavLink>
-          )}
-        </div>
+
+            <NavLink
+              to="/course"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                  : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+              }
+            >
+              Học theo lộ trình
+            </NavLink>
+
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                  : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+              }
+            >
+              Về chúng tôi
+            </NavLink>
+
+            {currUser === "Tutor" ? (
+              ""
+            ) : (
+              <NavLink
+                to="/become-tutor"
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                    : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+                }
+              >
+                Trở thành gia sư
+              </NavLink>
+            )}
+          </div>
+        )}
 
         {Logged ? (
           <div>

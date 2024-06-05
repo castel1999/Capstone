@@ -1,5 +1,5 @@
 import React from "react";
-import SideBar from "../../components/sideBar/SideBar";
+import SideBar from "./SideBar";
 import { Outlet } from "react-router-dom";
 import * as UserAPI from "../../api/UserAPI";
 import { useQuery } from "@tanstack/react-query";
