@@ -13,6 +13,7 @@ import {
 import { app } from "../../firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import ErrorPopup from "../../utils/ErrorPopup";
 
 const ProfilePage = () => {
   const data = useOutletContext();
@@ -94,7 +95,6 @@ const ProfilePage = () => {
     onSuccess: async () => {
       toast.success("Cập nhật thành công!");
       await queryClient.invalidateQueries("getCurrentUser");
-      await queryClient.refetchQueries("myData");
     },
     onError: (error) => {
       toast.error("Cập nhật thất bại!");
@@ -187,20 +187,6 @@ const ProfilePage = () => {
             {errors.dateOfBirth && (
               <ErrorPopup message={errors.dateOfBirth?.message} />
             )}
-          </div>
-
-          {/* Email */}
-          <div className="flex flex-col gap-2 relative">
-            <label htmlFor="email" className="font-bold">
-              Địa chỉ email
-            </label>
-            <input
-              readOnly
-              id="email"
-              className="cursor-default border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-theme"
-              {...register("email")}
-            />
-            {errors.email && <ErrorPopup message={errors.email?.message} />}
           </div>
 
           {/* Phone */}
