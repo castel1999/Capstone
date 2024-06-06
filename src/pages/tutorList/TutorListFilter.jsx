@@ -4,9 +4,6 @@ const TutorListFilter = ({ data, setFilteredData }) => {
   const [searchItem, setSearchItem] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
 
-  useEffect(() => {
-    filterData();
-  }, [data, searchItem, selectedLevel]);
 
   const handleSearchByName = (e) => {
     setSearchItem(e.target.value);
