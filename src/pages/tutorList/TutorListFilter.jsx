@@ -1,17 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const TutorListFilter = ({ data, setFilteredData }) => {
   const [searchItem, setSearchItem] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
-
-
-  const handleSearchByName = (e) => {
-    setSearchItem(e.target.value);
-  };
-
-  const handleLevelChange = (e) => {
-    setSelectedLevel(e.target.value);
-  };
+  const prevFilteredData = useRef([]);
 
   const filterData = () => {
     let filteredItems = data;
@@ -28,7 +20,23 @@ const TutorListFilter = ({ data, setFilteredData }) => {
       );
     }
 
-    setFilteredData(filteredItems);
+    // Only update state if the filtered data has changed
+    if (JSON.stringify(prevFilteredData.current) !== JSON.stringify(filteredItems)) {
+      prevFilteredData.current = filteredItems;
+      setFilteredData(filteredItems);
+    }
+  };
+
+  useEffect(() => {
+    filterData();
+  }, [data, searchItem, selectedLevel]);
+
+  const handleSearchByName = (e) => {
+    setSearchItem(e.target.value);
+  };
+
+  const handleLevelChange = (e) => {
+    setSelectedLevel(e.target.value);
   };
 
   return (
