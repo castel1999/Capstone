@@ -100,8 +100,7 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-
-          <div className="">Video</div>
+          <div className="">Thời gian biểu</div>
           <img className="h-3 w-3" src={rightArrow} />
         </div>
         <div
@@ -117,22 +116,6 @@ const TutorRegistration = () => {
           ) : (
             <img className="h-8 w-8 bg-black rounded-md" src={check} />
           )}
-          <div className="">Thời gian biểu</div>
-          <img className="h-3 w-3" src={rightArrow} />
-        </div>
-        <div
-          className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(7)}
-        >
-          {stage < 7 ? (
-            <div className="flex justify-center items-center h-8 w-8">7</div>
-          ) : stage === 7? (
-            <div className="flex justify-center items-center h-8 w-8 bg-black text-white rounded-md">
-              7
-            </div>
-          ) : (
-            <img className="h-8 w-8 bg-black rounded-md" src={check} />
-          )}
           <div className="">Giá cả</div>
         </div>
       </div>
@@ -142,9 +125,8 @@ const TutorRegistration = () => {
         {stage === 2 ? (<Certification setIsStage1Completed={setIsStage3Completed} setStage={setStage}/>) : ''}
         {stage === 3 ? (<Education setIsStage1Completed={setIsStage4Completed} setStage={setStage}/>) : ''}
         {stage === 4 ? (<Description setIsStage1Completed={setIsStage5Completed} setStage={setStage}/>) : ''}
-        {stage === 5 ? (<Video setIsStage1Completed={setIsStage6Completed} setStage={setStage}/>) : ''}
-        {stage === 6 ? (<Availability setIsStage1Completed={setIsStage7Completed} setStage={setStage}/>) : ''}
-        {stage === 7 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted} setStage={setStage}/>) : ''}
+        {stage === 5 ? (<Availability setIsStage1Completed={setIsStage7Completed} setStage={setStage}/>) : ''}
+        {stage === 6 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted} setStage={setStage}/>) : ''}
       </div>
     </div>
   );

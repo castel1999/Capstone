@@ -6,6 +6,7 @@ import { styled } from "@mui/material/styles";
 
 const About = (props) => {
   const setIsStage1Completed = props.setIsStage1Completed;
+  const [videoURL, setVideoURL] = useState("");
   const setStage = props.setStage;
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [warning, setWarining] = useState(false);
@@ -21,9 +22,16 @@ const About = (props) => {
   };
 
   const handleSubmit = () => {
-    console.log(1)
-    setStage(2)
-  }
+    console.log(1);
+    setStage(2);
+  };
+
+  const extractVideoID = (url) => {
+    const regExp =
+      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[7].length === 11 ? match[7] : null;
+  };
 
   return (
     <div className="flex flex-col p-12 gap-6">
@@ -35,7 +43,7 @@ const About = (props) => {
       </div>
       <form className="flex flex-col gap-4">
         <div>
-          <label htmlFor="profilePhoto">Profile Photo</label>
+          <label htmlFor="profilePhoto">Ảnh chân dung</label>
           <div className="flex flex-col py-6 border-y-2 border-[#dcdce5] gap-6">
             <div className="flex flex-row justify-between">
               <label className="">
@@ -165,6 +173,53 @@ const About = (props) => {
             type="tel"
             pattern="(0[0-9]{2}|[0-9]{3})([0-9]{1})([0-9]{2})([0-9]{6})"
             maxLength={12}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-4 mt-5">
+        <div className="font-semibold">
+            Dán liên kết tới video của bạn
+          </div>
+          
+          {videoURL === "" ? (
+            <div className=" flex items-center w-full h-[371px] border-2 border-[#dcdce5] rounded-md justify-center">
+              Video của bạn sẽ xuất hiện ở đây
+            </div>
+          ) : (
+            <div className="relative w-full overflow-hidden pt-[56.25%] rounded-md">
+              <iframe
+                className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${extractVideoID(
+                  videoURL
+                )}`}
+                title="YouTube video player"
+                frameborder="0"
+                allow=""
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+          )}
+
+
+          <div>
+            Tìm hiểu cách tải video lên{" "}
+            <a
+              href="https://support.google.com/youtube/answer/57407"
+              className="font-semibold underline hover:text-theme"
+              target="_blank"
+            >
+              Youtube
+            </a>
+          </div>
+
+          <input
+            className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+            type="text"
+            id="videoURL"
+            placeholder="www.youtube.com/watch?v=l5aZJBLAu1E"
+            onChange={(e) => setVideoURL(e.target.value)}
             required
           />
         </div>
