@@ -32,7 +32,7 @@ export const ExceptAdminModRoute = ({ exceptRoles }) => {
 
 
   if (exceptRoles && exceptRoles.includes(user?.role)) {
-    return <Navigate to="/about" replace />;
+    return <Navigate to="/dashboard/home" replace />;
   }
 
   return <Outlet />;
