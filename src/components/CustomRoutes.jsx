@@ -9,7 +9,7 @@ export const PrivateRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -31,7 +31,7 @@ export const ExceptAdminModRoute = ({ exceptRoles }) => {
   const { user } = useAuth();
 
 
-  if (exceptRoles && exceptRoles.includes(user.role)) {
+  if (exceptRoles && exceptRoles.includes(user?.role)) {
     return <Navigate to="/about" replace />;
   }
 
