@@ -1,7 +1,7 @@
 const BASE_API_LINK = import.meta.env.VITE_API_LINK;
 
-export const getUsers = async (data) => {
-  const response = await fetch(`${BASE_API_LINK}/Account/update`);
+export const getUsers = async () => {
+  const response = await fetch(`${BASE_API_LINK}/Admin/get/users`);
 
   const responseBody = await response.json();
 
