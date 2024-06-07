@@ -1,9 +1,9 @@
 import React from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import * as AdminAPI from "../../api/AdminAPI";
+import { DataGrid, GridToolbar, gridPageCountSelector, GridPagination, useGridApiContext, useGridSelector } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
-import { Box } from "@mui/material";
+import { Box, Pagination as MuiPagination } from "@mui/material";
+import * as AdminAPI from "../../api/AdminAPI";
 
 const AccountAdmin = () => {
   const {
@@ -27,9 +27,7 @@ const AccountAdmin = () => {
     email: item?.email,
     phoneNumber: item?.phoneNumber || "null",
     dateOfBirth: moment(item?.dateOfBirth?.split("T")[0]).format("DD-MM-YYYY"),
-    createdAt: moment(item?.createdAt?.split("T")[0]).format(
-      "DD-MM-YYYY, h:mm:ss a"
-    ),
+    createdAt: moment(item?.createdAt?.split("T")[0]).format("DD-MM-YYYY, h:mm:ss a"),
     isPremium: item?.isPremium ? "Premium" : "Thường",
     status: item?.status,
   }));
@@ -63,15 +61,43 @@ const AccountAdmin = () => {
     console.log(e);
   };
 
-  return (
-    <Box className="h-[700px]" display="grid">
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSizeOptions={[10, 25, 50, 100]}
-        onRowClick={(e) => handleClick(e)}
+  function Pagination({ page, onPageChange, className }) {
+    const apiRef = useGridApiContext();
+    const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+    return (
+      <MuiPagination
+        color="primary"
+        className={className}
+        count={pageCount}
+        page={page + 1}
+        onChange={(event, newPage) => {
+          onPageChange(event, newPage - 1);
+        }}
       />
-    </Box>
+    );
+  }
+
+  function CustomPagination(props) {
+    return <GridPagination ActionsComponent={Pagination} {...props} />;
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="font-bold text-3xl">Quản lý tài khoản</div>
+      <Box className="h-[650px]" display="grid">
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSizeOptions={[10, 25, 50, 100]}
+          onRowClick={(e) => handleClick(e)}
+          slots={{ toolbar: GridToolbar, pagination: CustomPagination }}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 25 } },
+          }}
+        />
+      </Box>
+    </div>
   );
 };
 
