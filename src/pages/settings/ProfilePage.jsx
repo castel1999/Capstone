@@ -14,6 +14,7 @@ import { app } from "../../firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import ErrorPopup from "../../utils/ErrorPopup";
+import moment from "moment";
 
 const ProfilePage = () => {
   const data = useOutletContext();
@@ -43,7 +44,7 @@ const ProfilePage = () => {
     resolver: yupResolver(validationSchema),
     defaultValues: {
       fullName: data?.fullName,
-      dateOfBirth: data?.dateOfBirth?.split("T")[0],
+      dateOfBirth: moment(data?.dateOfBirth).format("YYYY-MM-DD"), // Set to ISO format for input type="date"
       email: data?.email,
       phoneNumber: data?.phoneNumber,
     },
@@ -107,9 +108,13 @@ const ProfilePage = () => {
     const completeData = {
       id: localStorage.getItem("userID"),
       imageUrl: avatarURL,
+      dateOfBirth: moment(formData.dateOfBirth, "YYYY-MM-DD").format(
+        "DD-MM-YYYY"
+      ), // Reformatting to the required format for storage
       ...rest,
     };
     mutation.mutate(completeData);
+    console.log(completeData);
   };
 
   return (
