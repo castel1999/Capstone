@@ -1,14 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 
 const Description = (props) => {
   const setStage = props.setStage;
-  
+  const [descriptions, setDescriptions] = useState({
+    introduction: "",
+    teachingExperience: "",
+    motivation: "",
+    interestingTitle: "",
+  });
+  const [warnings, setWarnings] = useState({
+    introduction: "",
+    teachingExperience: "",
+    motivation: "",
+    interestingTitle: "",
+  });
+
+  const handleDescriptionChange = (field, value) => {
+    setDescriptions({ ...descriptions, [field]: value });
+    setWarnings({
+      ...warnings,
+      [field]: value ? "" : "",
+    });
+  };
+
   const handleGoback = () => {
     setStage(3);
   };
 
   const handleSubmit = () => {
-    setStage(5);
+    const newWarnings = {};
+    let allValid = true;
+    Object.keys(descriptions).forEach((key) => {
+      if (descriptions[key] === '') {
+        newWarnings[key] = "Thông tin này là bắt buộc.";
+        allValid = false;
+      } else {
+        newWarnings[key] = "";
+      }
+    });
+
+    setWarnings(newWarnings);
+    if (allValid) {
+      console.log(descriptions)
+    }
   };
 
   return (
@@ -19,7 +53,7 @@ const Description = (props) => {
         ngữ mà bạn sẽ giảng dạy.
       </div>
 
-      <div className="flex flex-col ">
+      <div className="flex flex-col gap-2">
         <div className="text-[24px] font-semibold">Giới thiệu bản thân</div>
         <div className="text-[16px]">
           Hãy cho những sinh viên tiềm năng thấy bạn là ai! Chia sẻ kinh nghiệm
@@ -29,8 +63,15 @@ const Description = (props) => {
         <textarea
           type="textarea"
           rows={4}
-          className="mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+          value={descriptions.introduction}
+          onChange={(e) =>
+            handleDescriptionChange("introduction", e.target.value)
+          }
+          className={`mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] ${
+            warnings.introduction ? "border-[#a3120a] bg-[#ffe2e0]" : "hover:border-black"
+          }`}
         />
+        {warnings.introduction && <div className="text-red-500">{warnings.introduction}</div>}
 
         <div className="text-[24px] font-semibold mt-10">
           Kinh nghiệm giảng dạy
@@ -43,8 +84,15 @@ const Description = (props) => {
         <textarea
           type="textarea"
           rows={4}
-          className="mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+          value={descriptions.teachingExperience}
+          onChange={(e) =>
+            handleDescriptionChange("teachingExperience", e.target.value)
+          }
+          className={`mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] ${
+            warnings.teachingExperience ? "border-[#a3120a] bg-[#ffe2e0]" : "hover:border-black"
+          }`}
         />
+        {warnings.teachingExperience && <div className="text-red-500">{warnings.teachingExperience}</div>}
 
         <div className="text-[24px] font-semibold mt-10">
           Tạo động lực cho sinh viên tiềm năng
@@ -56,8 +104,15 @@ const Description = (props) => {
         <textarea
           type="textarea"
           rows={4}
-          className="mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+          value={descriptions.motivation}
+          onChange={(e) =>
+            handleDescriptionChange("motivation", e.target.value)
+          }
+          className={`mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] ${
+            warnings.motivation ? "border-[#a3120a] bg-[#ffe2e0]" : "hover:border-black"
+          }`}
         />
+        {warnings.motivation && <div className="text-red-500">{warnings.motivation}</div>}
 
         <div className="text-[24px] font-semibold mt-10">
           Viết một tiêu đề hấp dẫn
@@ -70,8 +125,15 @@ const Description = (props) => {
         <textarea
           type="textarea"
           rows={4}
-          className="mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+          value={descriptions.interestingTitle}
+          onChange={(e) =>
+            handleDescriptionChange("interestingTitle", e.target.value)
+          }
+          className={`mt-2 px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] ${
+            warnings.interestingTitle ? "border-[#a3120a] bg-[#ffe2e0]" : "hover:border-black"
+          }`}
         />
+        {warnings.interestingTitle && <div className="text-red-500">{warnings.interestingTitle}</div>}
       </div>
 
       <div className="flex flex-row-reverse items-end gap-2">

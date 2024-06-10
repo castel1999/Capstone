@@ -1,6 +1,17 @@
 import React, { useState } from "react";
+import moment from "moment";
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { app } from "../../firebase";
 
 const Certification = (props) => {
+  const currentUser = localStorage.getItem("userID");
+  const current = new moment();
   const setStage = props.setStage;
   const [notHaveCertificate, setNotHaveCertificate] = useState(false);
   const [certifications, setCertifications] = useState([
@@ -11,6 +22,17 @@ const Certification = (props) => {
       yearStart: "",
       yearEnd: "",
       image: null,
+    },
+  ]);
+
+  const [warnings, setWarnings] = useState([
+    {
+      certificate: "",
+      description: "",
+      issuedBy: "",
+      yearStart: "",
+      yearEnd: "",
+      image: false,
     },
   ]);
 
@@ -26,25 +48,125 @@ const Certification = (props) => {
         image: null,
       },
     ]);
+
+    setWarnings([
+      ...warnings,
+      {
+        certificate: "",
+        description: "",
+        issuedBy: "",
+        yearStart: "",
+        yearEnd: "",
+      },
+    ]);
   };
 
   const handleCertificationChange = (index, field, value) => {
-    const newCertifications = certifications.map((cert, i) => {
-      if (i === index) {
-        return { ...cert, [field]: value };
-      }
-      return cert;
-    });
-    setCertifications(newCertifications);
+    setCertifications((prevCertifications) =>
+      prevCertifications.map((cert, i) =>
+        i === index ? { ...cert, [field]: value } : cert
+      )
+    );
+
+    setWarnings((prevWarnings) =>
+      prevWarnings.map((warn, i) =>
+        i === index ? { ...warn, [field]: "" } : warn
+      )
+    );
   };
 
   const handleGoback = () => {
     setStage(1);
   };
 
+  const onImageChange = async (event, index) => {
+    const storage = getStorage(app);
+    const storageRef = ref(
+      storage,
+      `Tutor registrations/${currentUser}/certificate${index + 1}`
+    );
+
+    if (event.target.files && event.target.files[0]) {
+      try {
+        await uploadBytes(storageRef, event.target.files[0]);
+        const url = await getDownloadURL(storageRef);
+
+        setCertifications((prevCertifications) =>
+          prevCertifications.map((item, idx) =>
+            idx === index ? { ...item, image: url } : item
+          )
+        );
+      } catch (error) {
+        console.error("Error uploading file: ", error);
+      }
+    }
+  };
+
+  const onImageRemove = async (index) => {
+    const storage = getStorage(app);
+    const storageRef = ref(
+      storage,
+      `Tutor registrations/${currentUser}/certificate${index + 1}`
+    );
+
+    try {
+      // await deleteObject(storageRef)
+      setCertifications((prevCertifications) =>
+        prevCertifications.map((item, idx) =>
+          idx === index ? { ...item, image: null } : item
+        )
+      );
+    } catch (error) {
+      console.error("Error uploading file: ", error);
+    }
+  };
+
+  const removeCertificate = (index) => {
+    const updatedCertificates = certifications.slice();
+    const updatedWarnings = warnings.slice();
+    onImageRemove(index);
+    updatedCertificates.splice(index, 1);
+    setCertifications(updatedCertificates);
+    updatedWarnings.splice(index, 1);
+    setWarnings(updatedWarnings);
+  };
+
   const handleSubmit = () => {
-    setStage(3);
-  }
+    var newWarnings = [];
+
+    certifications.map((cert) => {
+      const newWarning = {
+        certificate:
+          cert.certificate === "" ? "Bạn cần điền thông tin này" : "",
+        description:
+          cert.description === "" ? "Bạn cần điền thông tin này" : "",
+        issuedBy: cert.issuedBy === "" ? "Bạn cần điền thông tin này" : "",
+        yearStart:
+          cert.yearStart === ""
+            ? "Bạn cần điền thông tin này"
+            : Number(cert.yearStart) > current.year()
+            ? "Năm không hợp lệ"
+            : "",
+        yearEnd:
+          cert.yearEnd === ""
+            ? "Bạn cần điền thông tin này"
+            : Number(cert.yearEnd) > current.year() ||
+              Number(cert.yearEnd) < Number(cert.yearStart)
+            ? "Năm không hợp lệ"
+            : "",
+      };
+      newWarnings = [...newWarnings, newWarning];
+    });
+
+    setWarnings(newWarnings);
+    console.log(newWarnings);
+
+    const allFieldsValid = newWarnings.every((warning) =>
+      Object.values(warning).every((value) => value === "")
+    );
+
+    if (allFieldsValid) console.log("Certifications:", certifications);
+  };
 
   return (
     <div className="flex flex-col p-12 gap-6">
@@ -74,7 +196,7 @@ const Certification = (props) => {
               >
                 <path
                   d="M9.923 17.101 6 13.18 7.179 12l2.744 2.744L17.667 7l1.178 1.179z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
             </div>
@@ -85,26 +207,66 @@ const Certification = (props) => {
 
       {!notHaveCertificate ? (
         <div>
-          {certifications.map((certificate, index) => (
-            <div className="flex flex-col mt-4">
+          {certifications?.map((certificate, index) => (
+            <div className="flex flex-col mt-4 gap-2" key={index}>
               <div>Chứng chỉ</div>
-              <input
-                className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
-                type="text"
-                value={certificate?.certificate}
-                onChange={(e) =>
-                  handleCertificationChange(
-                    index,
-                    "certificate",
-                    e.target.value
-                  )
-                }
-                required
-              />
+              <div className="flex flex-row gap-2">
+                <input
+                  className={
+                    warnings[index].certificate === ""
+                      ? "w-full px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                      : "w-full px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                  }
+                  type="text"
+                  value={certificate?.certificate}
+                  onChange={(e) =>
+                    handleCertificationChange(
+                      index,
+                      "certificate",
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+                {certifications?.length > 1 ? (
+                  <div
+                    className="flex w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
+                    onClick={() => removeCertificate(index)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                      className="w-full"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16 3H8v2h8zM3 6h18v2h-2v13H5V8H3zm4 2h10v11H7zm2 2h2v7H9zm6 0h-2v7h2z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+              {warnings[index].certificate === "" ? (
+                ""
+              ) : (
+                <div className="text-[#a3120a]">
+                  {warnings[index].certificate}
+                </div>
+              )}
 
               <div className="mt-4">Mô tả</div>
               <input
-                className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                className={
+                  warnings[index].description === ""
+                    ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0] "
+                }
                 type="text"
                 value={certificate.description}
                 onChange={(e) =>
@@ -116,10 +278,21 @@ const Certification = (props) => {
                 }
                 required
               />
+              {warnings[index].description === "" ? (
+                ""
+              ) : (
+                <div className="text-[#a3120a]">
+                  {warnings[index].description}
+                </div>
+              )}
 
               <div className="mt-4">Phát hành bởi</div>
               <input
-                className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                className={
+                  warnings[index].issuedBy === ""
+                    ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0] "
+                }
                 type="text"
                 value={certificate.issuedBy}
                 onChange={(e) =>
@@ -127,12 +300,21 @@ const Certification = (props) => {
                 }
                 required
               />
+              {warnings[index].issuedBy === "" ? (
+                ""
+              ) : (
+                <div className="text-[#a3120a]">{warnings[index].issuedBy}</div>
+              )}
 
-              <div className="mt-4">
+              <div className="flex flex-col gap-2 mt-4">
                 <div>Năm học</div>
                 <div className="flex items-center gap-2">
                   <input
-                    className="flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    className={
+                      warnings[index].yearStart === ""
+                        ? "flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                        : "flex-1 px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                    }
                     type="number"
                     min="1900"
                     max="2099"
@@ -149,7 +331,11 @@ const Certification = (props) => {
                   />{" "}
                   -{" "}
                   <input
-                    className="flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    className={
+                      warnings[index].yearEnd === ""
+                        ? "flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                        : "flex-1 px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                    }
                     type="number"
                     min="1900"
                     max="2099"
@@ -164,6 +350,22 @@ const Certification = (props) => {
                       )
                     }
                   />
+                </div>
+                <div className="flex flex-row">
+                  {warnings[index].yearStart === "" ? (
+                    <div className="flex-1"></div>
+                  ) : (
+                    <div className="text-[#a3120a] flex-1">
+                      {warnings[index].yearStart}
+                    </div>
+                  )}
+                  {warnings[index].yearEnd === "" ? (
+                    ""
+                  ) : (
+                    <div className="ml-5 text-[#a3120a] flex-1">
+                      {warnings[index].yearEnd}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -184,13 +386,7 @@ const Certification = (props) => {
                   <label className="px-4 py-2 border-2 border-black rounded-lg hover:bg-[rgba(18,17,23,.06)] w-fit cursor-pointer">
                     Tải lên
                     <input
-                      onChange={(e) =>
-                        handleCertificationChange(
-                          index,
-                          "image",
-                          URL.createObjectURL(e.target.files[0])
-                        )
-                      }
+                      onChange={(e) => onImageChange(e, index)}
                       type="file"
                       hidden
                     />
@@ -204,14 +400,12 @@ const Certification = (props) => {
                       aria-hidden="true"
                       focusable="false"
                       className="w-6 h-6 absolute -top-2 -right-2 bg-white border-2 border-black rounded-md cursor-pointer"
-                      onClick={() =>
-                        handleCertificationChange(index, "image", null)
-                      }
+                      onClick={() => onImageRemove(index)}
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M7.207 5.793a1 1 0 0 0-1.414 1.414L10.586 12l-4.793 4.793a1 1 0 1 0 1.414 1.414L12 13.414l4.793 4.793a1 1 0 0 0 1.414-1.414L13.414 12l4.793-4.793a1 1 0 0 0-1.414-1.414L12 10.586z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       ></path>
                     </svg>
                   </div>

@@ -3,27 +3,127 @@ import question from "../../assets/question.png";
 import check from "../../assets/check.svg";
 import { Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { app } from "../../firebase";
 
 const About = (props) => {
+  const currentUser = localStorage.getItem("userID");
   const setIsStage1Completed = props.setIsStage1Completed;
   const [videoURL, setVideoURL] = useState("");
   const setStage = props.setStage;
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [warning, setWarining] = useState(false);
+  const [warning, setWarning] = useState({
+    profilePhoto: false,
+    fullName: "",
+    email: "",
+    nationalId: "",
+    videoUrl: "",
+  });
+  const [about, setAbout] = useState({
+    profilePhoto: null,
+    fullName: "",
+    email: "",
+    nationalId: "",
+    subjects: ["Toán"],
+    videoUrl: "",
+  });
+
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+    setAbout((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+    setWarning((prev) => ({
+      ...prev,
+      [id]: "",
+    }));
+  };
 
   const HtmlTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
   ))(({ theme }) => ({}));
 
-  const onImageChange = (event) => {
+  const onImageChange = async (event) => {
+    const storage = getStorage(app);
+    const storageRef = ref(
+      storage,
+      `Tutor registrations/${currentUser}/profilePhoto`
+    );
+  
     if (event.target.files && event.target.files[0]) {
-      setProfilePhoto(URL.createObjectURL(event.target.files[0]));
+      try {
+        await uploadBytes(storageRef, event.target.files[0]);
+        const url = await getDownloadURL(storageRef);
+        setAbout({...about, profilePhoto: url });
+        setWarning({ ...warning, profilePhoto: false });
+      } catch (error) {
+        console.error("Error uploading file: ", error);
+      }
     }
   };
 
+  const addSubject = () => {
+    setAbout({
+      ...about,
+      subjects: [...about.subjects, "Toán"],
+    });
+  };
+
+  const handleSubjectChange = (value, index) => {
+    const newSubjects = [...about.subjects];
+    newSubjects[index] = value;
+    setAbout((prev) => ({
+      ...prev,
+      subjects: newSubjects,
+    }));
+  };
+
+  const removeSubject = (index) => {
+    const updatedSubjects = about.subjects.filter((_, idx) => idx !== index);
+    setAbout({
+      ...about,
+      subjects: updatedSubjects,
+    });
+  };
+
   const handleSubmit = () => {
-    console.log(1);
-    setStage(2);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const videoUrlRegex =
+      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\s*[^\/\n\s]+\/\s*|channel\/|user\/[^\/\n\s]+\/|)|youtu\.be\/)([^\/\n\s?&]+)/;
+    const nationalRegex = /(0[0-9]{2}|[0-9]{3})([0-9]{1})([0-9]{2})([0-9]{6})/;
+
+    const newWarnings = {
+      profilePhoto: about.profilePhoto === null ? true : false,
+      email:
+        about.email === ""
+          ? "Bạn cần điền thông tin này"
+          : !emailRegex.test(about.email)
+          ? "Bạn cần điền đúng format email"
+          : "",
+      fullName: about.fullName === "" ? "Bạn cần điền thông tin này" : "",
+      nationalId:
+        about.nationalId === ""
+          ? "Bạn cần điền thông tin này"
+          : !nationalRegex.test(about.nationalId)
+          ? "Bạn cần điền đúng CCCD"
+          : "",
+      videoUrl:
+        about.videoUrl === ""
+          ? "Bạn cần điền thông tin này"
+          : !videoUrlRegex.test(about.videoUrl)
+          ? "Bạn cần điền đúng format url Youtube"
+          : "",
+    };
+
+    setWarning(newWarnings);
+
+    const allFieldsValid = !Object.values(newWarnings).some(
+      (value) => value !== false && value !== ""
+    );
+    console.log(newWarnings);
+
+    if (allFieldsValid) console.log(about);
   };
 
   const extractVideoID = (url) => {
@@ -47,12 +147,12 @@ const About = (props) => {
           <div className="flex flex-col py-6 border-y-2 border-[#dcdce5] gap-6">
             <div className="flex flex-row justify-between">
               <label className="">
-                {profilePhoto === null ? (
+                {about?.profilePhoto === null ? (
                   <div className="flex text-center items-center cursor-pointer text-[#4D4C5C] bg-[#f4f4f8] w-28 h-28 border-2 border-dashed border-[#121117] rounded-md text-[14px] font-normal">
                     JPG or PNG, max 5MB
                   </div>
                 ) : (
-                  <img className="w-28 h-28 rounded-md " src={profilePhoto} />
+                  <img className="w-28 h-28 rounded-md " src={about?.profilePhoto} />
                 )}
 
                 <input
@@ -104,7 +204,7 @@ const About = (props) => {
                 <img src={question} className="h-6 w-6" />
               </HtmlTooltip>
             </div>
-            {warning ? (
+            {warning.profilePhoto ? (
               <div className="flex flex-row px-4 py-3 bg-[#ffe2e0] items-center gap-3 rounded-md">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -114,9 +214,9 @@ const About = (props) => {
                   className="h-5 w-5"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M15.291 4.055 12 2 8.709 4.055l-3.78.874-.874 3.78L2 12l2.055 3.291.874 3.78 3.78.874L12 22l3.291-2.055 3.78-.874.874-3.78L22 12l-2.055-3.291-.874-3.78zM10.981 7.2l.126 6.608H12.9l.126-6.608zm.224 9.688q.336.322.798.322.463 0 .784-.322a1.1 1.1 0 0 0 .336-.798q0-.463-.336-.784a1.05 1.05 0 0 0-.784-.336 1.1 1.1 0 0 0-.798.336 1.07 1.07 0 0 0-.322.784q0 .462.322.798"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   ></path>
                 </svg>
                 Tải lên một bức ảnh của bạn để tiếp tục
@@ -146,43 +246,183 @@ const About = (props) => {
             />
           </label>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
           <label htmlFor="fullname">Họ và tên</label>
           <input
-            className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+            className={
+              warning.fullName === ""
+                ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0] "
+            }
             type="text"
-            id="fullname"
+            id="fullName"
+            value={about.fullName}
+            onChange={handleChange}
             required
           />
+          {warning.fullName === "" ? (
+            ""
+          ) : (
+            <div className="text-[#a3120a]">{warning.fullName}</div>
+          )}
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
           <label htmlFor="email">Email</label>
           <input
-            className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+            className={
+              warning.email === ""
+                ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0] "
+            }
             type="email"
-            id="lastName"
+            id="email"
+            value={about.email}
+            onChange={handleChange}
             required
           />
+          {warning.email === "" ? (
+            ""
+          ) : (
+            <div className="text-[#a3120a]">{warning.email}</div>
+          )}
         </div>
-        <div className="flex flex-col">
-          <label htmlFor="nationalID">Chứng minh nhân dân (CMCD/CCCD)</label>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="nationalId">Chứng minh nhân dân (CMCD/CCCD)</label>
           <input
-            className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
-            name="nationalID"
-            id="nationalID"
+            className={
+              warning.nationalId === ""
+                ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0] "
+            }
+            name="nationalId"
+            id="nationalId"
             type="tel"
             pattern="(0[0-9]{2}|[0-9]{3})([0-9]{1})([0-9]{2})([0-9]{6})"
             maxLength={12}
+            value={about.nationalId}
+            onChange={handleChange}
             required
           />
+          {warning.nationalId === "" ? (
+            ""
+          ) : (
+            <div className="text-[#a3120a]">{warning.nationalId}</div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-4 mt-5">
-        <div className="font-semibold">
-            Dán liên kết tới video của bạn
+        <div className="flex flex-col gap-3">
+          <label htmlFor="subjects">Chọn môn học giảng dạy</label>
+          {about.subjects.map((subject, index) => (
+            <div className="flex flex-row gap-3" key={""}>
+              <select
+                placeholder="Chọn môn học"
+                className="w-full px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                onChange={(e) => handleSubjectChange(e.target.value, index)}
+                value={subject}
+              >
+                <option key={"Toán"} value={"Toán"}>
+                  Toán
+                </option>
+                <option key={"Văn"} value={"Văn"}>
+                  Văn
+                </option>
+                <option key={"Sinh"} value={"Sinh"}>
+                  Sinh
+                </option>
+                <option key={"Vật lý"} value={"Vật lý"}>
+                  Vật lý
+                </option>
+                <option key={"Anh"} value={"Anh"}>
+                  Anh
+                </option>
+                <option key={"Địa lý"} value={"Địa lý"}>
+                  Địa lý
+                </option>
+                <option key={"Lịch sử"} value={"Lịch sử"}>
+                  Lịch sử
+                </option>
+                <option key={"IT"} value={"IT"}>
+                  IT
+                </option>
+              </select>
+
+              {about.subjects.length > 1 ? (
+                <div
+                  className="flex w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
+                  onClick={() => removeSubject(index)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                    className="w-full"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16 3H8v2h8zM3 6h18v2h-2v13H5V8H3zm4 2h10v11H7zm2 2h2v7H9zm6 0h-2v7h2z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
+          ))}
+          <div
+            className="font-semibold underline cursor-pointer"
+            onClick={() => addSubject()}
+          >
+            Thêm môn học khác
           </div>
-          
-          {videoURL === "" ? (
+        </div>
+
+        <div className="flex flex-col gap-4 mt-3">
+          <div className="flex justify-between">
+            <div className="font-semibold">Dán liên kết tới video của bạn</div>
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  <div className="flex flex-col gap-4 p-2 text-[14px]">
+                    <div className="flex flex-row items-center gap-3">
+                      <img className="w-4 h-4" src={check} /> Video của bạn phải
+                      dài từ 30 giây đến 2 phút.
+                    </div>
+                    <div className="flex flex-row items-center gap-3">
+                      <img className="w-4 h-4" src={check} />
+                      Quay ở chế độ ngang và ngang tầm mắt.
+                    </div>
+                    <div className="flex flex-row items-center gap-3">
+                      <img className="w-4 h-4" src={check} />
+                      Sử dụng bề mặt ổn định để video của bạn không bị rung.
+                    </div>
+                    <div className="flex flex-row items-center gap-3">
+                      <img className="w-4 h-4" src={check} />
+                      Đảm bảo khuôn mặt và mắt của bạn được nhìn thấy rõ ràng
+                      (ngoại trừ lý do tôn giáo).
+                    </div>
+                    <div className="flex flex-row items-center gap-3">
+                      <img className="w-4 h-4" src={check} />
+                      Làm nổi bật kinh nghiệm giảng dạy của bạn và bất kỳ chứng
+                      chỉ giảng dạy có liên quan nào.
+                    </div>
+                    <div className="flex flex-row items-center gap-3">
+                      <img className="w-4 h-4" src={check} />
+                      Chào đón học sinh của bạn một cách nồng nhiệt và mời họ
+                      đăng ký một bài học.
+                    </div>
+                  </div>
+                </React.Fragment>
+              }
+              placement="right"
+              arrow
+            >
+              <img src={question} className="h-6 w-6" />
+            </HtmlTooltip>
+          </div>
+
+          {about.videoUrl === "" ? (
             <div className=" flex items-center w-full h-[371px] border-2 border-[#dcdce5] rounded-md justify-center">
               Video của bạn sẽ xuất hiện ở đây
             </div>
@@ -191,19 +431,17 @@ const About = (props) => {
               <iframe
                 className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
                 src={`https://www.youtube.com/embed/${extractVideoID(
-                  videoURL
+                  about.videoUrl
                 )}`}
                 title="YouTube video player"
-                frameborder="0"
                 allow=""
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
               ></iframe>
             </div>
           )}
 
-
-          <div>
+          <div className="">
             Tìm hiểu cách tải video lên{" "}
             <a
               href="https://support.google.com/youtube/answer/57407"
@@ -215,13 +453,23 @@ const About = (props) => {
           </div>
 
           <input
-            className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+            className={
+              warning.videoUrl === ""
+                ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0] "
+            }
             type="text"
-            id="videoURL"
+            id="videoUrl"
             placeholder="www.youtube.com/watch?v=l5aZJBLAu1E"
-            onChange={(e) => setVideoURL(e.target.value)}
+            value={about.videoUrl}
+            onChange={handleChange}
             required
           />
+          {warning.videoUrl === "" ? (
+            ""
+          ) : (
+            <div className="text-[#a3120a]">{warning.videoUrl}</div>
+          )}
         </div>
         <div className="flex flex-row-reverse">
           <div
