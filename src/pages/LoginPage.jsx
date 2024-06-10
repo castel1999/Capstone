@@ -13,6 +13,10 @@ import { useAuth } from "../hooks/AuthContext";
 import ErrorPopup from "../utils/ErrorPopup";
 import logo from "../assets/logo.png";
 import loginBG from "../assets/loginBG.png";
+import { db } from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { Block } from "@mui/icons-material";
+
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -60,7 +64,29 @@ const LoginPage = () => {
 
       setUser({ role: data.role, userId: data.userId });
       await queryClient.invalidateQueries("getCurrentUser");
-
+      try {
+        // Get User data from API
+        const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
+        console.log(currentUserInfo)
+        if (currentUserInfo) {
+          // Save or update data user into FireStore
+          const userData = {
+            userID: data.userId,
+            avatar: currentUserInfo.value.imageUrl || "",
+            name: currentUserInfo.value.fullName || "",
+            lastLogin: serverTimestamp(),
+            blockedUser: []
+          };
+          await setDoc(doc(db, "users", userData.userID), userData);
+          await setDoc(doc(db, "userchats", userData.userID), {
+            chats: [],
+          });
+        } else {
+          console.log("Không lấy được thông tin user");
+        }
+      } catch (error) {
+        console.log("Lỗi khi lưu dữ liệu vào Firestore:", error);
+      }
       toast.success("Đăng nhập thành công!");
       navigate("/tutor-list");
     },
