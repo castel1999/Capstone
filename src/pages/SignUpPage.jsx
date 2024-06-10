@@ -254,7 +254,6 @@ const SignUpPage = () => {
             </button>
           </div>
         )}
-
         <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
           Đã có tài khoản?{" "}
           <Link

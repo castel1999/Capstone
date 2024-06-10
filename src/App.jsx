@@ -30,6 +30,9 @@ import TutorRegistration from "./pages/tutorRegistration/TutorRegistration";
 import MylessonPage from "./pages/myLesson/MylessonPage";
 import FavoritePage from "./pages/FavoritePage";
 import EmailPage from "./pages/settings/EmailPage";
+import Dasboard from "./pages/admin/Dasboard";
+import HomeAdmin from "./pages/admin/HomeAdmin";
+import AccountAdmin from "./pages/admin/AccountAdmin";
 
 function App() {
   return (
@@ -74,6 +77,15 @@ function App() {
 
           <Route element={<PrivateRoute allowedRoles={["Student"]} />}>
             <Route path="/tutor-registration" element={<TutorRegistration />} />
+          </Route>
+
+          <Route
+            element={<PrivateRoute allowedRoles={["Admin", "Moderator"]} />}
+          >
+            <Route path="/dashboard" element={<Dasboard />}>
+              <Route path="home" element={<HomeAdmin />} />
+              <Route path="accounts" element={<AccountAdmin />} />
+            </Route>
           </Route>
 
           <Route path="/unauthorized" element={<UnauthorizedPage />} />

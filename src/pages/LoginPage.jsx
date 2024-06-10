@@ -11,8 +11,13 @@ import { toast } from "react-toastify";
 import * as apiClient from "../api/UserAPI";
 import { useAuth } from "../hooks/AuthContext";
 import ErrorPopup from "../utils/ErrorPopup";
+import { jwtDecode } from "jwt-decode";
 import logo from "../assets/logo.png";
 import loginBG from "../assets/loginBG.png";
+import { db } from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { Block } from "@mui/icons-material";
+
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -54,13 +59,36 @@ const LoginPage = () => {
   const mutation = useMutation({
     mutationFn: apiClient.login,
     onSuccess: async (data) => {
+      const decodedToken = jwtDecode(data.accessToken);
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("userID", data.userId);
       localStorage.setItem("role", data.role);
 
-      setUser({ role: data.role, userId: data.userId });
+      setUser({ role: data.role, userId: data.userId, token: data.accessToken, decodedToken });
       await queryClient.invalidateQueries("getCurrentUser");
-
+      try {
+        // Get User data from API
+        const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
+        console.log(currentUserInfo)
+        if (currentUserInfo) {
+          // Save or update data user into FireStore
+          const userData = {
+            userID: data.userId,
+            avatar: currentUserInfo.value.imageUrl || "",
+            name: currentUserInfo.value.fullName || "",
+            lastLogin: serverTimestamp(),
+            blockedUser: []
+          };
+          await setDoc(doc(db, "users", userData.userID), userData);
+          await setDoc(doc(db, "userchats", userData.userID), {
+            chats: [],
+          });
+        } else {
+          console.log("Không lấy được thông tin user");
+        }
+      } catch (error) {
+        console.log("Lỗi khi lưu dữ liệu vào Firestore:", error);
+      }
       toast.success("Đăng nhập thành công!");
       navigate("/tutor-list");
     },
@@ -150,46 +178,28 @@ const LoginPage = () => {
         </div>
         <div className="mt-4 flex justify-between font-semibold text-sm">
           <label className="flex text-slate-500 hover:text-slate-600 cursor-pointer">
-            <input className="mr-1" type="checkbox" />
-            <span>Ghi nhớ tài khoản</span>
+            <input
+              className="mr-1"
+              type="checkbox"
+              name="remember"
+              id="remember"
+            />
+            <span>Ghi nhớ tôi</span>
           </label>
           <a
             className="text-blue-600 hover:text-blue-700 hover:underline hover:underline-offset-4"
-            href="#"
+            href="#!"
           >
             Quên mật khẩu?
           </a>
         </div>
-        {/* Submit btn */}
-        {mutation.isPending ? (
-          <div className="text-center md:text-left">
-            <button
-              className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider cursor-wait"
-              type="button"
-              disabled
-            >
-              Loading...
-            </button>
-          </div>
-        ) : (
-          <div className="text-center md:text-left">
-            <button
-              className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
-              type="button"
-              onClick={onSubmit}
-            >
-              Đăng nhập
-            </button>
-          </div>
-        )}
-        <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
-          Chưa có tài khoản?{" "}
-          <Link
-            className="text-red-600 hover:underline hover:underline-offset-4"
-            to="/signup"
+        <div className="text-center md:text-left">
+          <button
+            className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
+            onClick={onSubmit}
           >
-            Đăng ký
-          </Link>
+            Đăng nhập
+          </button>
         </div>
       </div>
     </section>
