@@ -123,7 +123,7 @@ const About = (props) => {
     );
     console.log(newWarnings);
 
-    if (allFieldsValid) console.log(about);
+    if (allFieldsValid) console.log('About information: ', about);
   };
 
   const extractVideoID = (url) => {

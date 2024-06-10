@@ -41,7 +41,7 @@ const Description = (props) => {
 
     setWarnings(newWarnings);
     if (allValid) {
-      console.log(descriptions)
+      console.log('Description: ', descriptions)
     }
   };
 

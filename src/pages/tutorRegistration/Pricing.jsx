@@ -14,7 +14,7 @@ const Pricing = (props) => {
     setWarning(newWarning);
 
     if (newWarning === "") {
-      console.log(price);
+      console.log('Price: ',price);
       alert("register finish");
     }
   };
@@ -58,9 +58,9 @@ const Pricing = (props) => {
             className="h-6 w-6"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M18.567 6.176a1 1 0 0 1 .257 1.39l-7.563 11a1 1 0 0 1-1.648 0l-3.437-5a1 1 0 1 1 1.648-1.133l2.614 3.802 6.738-9.802a1 1 0 0 1 1.39-.257Z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             ></path>
           </svg>
           <div>
@@ -77,9 +77,9 @@ const Pricing = (props) => {
             className="h-6 w-6"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M18.567 6.176a1 1 0 0 1 .257 1.39l-7.563 11a1 1 0 0 1-1.648 0l-3.437-5a1 1 0 1 1 1.648-1.133l2.614 3.802 6.738-9.802a1 1 0 0 1 1.39-.257Z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             ></path>
           </svg>
           <div>
