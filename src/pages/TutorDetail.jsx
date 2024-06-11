@@ -114,7 +114,7 @@ const TutorDetail = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-row w-[100%] text-base font-semibold border-2 rounded-lg border-black bg-white sticky top-[88px] z-40">
+        <div className="flex flex-row w-[100%] text-base font-semibold border-2 rounded-lg border-black bg-white sticky top-[90px] z-40">
           <Link
             to="introduction"
             duration={500}
