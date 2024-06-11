@@ -14,7 +14,7 @@ const Chat = () => {
   const [showChat, setShowChat] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [text, setText] = useState("");
-  const logged = localStorage.getItem("userID") !== null;
+  const logged = localStorage.getItem("token") !== null;
   const role = localStorage.getItem("role");
   // Open dropdown chat 
   const [isOpen, setIsOpen] = useState(false);

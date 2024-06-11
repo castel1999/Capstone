@@ -7,7 +7,7 @@ import UserNavbar from "./userNavbar/UserNavbar";
 import Loading from "../../utils/Loading";
 
 const NavBar = () => {
-  const Logged = localStorage.getItem("userID") !== null;
+  const Logged = localStorage.getItem("token") !== null;
   const currUser = localStorage.getItem("role");
 
   const navigate = useNavigate();

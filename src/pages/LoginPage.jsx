@@ -18,7 +18,6 @@ import { db } from "../firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Block } from "@mui/icons-material";
 
-
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useAuth();
@@ -61,15 +60,18 @@ const LoginPage = () => {
     onSuccess: async (data) => {
       const decodedToken = jwtDecode(data.accessToken);
       localStorage.setItem("token", data.accessToken);
-      localStorage.setItem("userID", data.userId);
       localStorage.setItem("role", data.role);
 
-      setUser({ role: data.role, userId: data.userId, token: data.accessToken, decodedToken });
+      setUser({
+        role: data.role,
+        token: data.accessToken,
+        decodedToken,
+      });
       await queryClient.invalidateQueries("getCurrentUser");
       try {
         // Get User data from API
         const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
-        console.log(currentUserInfo)
+        console.log(currentUserInfo);
         if (currentUserInfo) {
           // Save or update data user into FireStore
           const userData = {
@@ -77,7 +79,7 @@ const LoginPage = () => {
             avatar: currentUserInfo.value.imageUrl || "",
             name: currentUserInfo.value.fullName || "",
             lastLogin: serverTimestamp(),
-            blockedUser: []
+            blockedUser: [],
           };
           await setDoc(doc(db, "users", userData.userID), userData);
           await setDoc(doc(db, "userchats", userData.userID), {
