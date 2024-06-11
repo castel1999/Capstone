@@ -14,14 +14,16 @@ import { Navigate, NavLink } from "react-router-dom";
 const SideBarAdmin = () => {
   const [open, setOpen] = useState(true);
   const Menus = [
-    { title: "Dashboard", src: Chart_fill, path: "/dashboard/home" },
+    { title: "Thống kê", src: Chart_fill, path: "/dashboard/home" },
     { title: "Inbox", src: Chat, path: "/dashboard/inbox" },
-    { title: "Accounts", src: User, path: "/dashboard/accounts", gap: true },
-    { title: "Schedule", src: Calendar, path: "/dashboard/schedule" },
-    { title: "Search", src: Search, path: "/dashboard/search" },
-    { title: "Analytics", src: Chart, path: "/dashboard/analytics" },
-    { title: "Files", src: Folder, path: "/dashboard/files", gap: true },
-    { title: "Setting", src: Setting, path: "/dashboard/setting" },
+    { title: "Tài khoản", src: User, path: "/dashboard/accounts", gap: true },
+    {
+      title: "Đăng ký giảng viên",
+      src: Calendar,
+      path: "/dashboard/tutor-request",
+    },
+    { title: "Giao dịch", src: Chart, path: "/dashboard/analytics" },
+    { title: "Cài Đặt", src: Setting, path: "/dashboard/setting", gap: true },
   ];
 
   const logout = () => {
