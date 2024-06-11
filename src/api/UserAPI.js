@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+
 const BASE_API_LINK = import.meta.env.VITE_API_LINK;
 
 export const getTutor = async () => {
@@ -47,7 +49,8 @@ export const register = async (data) => {
 
 export const getCurrentUser = async () => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_API_LINK}/Account/get/${localStorage.getItem("userID")}`, {
+  const decode = jwtDecode(token)
+  const response = await fetch(`${BASE_API_LINK}/Account/get/${decode.UserId}`, {
     headers: {
       "Authorization": `Bearer ${token}`
     }

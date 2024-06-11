@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
@@ -16,16 +16,17 @@ export const AuthProvider = ({ children }) => {
 
     const decodedToken = jwtDecode(token);
     const role = localStorage.getItem("role");
-    const userId = localStorage.getItem("userID");
 
     if (decodedToken.exp * 1000 < Date.now()) {
       localStorage.clear();
       return null;
     }
 
-    return { role, userId, token, decodedToken };
+    return { role, token, decodedToken };
   });
+  console.log('user',user);
 
+  // Token Expiration Handling
   useEffect(() => {
     if (!user) return;
 
@@ -33,12 +34,13 @@ export const AuthProvider = ({ children }) => {
     const timer = setTimeout(() => {
       localStorage.clear();
       setUser(null);
-      window.location.href = "/login"; // Redirect to login page
+      window.location.href = "/login";
     }, remainingTime);
 
     return () => clearTimeout(timer);
   }, [user]);
 
+  // Handling Storage Changes
   useEffect(() => {
     const handleStorageChange = () => {
       const token = localStorage.getItem("token");
@@ -49,7 +51,6 @@ export const AuthProvider = ({ children }) => {
 
       const decodedToken = jwtDecode(token);
       const role = localStorage.getItem("role");
-      const userId = localStorage.getItem("userID");
 
       if (decodedToken.exp * 1000 < Date.now()) {
         localStorage.clear();
@@ -57,7 +58,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      setUser({ role, userId, token, decodedToken });
+      setUser({ role, token, decodedToken });
     };
 
     window.addEventListener("storage", handleStorageChange);
