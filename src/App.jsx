@@ -33,6 +33,8 @@ import EmailPage from "./pages/settings/EmailPage";
 import Dasboard from "./pages/admin/Dasboard";
 import HomeAdmin from "./pages/admin/HomeAdmin";
 import AccountAdmin from "./pages/admin/AccountAdmin";
+import TutorRequestAdmin from "./pages/admin/TutorRequestAdmin";
+import TutorRequestDetail from "./pages/admin/TutorRequestDetail";
 
 function App() {
   return (
@@ -85,6 +87,11 @@ function App() {
             <Route path="/dashboard" element={<Dasboard />}>
               <Route path="home" element={<HomeAdmin />} />
               <Route path="accounts" element={<AccountAdmin />} />
+              <Route path="tutor-request" element={<TutorRequestAdmin />} />
+              <Route
+                path="tutor-request-detail/:tutorId"
+                element={<TutorRequestDetail />}
+              />
             </Route>
           </Route>
 
