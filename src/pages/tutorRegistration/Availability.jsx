@@ -2,82 +2,7 @@ import React, { useState } from "react";
 
 const Availability = (props) => {
   const setStage = props.setStage;
-  const [dayOfWeek, setDayOfWeek] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
-  const [weekSchedule, setWeekSchedule] = useState({
-    monday: [],
-    tuesday: [],
-    wednesday: [],
-    thursday: [],
-    friday: [],
-    saturday: [],
-    sunday: [],
-  });
-
-  const handleGoback = () => {
-    setStage(4);
-  };
-
-  const handleSubmit = () => {
-    setStage(6);
-  };
-
-  const toggleDay = (index) => {
-    const day = dayNames[index];
-    setDayOfWeek(
-      dayOfWeek.map((selected, idx) => (idx === index ? !selected : selected))
-    );
-
-    if (weekSchedule[day].length === 0 && !dayOfWeek[index]) {
-      addTimeRange(day);
-    }
-  };
-
-  const addTimeRange = (day) => {
-    const updatedDay = [
-      ...weekSchedule[day],
-      { startingTime: "", endingTime: "" },
-    ];
-    setWeekSchedule({ ...weekSchedule, [day]: updatedDay });
-  };
-
-  const handleTimeChange = (day, index, newTime, field) => {
-    const updatedDay = weekSchedule[day].map((timeRange, i) => {
-      if (i === index) {
-        return { ...timeRange, [field]: newTime };
-      }
-      return timeRange;
-    });
-    setWeekSchedule({ ...weekSchedule, [day]: updatedDay });
-  };
-
-  const removeTimeRange = (day, index) => {
-    const updatedDay = weekSchedule[day].filter((_, idx) => idx !== index);
-    setWeekSchedule({ ...weekSchedule, [day]: updatedDay });
-  };
-
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        options.push(time);
-      }
-    }
-    return options;
-  };
-
-  const timeOptions = generateTimeOptions();
-
+  const [dayOfWeek, setDayOfWeek] = useState(Array(7).fill(false));
   const dayNames = [
     "monday",
     "tuesday",
@@ -96,6 +21,116 @@ const Availability = (props) => {
     "Thứ bảy",
     "Chủ nhật",
   ];
+  const [weekSchedule, setWeekSchedule] = useState({
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+  });
+  const [weekWarnings, setWeekWarnings] = useState({
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+    total: "",
+  });
+
+  const toggleDay = (index) => {
+    const day = dayNames[index];
+    setDayOfWeek(
+      dayOfWeek.map((selected, idx) => (idx === index ? !selected : selected))
+    );
+
+    if (weekSchedule[day].length === 0 && !dayOfWeek[index]) {
+      addTimeRange(day);
+    }
+    setWeekWarnings({ ...weekWarnings, ["total"]: "" });
+  };
+
+  const addTimeRange = (day) => {
+    const updatedDay = [
+      ...weekSchedule[day],
+      { startingTime: "", endingTime: "" },
+    ];
+    const updatedWarnings = [
+      ...weekWarnings[day],
+      { startingTime: "", endingTime: "" },
+    ];
+    setWeekSchedule({ ...weekSchedule, [day]: updatedDay });
+    setWeekWarnings({ ...weekWarnings, [day]: updatedWarnings });
+  };
+
+  const handleTimeChange = (day, index, newTime, field) => {
+    const updatedDay = weekSchedule[day].map((timeRange, i) => {
+      if (i === index) {
+        return { ...timeRange, [field]: newTime };
+      }
+      return timeRange;
+    });
+    setWeekSchedule({ ...weekSchedule, [day]: updatedDay });
+
+    const updatedWarnings = weekWarnings[day].map((warning, i) => {
+      if (i === index) {
+        const error = validateTimeRange(
+          updatedDay[i].startingTime,
+          updatedDay[i].endingTime
+        );
+        console.log(updatedDay[i].startingTime);
+        console.log(updatedDay[i].endingTime);
+        return { ...warning, [field]: error };
+      }
+      return warning;
+    });
+    setWeekWarnings({ ...weekWarnings, [day]: updatedWarnings });
+  };
+
+  const removeTimeRange = (day, index) => {
+    const updatedDay = weekSchedule[day].filter((_, idx) => idx !== index);
+    const updatedWarnings = weekWarnings[day].filter((_, idx) => idx !== index);
+    setWeekSchedule({ ...weekSchedule, [day]: updatedDay });
+    setWeekWarnings({ ...weekWarnings, [day]: updatedWarnings });
+  };
+
+  const validateTimeRange = (start, end) => {
+    if (start === "" || end === "") return "Thời gian không được để trống";
+    if (start >= end) return "Thời gian bắt đầu phải trước thời gian kết thúc";
+    return "";
+  };
+
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(time);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+
+  const handleGoback = () => {
+    setStage(4);
+  };
+
+  const handleSubmit = () => {
+    const allDaysOff = dayOfWeek.every((day) => !day);
+    if (allDaysOff) {
+      setWeekWarnings({
+        ...weekWarnings,
+        ["total"]: "Chọn ít nhất một ngày và thời gian để tiếp tục",
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col p-12 gap-6">
@@ -109,7 +144,9 @@ const Availability = (props) => {
       {dayOfWeek.map((day, index) => (
         <div key={index}>
           <div
-            className="flex flex-row gap-3 cursor-pointer w-fit"
+            className={`flex flex-row gap-3 cursor-pointer w-fit ${
+              weekWarnings.total === "" ? "" : "text-[#a3120a]"
+            }`}
             onClick={() => toggleDay(index)}
           >
             {dayOfWeek[index] ? (
@@ -121,14 +158,20 @@ const Availability = (props) => {
                   fill="white"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M9.923 17.101 6 13.18 7.179 12l2.744 2.744L17.667 7l1.178 1.179z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   ></path>
                 </svg>
               </div>
             ) : (
-              <div className="h-6 w-6 bg-white border-2 border-black rounded-md" />
+              <div
+                className={`h-6 w-6 bg-white border-2 ${
+                  weekWarnings.total === ""
+                    ? "border-black"
+                    : "border-[#a3120a]"
+                } rounded-md`}
+              />
             )}
             {dayLabels[index]}
           </div>
@@ -167,17 +210,8 @@ const Availability = (props) => {
                   </div>
                   <div className="flex flex-col flex-1">
                     {i == 0 ? <div>To</div> : ""}
-                    {/* <input
-                      className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
-                      type="time"
-                      value={timeRange.endingTime}
-                      step="1800"
-                      onChange={() => {}}
-                      required
-                    /> */}
-
                     <select
-                      className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                      className="px-[14px] w-full py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
                       value={timeRange.endingTime}
                       onChange={(e) =>
                         handleTimeChange(
@@ -198,7 +232,7 @@ const Availability = (props) => {
 
                   {weekSchedule[dayNames[index]].length > 1 ? (
                     <div
-                      className="w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
+                      className="flex w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
                       onClick={() => removeTimeRange(dayNames[index], index)}
                     >
                       <svg
@@ -209,9 +243,9 @@ const Availability = (props) => {
                         className="w-full"
                       >
                         <path
-                          fill-rule="evenodd"
+                          fillRule="evenodd"
                           d="M16 3H8v2h8zM3 6h18v2h-2v13H5V8H3zm4 2h10v11H7zm2 2h2v7H9zm6 0h-2v7h2z"
-                          clip-rule="evenodd"
+                          clipRule="evenodd"
                         ></path>
                       </svg>
                     </div>

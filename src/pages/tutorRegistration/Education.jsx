@@ -1,6 +1,10 @@
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import moment from "moment";
 import React, { useState } from "react";
+import { app } from "../../firebase";
 
 const Education = (props) => {
+  const currentUser = localStorage.getItem("userID");
   const setStage = props.setStage;
   const [notHave, setNotHave] = useState(false);
   const [educations, setEducations] = useState([
@@ -13,6 +17,16 @@ const Education = (props) => {
       image: null,
     },
   ]);
+  const [warnings, setWarnings] = useState(
+    educations.map(() => ({
+      university: "",
+      degree: "",
+      specialization: "",
+      yearStart: "",
+      yearEnd: "",
+      image: false,
+    }))
+  );
 
   const addEducation = () => {
     setEducations([
@@ -26,24 +40,110 @@ const Education = (props) => {
         image: null,
       },
     ]);
+    setWarnings([
+      ...warnings,
+      {
+        university: "",
+        degree: "",
+        specialization: "",
+        yearStart: "",
+        yearEnd: "",
+        image: false,
+      },
+    ]);
   };
 
   const handleEducationChange = (index, field, value) => {
-    const newEducations = educations.map((edu, i) => {
-      if (i === index) {
-        return { ...edu, [field]: value };
+    setEducations((prevEducations) =>
+      prevEducations.map((edu, i) =>
+        i === index ? { ...edu, [field]: value } : edu
+      )
+    );
+
+    setWarnings((prevWarnings) =>
+      prevWarnings.map((warn, i) =>
+        i === index ? { ...warn, [field]: "" } : warn
+      )
+    );
+  };
+
+  const handleImageUpload = async (event, index) => {
+    const storage = getStorage(app);
+    const storageRef = ref(
+      storage,
+      `Tutor registrations/${currentUser}/education${index + 1}`
+    );
+
+    if (event.target.files && event.target.files[0]) {
+      try {
+        await uploadBytes(storageRef, event.target.files[0]);
+        const url = await getDownloadURL(storageRef);
+        handleEducationChange(index, "image", url);
+      } catch (error) {
+        console.error("Error uploading file: ", error);
       }
-      return edu;
-    });
-    setEducations(newEducations);
+    }
+  };
+
+  const handleImageRemove = async (index) => {
+    const storage = getStorage(app);
+    const storageRef = ref(
+      storage,
+      `User registrations/${currentUser}/education${index + 1}`
+    );
+
+    try {
+      // await deleteObject(storageRef);
+      handleEducationChange(index, "image", null);
+    } catch (error) {
+      console.error("Error removing file: ", error);
+    }
+  };
+
+  const removeEducation = (index) => {
+    const updatedEducations = educations.slice();
+    const updatedWarnings = warnings.slice();
+    handleImageRemove(index);
+    updatedEducations.splice(index, 1);
+    setEducations(updatedEducations);
+    updatedWarnings.splice(index, 1);
+    setWarnings(updatedWarnings);
+  };
+
+  const handleSubmit = () => {
+    const newWarnings = educations.map((edu) => ({
+      university: edu.university === "" ? "Bạn cần điền thông tin này" : "",
+      degree: edu.degree === "" ? "Bạn cần điền thông tin này" : "",
+      specialization:
+        edu.specialization === "" ? "Bạn cần điền thông tin này" : "",
+      yearStart:
+        edu.yearStart === ""
+          ? "Bạn cần điền thông tin này"
+          : Number(edu.yearStart) > moment().year()
+          ? "Năm không hợp lệ"
+          : "",
+      yearEnd:
+        edu.yearEnd === ""
+          ? "Bạn cần điền thông tin này"
+          : Number(edu.yearEnd) < Number(edu.yearStart) ||
+            Number(edu.yearEnd) > moment().year()
+          ? "Năm không hợp lệ"
+          : "",
+    }));
+
+    setWarnings(newWarnings);
+    const allFieldsValid = newWarnings.every((warning) =>
+      Object.values(warning).every((value) => value === "")
+    );
+
+    if (allFieldsValid) {
+      console.log("Educations:", educations);
+      // setStage(4);  // Proceed to the next stage
+    }
   };
 
   const handleGoback = () => {
     setStage(2);
-  };
-
-  const handleSubmit = () => {
-    setStage(4);
   };
 
   return (
@@ -74,7 +174,7 @@ const Education = (props) => {
               >
                 <path
                   d="M9.923 17.101 6 13.18 7.179 12l2.744 2.744L17.667 7l1.178 1.179z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
             </div>
@@ -86,40 +186,81 @@ const Education = (props) => {
       {!notHave ? (
         <div>
           {educations.map((education, index) => (
-            <div className="flex flex-col mt-4">
+            <div className="flex flex-col mt-4 gap-2" key={index}>
               <div>Trường đại học</div>
-              <input
-                className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
-                type="text"
-                value={education?.university}
-                onChange={(e) =>
-                  handleEducationChange(
-                    index,
-                    "university",
-                    e.target.value
-                  )
-                }
-                required
-              />
+              <div className="flex flex-row gap-2">
+                <input
+                  className={
+                    warnings[index].university === ""
+                      ? "w-full px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                      : "w-full px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                  }
+                  type="text"
+                  value={education?.university}
+                  onChange={(e) =>
+                    handleEducationChange(index, "university", e.target.value)
+                  }
+                  required
+                />
+
+                {educations?.length > 1 ? (
+                  <div
+                    className="flex w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
+                    onClick={() => removeEducation(index)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                      className="w-full"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16 3H8v2h8zM3 6h18v2h-2v13H5V8H3zm4 2h10v11H7zm2 2h2v7H9zm6 0h-2v7h2z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+              {warnings[index].university === "" ? (
+                ""
+              ) : (
+                <div className="text-[#a3120a]">
+                  {warnings[index].university}
+                </div>
+              )}
 
               <div className="mt-4">Bằng cấp</div>
               <input
-                className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                className={
+                  warnings[index].degree === ""
+                    ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    : "w-full px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                }
                 type="text"
                 value={education.degree}
                 onChange={(e) =>
-                  handleEducationChange(
-                    index,
-                    "degree",
-                    e.target.value
-                  )
+                  handleEducationChange(index, "degree", e.target.value)
                 }
                 required
               />
+              {warnings[index].degree === "" ? (
+                ""
+              ) : (
+                <div className="text-[#a3120a]">{warnings[index].degree}</div>
+              )}
 
               <div className="mt-4">Chuyên môn</div>
               <input
-                className="px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                className={
+                  warnings[index].specialization === ""
+                    ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    : "w-full px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                }
                 type="text"
                 value={education.specialization}
                 onChange={(e) =>
@@ -127,12 +268,23 @@ const Education = (props) => {
                 }
                 required
               />
+              {warnings[index].specialization === "" ? (
+                ""
+              ) : (
+                <div className="text-[#a3120a]">
+                  {warnings[index].specialization}
+                </div>
+              )}
 
               <div className="mt-4">
                 <div>Năm học</div>
                 <div className="flex items-center gap-2">
                   <input
-                    className="flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    className={
+                      warnings[index].yearStart === ""
+                        ? "flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                        : "flex-1 px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                    }
                     type="number"
                     min="1900"
                     max="2099"
@@ -140,16 +292,16 @@ const Education = (props) => {
                     required
                     value={education.yearStart}
                     onChange={(e) =>
-                      handleEducationChange(
-                        index,
-                        "yearStart",
-                        e.target.value
-                      )
+                      handleEducationChange(index, "yearStart", e.target.value)
                     }
                   />{" "}
                   -{" "}
                   <input
-                    className="flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    className={
+                      warnings[index].yearStart === ""
+                        ? "flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                        : "flex-1 px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
+                    }
                     type="number"
                     min="1900"
                     max="2099"
@@ -157,13 +309,25 @@ const Education = (props) => {
                     required
                     value={education.yearEnd}
                     onChange={(e) =>
-                      handleEducationChange(
-                        index,
-                        "yearEnd",
-                        e.target.value
-                      )
+                      handleEducationChange(index, "yearEnd", e.target.value)
                     }
                   />
+                </div>
+                <div className="flex flex-row">
+                  {warnings[index].yearStart === "" ? (
+                    <div className="flex-1"></div>
+                  ) : (
+                    <div className="text-[#a3120a] flex-1">
+                      {warnings[index].yearStart}
+                    </div>
+                  )}
+                  {warnings[index].yearEnd === "" ? (
+                    ""
+                  ) : (
+                    <div className="ml-5 text-[#a3120a] flex-1">
+                      {warnings[index].yearEnd}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -184,13 +348,7 @@ const Education = (props) => {
                   <label className="px-4 py-2 border-2 border-black rounded-lg hover:bg-[rgba(18,17,23,.06)] w-fit cursor-pointer">
                     Tải lên
                     <input
-                      onChange={(e) =>
-                        handleEducationChange(
-                          index,
-                          "image",
-                          URL.createObjectURL(e.target.files[0])
-                        )
-                      }
+                      onChange={(e) => handleImageUpload(e, index)}
                       type="file"
                       hidden
                     />
@@ -209,9 +367,9 @@ const Education = (props) => {
                       }
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M7.207 5.793a1 1 0 0 0-1.414 1.414L10.586 12l-4.793 4.793a1 1 0 1 0 1.414 1.414L12 13.414l4.793 4.793a1 1 0 0 0 1.414-1.414L13.414 12l4.793-4.793a1 1 0 0 0-1.414-1.414L12 10.586z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       ></path>
                     </svg>
                   </div>
