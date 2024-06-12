@@ -8,9 +8,10 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { app } from "../../firebase";
+import {useAuth} from '../../hooks/AuthContext'
 
 const Certification = (props) => {
-  const currentUser = localStorage.getItem("userID");
+  const currentUser = useAuth().user.decodedToken.UserId;
   const current = new moment();
   const setStage = props.setStage;
   const [notHaveCertificate, setNotHaveCertificate] = useState(false);

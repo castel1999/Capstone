@@ -5,9 +5,11 @@ import { Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../../firebase";
+import {useAuth} from '../../hooks/AuthContext'
 
 const About = (props) => {
-  const currentUser = localStorage.getItem("userID");
+  const currentUser = useAuth().user.decodedToken.UserId;
+  console.log(currentUser)
   const setIsStage1Completed = props.setIsStage1Completed;
   const [videoURL, setVideoURL] = useState("");
   const setStage = props.setStage;

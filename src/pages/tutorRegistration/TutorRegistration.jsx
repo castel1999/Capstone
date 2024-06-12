@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import rightArrow from "../../assets/right-arrow.svg";
 import check from "../../assets/check.svg";
 import About from "./About";
-import Photo from "./Photo";
 import Certification from "./Certification";
 import Education from "./Education";
 import Description from "./Description";
-import Video from "./Video";
 import Availability from "./Availability";
 import Pricing from "./Pricing";
 

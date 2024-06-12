@@ -2,9 +2,10 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import moment from "moment";
 import React, { useState } from "react";
 import { app } from "../../firebase";
+import {useAuth} from '../../hooks/AuthContext'
 
 const Education = (props) => {
-  const currentUser = localStorage.getItem("userID");
+  const currentUser = useAuth().user.decodedToken.UserId;
   const setStage = props.setStage;
   const [notHave, setNotHave] = useState(false);
   const [educations, setEducations] = useState([
