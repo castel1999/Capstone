@@ -4,20 +4,20 @@ import * as UserAPI from "../../api/UserAPI";
 import { toast } from "react-toastify";
 import DepositModal from "./DepositModal";
 import WithdrawalModal from "./WithdrawalModal";
-
-// - nạp:
-// senderId: id của admin
-// receiverId: id tài khoản
-
-// - rút: ngược lại
+import { useAuth } from "../../hooks/AuthContext";
 
 const WalletPage = () => {
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
   const [transactionId, setTransactionId] = useState();
+  const [walletData, setWalletData] = useState(null);
+
+  const { user } = useAuth();
+  const userId = user.decodedToken.UserId;
+  console.log(walletData);
 
   const updatePayment = useMutation({
-    mutationFn: UserAPI.updatePayment,
+    mutationFn: UserAPI.updateTransaction,
     onSuccess: async (data) => {
       toast.success("Nạp tiền thành công!");
       console.log("deposit success");
@@ -29,12 +29,11 @@ const WalletPage = () => {
   });
 
   const deposit = useMutation({
-    mutationFn: UserAPI.deposit,
+    mutationFn: UserAPI.walletTransaction,
     onSuccess: async (data) => {
       console.log("link", data?.paymentUrl);
       setTransactionId(data?.walletTransactionId);
 
-      // Call updatePayment after setting transactionId
       const update = {
         transactionId: data?.walletTransactionId,
         choice: 3,
@@ -43,37 +42,39 @@ const WalletPage = () => {
       alert(update.transactionId);
       window.location.href = data?.paymentUrl;
       updatePayment.mutate(update);
-
-      // localStorage.setItem("paymentSuccess", "true");
     },
     onError: (error) => {
       if (error.status === 400 || error.status === 500) {
         toast.error("Nạp tối thiểu 10.000 VND và tối đa 10.000.000 VND");
       }
-
-      // localStorage.removeItem("paymentSuccess");
       console.log(error.message);
     },
   });
 
   const handleDeposit = (amount) => {
     const data = {
-      amount: parseInt(amount, 10), // Use the amount from input
+      amount: parseInt(amount, 10),
       redirectUrl: "http://localhost:5173/settings/wallet",
       senderId: "7CCB26A5-7224-4185-E553-08DC7C73F8C7",
-      receiverId: "5D9A911E-C29C-4C40-4E18-08DC7E68269C",
+      receiverId: `${walletData}`,
       choice: 1,
     };
 
     deposit.mutate(data);
   };
 
-  // useEffect(() => {
-  //   if (localStorage.getItem("paymentSuccess")) {
-  //     toast.success("Nạp tiền thành công!");
-  //     localStorage.removeItem("paymentSuccess");
-  //   }
-  // }, []);
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      try {
+        const data = await UserAPI.getWallet(userId);
+        setWalletData(data.walletId);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    fetchWalletData();
+  }, [userId]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -134,7 +135,6 @@ const WalletPage = () => {
       <WithdrawalModal
         isOpen={isWithdrawalOpen}
         onClose={() => setIsWithdrawalOpen(false)}
-        // onSubmit={() => handleSubmit(test.amount)}
       />
     </div>
   );

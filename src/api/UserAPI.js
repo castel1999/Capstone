@@ -97,9 +97,45 @@ export const updateUserProfile = async (data) => {
   return responseBody;
 };
 
+export const getWallet = async (UserId) => {
+  const token = localStorage.getItem("token");
+  const decode = jwtDecode(token)
+  const response = await fetch(`${BASE_API_LINK}/Wallet/get/wallet/user/${UserId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
 
-export const payment = async (data) => {
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
+
+export const walletTransaction = async (data) => {
   const response = await fetch(`${BASE_API_LINK}/Transaction/wallet`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(responseBody.message);
+    error.status = response.status; // Add status code to error object
+    throw error;
+  }
+
+  return responseBody;
+};
+
+export const updateTransaction = async (data) => {
+  const response = await fetch(`${BASE_API_LINK}/Transaction/update`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
