@@ -114,6 +114,23 @@ export const getWallet = async (UserId) => {
   return responseBody;
 };
 
+export const getWalletTransaction = async (walletID) => {
+  const token = localStorage.getItem("token");
+  const decode = jwtDecode(token)
+  const response = await fetch(`${BASE_API_LINK}/Transaction/get/wallet-transactions/wallet/${walletID}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
+
 export const walletTransaction = async (data) => {
   const response = await fetch(`${BASE_API_LINK}/Transaction/wallet`, {
     method: "POST",

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import * as UserAPI from "../../api/UserAPI";
 import { toast } from "react-toastify";
 import DepositModal from "./DepositModal";
@@ -10,15 +10,26 @@ const WalletPage = () => {
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
   const [transactionId, setTransactionId] = useState();
-  const [walletData, setWalletData] = useState(null);
 
   const { user } = useAuth();
   const userId = user.decodedToken.UserId;
-  console.log(walletData);
+
+  const { data: walletData, isLoading: isWalletLoading } = useQuery({
+    queryKey: ["wallet", userId],
+    queryFn: () => UserAPI.getWallet(userId),
+  });
+
+  const { data: transactions, isLoading: isTransactionsLoading } = useQuery({
+    queryKey: ["transactions", walletData?.walletId],
+    queryFn: () => UserAPI.getWalletTransaction(walletData.walletId),
+    enabled: !!walletData,
+  });
+
+  console.log(walletData?.walletId);
 
   const updatePayment = useMutation({
     mutationFn: UserAPI.updateTransaction,
-    onSuccess: async (data) => {
+    onSuccess: () => {
       toast.success("Nạp tiền thành công!");
       console.log("deposit success");
     },
@@ -30,7 +41,7 @@ const WalletPage = () => {
 
   const deposit = useMutation({
     mutationFn: UserAPI.walletTransaction,
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       console.log("link", data?.paymentUrl);
       setTransactionId(data?.walletTransactionId);
 
@@ -51,30 +62,25 @@ const WalletPage = () => {
     },
   });
 
-  const handleDeposit = (amount) => {
+  const handleDeposit = async (amount) => {
     const data = {
       amount: parseInt(amount, 10),
       redirectUrl: "http://localhost:5173/settings/wallet",
       senderId: "7CCB26A5-7224-4185-E553-08DC7C73F8C7",
-      receiverId: `${walletData}`,
+      receiverId: `${walletData?.walletId}`,
       choice: 1,
     };
 
-    deposit.mutate(data);
+    await deposit.mutateAsync(data);
   };
 
-  useEffect(() => {
-    const fetchWalletData = async () => {
-      try {
-        const data = await UserAPI.getWallet(userId);
-        setWalletData(data.walletId);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
+  if (isWalletLoading || isTransactionsLoading) {
+    return <div>Loading...</div>;
+  }
 
-    fetchWalletData();
-  }, [userId]);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -114,16 +120,49 @@ const WalletPage = () => {
       </div>
 
       <div>
-        <div className="flex flex-row justify-between items-center">
-          <div className="font-semibold text-2xl">Latest Transactions</div>
+        <div className="flex flex-row justify-between items-center mb-9">
+          <div className="font-semibold text-2xl">Thống kê giao dịch</div>
           <div className="transition ease-in-out delay-150 border-2  border-black rounded-lg text-black py-1 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300 cursor-pointer">
             ...
           </div>
         </div>
-        <div>
-          <div></div>
-          <div></div>
-          <div></div>
+        <div className="overflow-x-auto mb-10">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                  ID
+                </th>
+                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                  Số tiền
+                </th>
+                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                  Loại giao dịch
+                </th>
+                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                  Thời gian
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {transactions.map((transaction) => (
+                <tr key={transaction.walletTransactionId}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {transaction.walletTransactionId}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatCurrency(transaction.amount)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {transaction.note === null ? 'Giao dịch chưa hoàn thành' : transaction.note}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(transaction.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 

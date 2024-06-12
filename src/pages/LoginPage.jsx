@@ -200,7 +200,11 @@ const LoginPage = () => {
             className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
             onClick={onSubmit}
           >
-            Đăng nhập
+            {mutation.isPending ? (
+              <div className="cursor-progress">Loading</div>
+            ) : (
+              "Đăng nhập"
+            )}
           </button>
         </div>
       </div>
