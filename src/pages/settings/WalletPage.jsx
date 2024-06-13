@@ -65,7 +65,9 @@ const WalletPage = () => {
   const handleDeposit = async (amount) => {
     const data = {
       amount: parseInt(amount, 10),
-      redirectUrl: "http://localhost:5173/settings/wallet",
+      redirectUrl:
+        "https://capstone-snowy-one.vercel.app/settings/wallet" ||
+        "http://localhost:5173/settings/wallet",
       senderId: "7CCB26A5-7224-4185-E553-08DC7C73F8C7",
       receiverId: `${walletData?.walletId}`,
       choice: 1,
@@ -79,7 +81,10 @@ const WalletPage = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   return (
@@ -130,16 +135,28 @@ const WalletPage = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
+                >
                   ID
                 </th>
-                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
+                >
                   Số tiền
                 </th>
-                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
+                >
                   Loại giao dịch
                 </th>
-                <th scope="col" className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
+                >
                   Thời gian
                 </th>
               </tr>
@@ -154,7 +171,9 @@ const WalletPage = () => {
                     {formatCurrency(transaction.amount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {transaction.note === null ? 'Giao dịch chưa hoàn thành' : transaction.note}
+                    {transaction.note === null
+                      ? "Giao dịch chưa hoàn thành"
+                      : transaction.note}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(transaction.createdAt).toLocaleString()}
