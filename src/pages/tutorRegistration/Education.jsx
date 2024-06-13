@@ -1,12 +1,15 @@
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { app } from "../../firebase";
-import {useAuth} from '../../hooks/AuthContext'
+import { useAuth } from "../../hooks/AuthContext";
+import { animateScroll } from "react-scroll";
 
 const Education = (props) => {
   const currentUser = useAuth().user.decodedToken.UserId;
+  const current = new moment();
   const setStage = props.setStage;
+  const setIsStage3Completed = props.setIsStage3Completed;
   const [notHave, setNotHave] = useState(false);
   const [educations, setEducations] = useState([
     {
@@ -113,21 +116,23 @@ const Education = (props) => {
 
   const handleSubmit = () => {
     const newWarnings = educations.map((edu) => ({
-      university: edu.university === "" ? "Bạn cần điền thông tin này" : "",
-      degree: edu.degree === "" ? "Bạn cần điền thông tin này" : "",
+      university: edu.university === "" ? "Thông tin này là bắt buộc." : "",
+      degree: edu.degree === "" ? "Thông tin này là bắt buộc." : "",
       specialization:
-        edu.specialization === "" ? "Bạn cần điền thông tin này" : "",
+        edu.specialization === "" ? "Thông tin này là bắt buộc." : "",
       yearStart:
         edu.yearStart === ""
-          ? "Bạn cần điền thông tin này"
-          : Number(edu.yearStart) > moment().year()
+          ? "Thông tin này là bắt buộc."
+          : Number(edu.yearStart) > current.year() ||
+            Number(edu.yearStart) < 1900
           ? "Năm không hợp lệ"
           : "",
       yearEnd:
         edu.yearEnd === ""
-          ? "Bạn cần điền thông tin này"
+          ? "Thông tin này là bắt buộc."
           : Number(edu.yearEnd) < Number(edu.yearStart) ||
-            Number(edu.yearEnd) > moment().year()
+            Number(edu.yearEnd) > moment().year() ||
+            Number(edu.yearEnd) < 1900
           ? "Năm không hợp lệ"
           : "",
     }));
@@ -137,15 +142,23 @@ const Education = (props) => {
       Object.values(warning).every((value) => value === "")
     );
 
-    if (allFieldsValid) {
+    if (notHave) {
+      setIsStage3Completed(true);
+      setStage(4);
+    } else if (allFieldsValid) {
       console.log("Educations:", educations);
-      // setStage(4);  // Proceed to the next stage
+      setIsStage3Completed(true);
+      setStage(4);
     }
   };
 
   const handleGoback = () => {
     setStage(2);
   };
+
+  useEffect(() => {
+    animateScroll.scrollToTop({ duration: 400, smooth: true });
+  }, []);
 
   return (
     <div className="flex flex-col p-12 gap-6">
@@ -185,9 +198,9 @@ const Education = (props) => {
       </div>
 
       {!notHave ? (
-        <div>
+        <form>
           {educations.map((education, index) => (
-            <div className="flex flex-col mt-4 gap-2" key={index}>
+            <form className="flex flex-col mt-4 gap-2" key={index}>
               <div>Trường đại học</div>
               <div className="flex flex-row gap-2">
                 <input
@@ -376,7 +389,7 @@ const Education = (props) => {
                   </div>
                 )}
               </div>
-            </div>
+            </form>
           ))}
 
           <div
@@ -385,7 +398,7 @@ const Education = (props) => {
           >
             Thêm chứng chỉ khác
           </div>
-        </div>
+        </form>
       ) : (
         ""
       )}

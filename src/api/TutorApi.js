@@ -2,8 +2,16 @@ const BASE_API_LINK = import.meta.env.VITE_API_LINK;
 
 export const getTutorDetail = async (tutorId) => {
   const response = await fetch(`${BASE_API_LINK}/Admin/get/tutor/${tutorId}`);
+  // const response = await fetch(`https://66479db42bb946cf2f9e5c01.mockapi.io/tutor-detail/${tutorId}`);
   return response.json();
 };
+
+export const getTutorDetail2 = async (tutorId) => {
+  // const response = await fetch(`${BASE_API_LINK}/Admin/get/tutor/${tutorId}`);
+  const response = await fetch(`https://66479db42bb946cf2f9e5c01.mockapi.io/tutor-detail/${tutorId}`);
+  return response.json();
+};
+
 
 export const getUserDetail = async (userId) => {
   const response = await fetch(`${BASE_API_LINK}/Account/get/${userId}`);

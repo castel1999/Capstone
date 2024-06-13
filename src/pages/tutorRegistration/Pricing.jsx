@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { animateScroll } from "react-scroll";
 
 const Pricing = (props) => {
   const setStage = props.setStage;
@@ -18,6 +19,11 @@ const Pricing = (props) => {
       alert("register finish");
     }
   };
+
+  useEffect(() => {
+    animateScroll.scrollToTop({duration: 400,
+      smooth: true,});
+  },[])
 
   return (
     <div className="flex flex-col p-12 gap-6">

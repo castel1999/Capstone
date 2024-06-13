@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { animateScroll } from "react-scroll";
 
 const Description = (props) => {
   const setStage = props.setStage;
+  const setIsStage4Completed = props.setIsStage4Completed;
   const [descriptions, setDescriptions] = useState({
     introduction: "",
     teachingExperience: "",
@@ -41,9 +43,16 @@ const Description = (props) => {
 
     setWarnings(newWarnings);
     if (allValid) {
+      setIsStage4Completed(true)
       console.log('Description: ', descriptions)
+      setStage(5)
     }
   };
+
+  useEffect(() => {
+    animateScroll.scrollToTop({duration: 400,
+      smooth: true,});
+  },[])
 
   return (
     <div className="flex flex-col p-12 gap-6">

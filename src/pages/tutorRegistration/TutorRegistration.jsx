@@ -38,7 +38,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(2)}
+          onClick={isStage1Completed ? () => setStage(2) : ''}
         >
           {stage < 2 ? (
             <div className="flex justify-center items-center h-8 w-8">2</div>
@@ -55,7 +55,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(3)}
+          onClick={isStage2Completed ? () => setStage(3) : ''}
         >
           {stage < 3 ? (
             <div className="flex justify-center items-center h-8 w-8">3</div>
@@ -71,7 +71,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(4)}
+          onClick={isStage3Completed ? () => setStage(4) : ''}
         >
           {stage < 4 ? (
             <div className="flex justify-center items-center h-8 w-8">4</div>
@@ -87,7 +87,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(5)}
+          onClick={isStage4Completed ? () => setStage(5) : ''}
         >
           {stage < 5 ? (
             <div className="flex justify-center items-center h-8 w-8">5</div>
@@ -103,7 +103,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={() => setStage(6)}
+          onClick={isStage5Completed ? () => setStage(6) : ''}
         >
           {stage < 6 ? (
             <div className="flex justify-center items-center h-8 w-8">6</div>
@@ -120,10 +120,10 @@ const TutorRegistration = () => {
 
       <div className="w-[50%]">
         {stage === 1 ? (<About setIsStage1Completed={setIsStage1Completed} setStage={setStage}/>) : ''}
-        {stage === 2 ? (<Certification setIsStage1Completed={setIsStage3Completed} setStage={setStage}/>) : ''}
-        {stage === 3 ? (<Education setIsStage1Completed={setIsStage4Completed} setStage={setStage}/>) : ''}
-        {stage === 4 ? (<Description setIsStage1Completed={setIsStage5Completed} setStage={setStage}/>) : ''}
-        {stage === 5 ? (<Availability setIsStage1Completed={setIsStage7Completed} setStage={setStage}/>) : ''}
+        {stage === 2 ? (<Certification setIsStage2Completed={setIsStage2Completed} setStage={setStage}/>) : ''}
+        {stage === 3 ? (<Education setIsStage3Completed={setIsStage3Completed} setStage={setStage}/>) : ''}
+        {stage === 4 ? (<Description setIsStage4Completed={setIsStage4Completed} setStage={setStage}/>) : ''}
+        {stage === 5 ? (<Availability setIsStage5Completed={setIsStage5Completed} setStage={setStage}/>) : ''}
         {stage === 6 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted} setStage={setStage}/>) : ''}
       </div>
     </div>
