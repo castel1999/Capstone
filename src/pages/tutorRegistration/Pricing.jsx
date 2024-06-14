@@ -71,7 +71,7 @@ const Pricing = (props) => {
           </svg>
           <div>
             Đối với tất cả các buổi học, chúng tôi sẽ tính phí theo tỷ lệ phần
-            trăm (18%-33%) theo giờ
+            trăm (5%-10%) theo giờ
           </div>
         </div>
         <div className="flex flex-row mt-5 gap-2">

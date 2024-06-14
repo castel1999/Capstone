@@ -17,6 +17,9 @@ import loginBG from "../assets/loginBG.png";
 import { db } from "../firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Block } from "@mui/icons-material";
+import { auth, googleProvider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
+import { avatar } from "@material-tailwind/react";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,18 +49,91 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm(formOptions);
 
-  const handleOnClick = (e) => {
-    e.preventDefault();
-    console.log("GOOGLE");
+  const handleOnClick = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      // Get User data from API
+      const { displayName: name, uid: googleId, email, photoURL, emailVerified } = user;
+      const userdata = {
+        googleId,
+        imageUrl: photoURL,
+        name,
+        email,
+        emailVerified,
+      };
+      console.log(userdata);
+      mutationEmail.mutate(userdata);
+    } catch (error) {
+      console.error('Error during login', error);
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
+  const mutationEmail = useMutation({
+    mutationFn: apiClient.loginByEmail,
+    onSuccess: async (data) => {
+      console.log(data);
+      if (!data) {
+        console.error('No data received');
+        return;
+      }
+      if (!data.accessToken) {
+        console.error('No access token received');
+        return;
+      }
+      const decodedToken = jwtDecode(data.accessToken);
+      localStorage.setItem('token', data.accessToken);
+      localStorage.setItem('role', data.role);
+      setUser({
+        role: data.role,
+        token: data.accessToken,
+        decodedToken,
+      });
+      await queryClient.invalidateQueries('getCurrentUser');
+      try {
+        // Get User data from API
+        const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
+        console.log(currentUserInfo);
+        if (currentUserInfo) {
+          // Save or update data user into FireStore
+          const userData = {
+            userID: data.userId,
+            avatar: currentUserInfo.value.imageUrl || '',
+            name: currentUserInfo.value.fullName || '',
+            lastLogin: serverTimestamp(),
+            blockedUser: [],
+          };
+          await setDoc(doc(db, 'users', userData.userID), userData);
+          await setDoc(doc(db, 'userchats', userData.userID), {
+            chats: [],
+          });
+        } else {
+          console.log('Không lấy được thông tin user');
+        }
+      } catch (error) {
+        console.log('Lỗi khi lưu dữ liệu vào Firestore:', error);
+      }
+      toast.success('Đăng nhập thành công!');
+      navigate('/tutor-list');
+    },
+    onError: (error) => {
+      if (error.status === 400) {
+        toast.error('Sai tên đăng nhập hoặc mật khẩu!');
+      } else if (error.status === 404) {
+        toast.error('Tài khoản không tồn tại!');
+      } else if (error.status === 500) {
+        toast.error('Lỗi máy chủ nội bộ!');
+      }
+      console.log(error.message);
+    },
+  });
   const mutation = useMutation({
     mutationFn: apiClient.login,
     onSuccess: async (data) => {
+      console.log(data);
       const decodedToken = jwtDecode(data.accessToken);
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("role", data.role);
@@ -101,6 +177,8 @@ const LoginPage = () => {
         toast.error("Tài khoản không tồn tại!");
       } else if (error.status === 500) {
         toast.error("Lỗi máy chủ nội bộ!");
+      } else if (error.status === 204) {
+        toast.error("Không có dữ liệu trả về!");
       }
       console.log(error.message);
     },
