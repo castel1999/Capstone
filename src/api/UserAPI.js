@@ -29,7 +29,29 @@ export const login = async (data) => {
   return responseBody;
 };
 
+// Login By Email 
+export const loginByEmail = async (data) => {
+  try {
+    const response = await fetch(`${BASE_API_LINK}/Auth/login-by-email-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data)
+    });
+    const responseBody = await response.json();
+    if (!response.ok) {
+      const error = new Error(responseBody.message);
+      error.status = response.status; // Add status code to error object
+      throw error;
+    }
+    return responseBody;
+  } catch (error) {
+    console.log(error)
+  }
+}
 
+// Register
 export const register = async (data) => {
   const response = await fetch(`${BASE_API_LINK}/Account/register`, {
     method: "POST",
@@ -40,11 +62,14 @@ export const register = async (data) => {
     body: JSON.stringify(data),
   });
 
-  const responseBody = await response.json();
-
   if (!response.ok) {
     throw new Error(responseBody.message);
   }
+  const responseBody = await response.json();
+  if (!response.accessToken) {
+    throw new Error("Không có accessToken");
+  }
+  return responseBody;
 };
 
 export const getCurrentUser = async () => {
