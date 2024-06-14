@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }) => {
 
     return { role, token, decodedToken };
   });
-  console.log('user',user);
 
   // Token Expiration Handling
   useEffect(() => {

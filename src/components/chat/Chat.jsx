@@ -29,7 +29,6 @@ const Chat = () => {
   const handleEmojiOneClick = (e) => {
     setText((prev) => prev + e.emoji);
   }
-  console.log(text);
   return (
     <>
       {logged && role !== "Admin" && role !== "Moderator" ? (
