@@ -32,7 +32,7 @@ const Timetable = () => {
 
   return (
     <div className="w-full flex flex-col">
-      <div className="w-full bg-[#F4F4F8] flex flex-row justify-between rounded-lg">
+      {/* <div className="w-full bg-[#F4F4F8] flex flex-row justify-between rounded-lg">
         <div
           className={
             timeDuration == 25
@@ -53,7 +53,7 @@ const Timetable = () => {
         >
           50 mins
         </div>
-      </div>
+      </div> */}
 
       <div className="flex justify-between pt-3">
         <div className="flex flex-row gap-4">
@@ -94,7 +94,7 @@ const Timetable = () => {
             {calendarDate.clone().day(7).date()} {calendarDate.year()}
           </div>
         </div>
-        <div>asdfasfd</div>
+        {/* <div>asdfasfd</div> */}
       </div>
 
       <div className="flex flex-row pt-4 gap-2">

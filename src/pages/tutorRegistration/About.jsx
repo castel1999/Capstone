@@ -5,11 +5,11 @@ import { Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../../firebase";
+import {useAuth} from '../../hooks/AuthContext'
 
 const About = (props) => {
-  const currentUser = localStorage.getItem("userID");
+  const currentUser = useAuth().user.decodedToken.UserId;
   const setIsStage1Completed = props.setIsStage1Completed;
-  const [videoURL, setVideoURL] = useState("");
   const setStage = props.setStage;
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [warning, setWarning] = useState({
@@ -97,20 +97,20 @@ const About = (props) => {
       profilePhoto: about.profilePhoto === null ? true : false,
       email:
         about.email === ""
-          ? "Bạn cần điền thông tin này"
+          ? "Thông tin này là bắt buộc."
           : !emailRegex.test(about.email)
           ? "Bạn cần điền đúng format email"
           : "",
-      fullName: about.fullName === "" ? "Bạn cần điền thông tin này" : "",
+      fullName: about.fullName === "" ? "Thông tin này là bắt buộc." : "",
       nationalId:
         about.nationalId === ""
-          ? "Bạn cần điền thông tin này"
+          ? "Thông tin này là bắt buộc."
           : !nationalRegex.test(about.nationalId)
           ? "Bạn cần điền đúng CCCD"
           : "",
       videoUrl:
         about.videoUrl === ""
-          ? "Bạn cần điền thông tin này"
+          ? "Thông tin này là bắt buộc."
           : !videoUrlRegex.test(about.videoUrl)
           ? "Bạn cần điền đúng format url Youtube"
           : "",
@@ -121,9 +121,12 @@ const About = (props) => {
     const allFieldsValid = !Object.values(newWarnings).some(
       (value) => value !== false && value !== ""
     );
-    console.log(newWarnings);
 
-    if (allFieldsValid) console.log('About information: ', about);
+    if (allFieldsValid){
+      console.log('About information: ', about);
+      setIsStage1Completed(true)
+      setStage(2)
+    } 
   };
 
   const extractVideoID = (url) => {

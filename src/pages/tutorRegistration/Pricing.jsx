@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { animateScroll } from "react-scroll";
 
 const Pricing = (props) => {
   const setStage = props.setStage;
@@ -18,6 +19,11 @@ const Pricing = (props) => {
       alert("register finish");
     }
   };
+
+  useEffect(() => {
+    animateScroll.scrollToTop({duration: 400,
+      smooth: true,});
+  },[])
 
   return (
     <div className="flex flex-col p-12 gap-6">
@@ -65,7 +71,7 @@ const Pricing = (props) => {
           </svg>
           <div>
             Đối với tất cả các buổi học, chúng tôi sẽ tính phí theo tỷ lệ phần
-            trăm (18%-33%) theo giờ
+            trăm (5%-10%) theo giờ
           </div>
         </div>
         <div className="flex flex-row mt-5 gap-2">

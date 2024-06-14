@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import moment from "moment";
 import {
   deleteObject,
@@ -8,11 +8,14 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { app } from "../../firebase";
+import { useAuth } from "../../hooks/AuthContext";
+import { animateScroll } from "react-scroll";
 
 const Certification = (props) => {
-  const currentUser = localStorage.getItem("userID");
+  const currentUser = useAuth().user.decodedToken.UserId;
   const current = new moment();
   const setStage = props.setStage;
+  const setIsStage2Completed = props.setIsStage2Completed;
   const [notHaveCertificate, setNotHaveCertificate] = useState(false);
   const [certifications, setCertifications] = useState([
     {
@@ -102,6 +105,11 @@ const Certification = (props) => {
     }
   };
 
+  useEffect(() => {
+    animateScroll.scrollToTop({duration: 400,
+      smooth: true,});
+  },[])
+
   const onImageRemove = async (index) => {
     const storage = getStorage(app);
     const storageRef = ref(
@@ -137,21 +145,23 @@ const Certification = (props) => {
     certifications.map((cert) => {
       const newWarning = {
         certificate:
-          cert.certificate === "" ? "Bạn cần điền thông tin này" : "",
+          cert.certificate === "" ? "Thông tin này là bắt buộc." : "",
         description:
-          cert.description === "" ? "Bạn cần điền thông tin này" : "",
-        issuedBy: cert.issuedBy === "" ? "Bạn cần điền thông tin này" : "",
+          cert.description === "" ? "Thông tin này là bắt buộc." : "",
+        issuedBy: cert.issuedBy === "" ? "Thông tin này là bắt buộc." : "",
         yearStart:
           cert.yearStart === ""
-            ? "Bạn cần điền thông tin này"
-            : Number(cert.yearStart) > current.year()
+            ? "Thông tin này là bắt buộc."
+            : Number(cert.yearStart) > current.year() ||
+              Number(cert.yearStart) < 1900
             ? "Năm không hợp lệ"
             : "",
         yearEnd:
           cert.yearEnd === ""
-            ? "Bạn cần điền thông tin này"
+            ? "Thông tin này là bắt buộc."
             : Number(cert.yearEnd) > current.year() ||
-              Number(cert.yearEnd) < Number(cert.yearStart)
+              Number(cert.yearEnd) < Number(cert.yearEnd) ||
+              Number(cert.yearEnd) < 1900
             ? "Năm không hợp lệ"
             : "",
       };
@@ -159,13 +169,19 @@ const Certification = (props) => {
     });
 
     setWarnings(newWarnings);
-    console.log(newWarnings);
 
     const allFieldsValid = newWarnings.every((warning) =>
       Object.values(warning).every((value) => value === "")
     );
 
-    if (allFieldsValid) console.log("Certifications:", certifications);
+    if (notHaveCertificate) {
+      setIsStage2Completed(true);
+      setStage(3);
+    } else if (allFieldsValid) {
+      setIsStage2Completed(true);
+      setStage(3);
+      console.log("Certifications:", certifications);
+    }
   };
 
   return (
@@ -206,7 +222,7 @@ const Certification = (props) => {
       </div>
 
       {!notHaveCertificate ? (
-        <div>
+        <form>
           {certifications?.map((certificate, index) => (
             <div className="flex flex-col mt-4 gap-2" key={index}>
               <div>Chứng chỉ</div>
@@ -420,7 +436,7 @@ const Certification = (props) => {
           >
             Thêm chứng chỉ khác
           </div>
-        </div>
+        </form>
       ) : (
         ""
       )}

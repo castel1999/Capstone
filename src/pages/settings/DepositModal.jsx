@@ -2,12 +2,15 @@ import React, { useState } from "react";
 
 const DepositModal = ({ isOpen, onClose, onSubmit }) => {
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleDeposit = (e) => {
+  const handleDeposit = async (e) => {
     e.preventDefault();
-    onSubmit(amount); // Pass the amount to onSubmit
+    setLoading(true);
+    await onSubmit(amount);
+    setLoading(false);
   };
 
   return (
@@ -25,21 +28,24 @@ const DepositModal = ({ isOpen, onClose, onSubmit }) => {
               onChange={(e) => setAmount(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
+              disabled={loading}
             />
           </div>
           <div className="flex justify-end">
             <button
               type="button"
-              className="mr-4 bg-gray-500 text-white px-4 py-2 rounded"
+              className={`mr-4 bg-gray-500 text-white px-4 py-2 rounded ${loading ? 'cursor-progress' : ''}`}
               onClick={onClose}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className={`bg-blue-500 text-white px-4 py-2 rounded ${loading ? 'cursor-progress' : ''}`}
+              disabled={loading}
             >
-              Nạp tiền
+              {loading ? 'Processing...' : 'Nạp tiền'}
             </button>
           </div>
         </form>
