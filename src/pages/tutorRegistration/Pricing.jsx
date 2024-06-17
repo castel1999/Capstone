@@ -1,22 +1,46 @@
+import { useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { animateScroll } from "react-scroll";
+import * as TutorApi from "../../api/TutorApi";
+import { toast } from "react-toastify";
 
 const Pricing = (props) => {
   const setStage = props.setStage;
-  const [price, setPrice] = useState(0);
+  const price = props.price;
+  const setPrice = props.setPrice;
+  const tutorId = props.tutorId;
   const [warning, setWarning] = useState("");
 
   const handleGoback = () => {
     setStage(5);
   };
 
+  const mutation = useMutation({
+    mutationFn: (variables) =>
+      TutorApi.registerTutorStep6(variables.targetValue),
+    onSuccess: (data) => {
+      toast.success("Hoàn tất đăng ký !");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.log(error.message);
+    },
+  });
+
+  const submitPricing = () => {
+    const targetValue = {
+      tutorID: tutorId,
+      price: price
+    }
+    mutation.mutate({targetValue})
+  }
+
   const handleSubmit = () => {
     const newWarning = price === 0 ? "Bạn cần điền thông tin này" : "";
     setWarning(newWarning);
 
     if (newWarning === "") {
-      console.log('Price: ',price);
-      alert("register finish");
+      submitPricing()
     }
   };
 

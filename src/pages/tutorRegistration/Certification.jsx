@@ -10,23 +10,19 @@ import {
 import { app } from "../../firebase";
 import { useAuth } from "../../hooks/AuthContext";
 import { animateScroll } from "react-scroll";
+import { useMutation } from "@tanstack/react-query";
+import * as TutorApi from "../../api/TutorApi";
+import { toast } from "react-toastify";
 
 const Certification = (props) => {
   const currentUser = useAuth().user.decodedToken.UserId;
   const current = new moment();
+  const tutorId = props.tutorId;
   const setStage = props.setStage;
   const setIsStage2Completed = props.setIsStage2Completed;
+  const certifications = props.certifications;
+  const setCertifications = props.setCertifications;
   const [notHaveCertificate, setNotHaveCertificate] = useState(false);
-  const [certifications, setCertifications] = useState([
-    {
-      certificate: "",
-      description: "",
-      issuedBy: "",
-      yearStart: "",
-      yearEnd: "",
-      image: null,
-    },
-  ]);
 
   const [warnings, setWarnings] = useState([
     {
@@ -106,9 +102,8 @@ const Certification = (props) => {
   };
 
   useEffect(() => {
-    animateScroll.scrollToTop({duration: 400,
-      smooth: true,});
-  },[])
+    animateScroll.scrollToTop({ duration: 400, smooth: true });
+  }, []);
 
   const onImageRemove = async (index) => {
     const storage = getStorage(app);
@@ -137,6 +132,36 @@ const Certification = (props) => {
     setCertifications(updatedCertificates);
     updatedWarnings.splice(index, 1);
     setWarnings(updatedWarnings);
+  };
+
+  const mutation = useMutation({
+    mutationFn: (variables) =>
+      TutorApi.registerTutorStep2(variables.targetValue, variables.tutorId),
+    onSuccess: (data) => {
+      setIsStage2Completed(true);
+      toast.success("Thêm chứng chỉ thành công !");
+      setStage(3);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.log(error.message);
+    },
+  });
+
+  const submitStep2 = () => {
+    let targetValue = [];
+    certifications?.map((cert) => {
+      targetValue.push({
+        imageUrl: cert?.image,
+        certificateName: cert?.certificate,
+        certificateDescription: cert?.description,
+        certificateFrom: cert?.issuedBy,
+        startYear: cert?.yearStart,
+        endYear: cert?.yearEnd,
+      });
+    });
+
+    mutation.mutate({ targetValue, tutorId });
   };
 
   const handleSubmit = () => {
@@ -178,9 +203,7 @@ const Certification = (props) => {
       setIsStage2Completed(true);
       setStage(3);
     } else if (allFieldsValid) {
-      setIsStage2Completed(true);
-      setStage(3);
-      console.log("Certifications:", certifications);
+      submitStep2();
     }
   };
 

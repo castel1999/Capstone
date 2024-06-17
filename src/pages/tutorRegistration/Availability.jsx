@@ -1,11 +1,17 @@
 import { CleanHands } from "@mui/icons-material";
+import { useMutation } from "@tanstack/react-query";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { animateScroll } from "react-scroll";
+import { toast } from "react-toastify";
+import * as TutorApi from "../../api/TutorApi";
 
 const Availability = (props) => {
   const setStage = props.setStage;
   const setIsStage5Completed = props.setIsStage5Completed;
+  const weekSchedule = props.weekSchedule;
+  const setWeekSchedule = props.setWeekSchedule;
+  const tutorId = props.tutorId;
   const current = new moment();
   const [dayOfWeek, setDayOfWeek] = useState(Array(7).fill(false));
   const [total, setTotal] = useState(false);
@@ -27,15 +33,6 @@ const Availability = (props) => {
     "Thứ bảy",
     "Chủ nhật",
   ];
-  const [weekSchedule, setWeekSchedule] = useState({
-    monday: [],
-    tuesday: [],
-    wednesday: [],
-    thursday: [],
-    friday: [],
-    saturday: [],
-    sunday: [],
-  });
   const [weekWarnings, setWeekWarnings] = useState({
     monday: [],
     tuesday: [],
@@ -49,13 +46,10 @@ const Availability = (props) => {
   const addTimeRange = (day) => {
     const updatedWarning = [
       ...weekWarnings[day],
-      { startingTime: "", endingTime: "" },
+      { startTime: "", endTime: "" },
     ];
 
-    const updatedDay = [
-      ...weekSchedule[day],
-      { startingTime: "", endingTime: "" },
-    ];
+    const updatedDay = [...weekSchedule[day], { startTime: "", endTime: "" }];
 
     setWeekWarnings((prevWarnings) => ({
       ...prevWarnings,
@@ -130,9 +124,41 @@ const Availability = (props) => {
   };
 
   const areAllWarningsEmpty = () => {
-    return Object.values(weekWarnings).every(dayWarnings =>
-      dayWarnings.every(warning => warning.startingTime === "" && warning.endingTime === "")
+    return Object.values(weekWarnings).every((dayWarnings) =>
+      dayWarnings.every(
+        (warning) => warning.startTime === "" && warning.endTime === ""
+      )
     );
+  };
+
+  const mutation = useMutation({
+    mutationFn: (variables) =>
+      TutorApi.registerTutorStep5(
+        { request: variables.targetValue },
+        variables.tutorId
+      ),
+    onSuccess: (data) => {
+      setIsStage5Completed(true);
+      toast.success("Thêm thời gian biểu thành công !");
+      setStage(6);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.log(error.message);
+    },
+  });
+
+  const submitStep5 = () => {
+    const targetValue = [];
+    dayNames.map((day, index) => {
+      if (weekSchedule[day].length !== 0)
+        targetValue.push({
+          dayOfWeek: index !== 6 ? index + 2 : 0,
+          tutorStartTimeEndTimRegisterRequests: weekSchedule[day],
+        });
+    });
+
+    mutation.mutate({ targetValue, tutorId });
   };
 
   const handleSubmit = () => {
@@ -155,29 +181,29 @@ const Availability = (props) => {
 
     dayNames.forEach((day, index) => {
       weekSchedule[day].forEach((timeRange, i) => {
-        const startMinutes = convertTimeToMinutes(timeRange.startingTime);
-        const endMinutes = convertTimeToMinutes(timeRange.endingTime);
+        const startMinutes = convertTimeToMinutes(timeRange.startTime);
+        const endMinutes = convertTimeToMinutes(timeRange.endTime);
         let warning = {
-          startingTime: "",
-          endingTime: "",
+          startTime: "",
+          endTime: "",
         };
 
         if (dayOfWeek[index]) {
           finalTimeTable[day].push(timeRange);
-          if (timeRange.startingTime === "") {
-            warning.startingTime = "Thông tin này là bắt buộc.";
+          if (timeRange.startTime === "") {
+            warning.startTime = "Thông tin này là bắt buộc.";
           } else if (
             i > 0 &&
             startMinutes <
-              convertTimeToMinutes(weekSchedule[day][i - 1]?.endingTime)
+              convertTimeToMinutes(weekSchedule[day][i - 1]?.endTime)
           ) {
-            warning.startingTime = "Giờ không hợp lệ";
+            warning.startTime = "Giờ không hợp lệ";
           }
 
-          if (timeRange.endingTime === "") {
-            warning.endingTime = "Thông tin này là bắt buộc.";
+          if (timeRange.endTime === "") {
+            warning.endTime = "Thông tin này là bắt buộc.";
           } else if (endMinutes < startMinutes) {
-            warning.endingTime = "Giờ không hợp lệ";
+            warning.endTime = "Giờ không hợp lệ";
           }
         }
 
@@ -187,9 +213,9 @@ const Availability = (props) => {
     setWeekWarnings(newWarnings);
 
     if (areAllWarningsEmpty()) {
-      console.log('TimeTable: ', finalTimeTable)
-      setIsStage5Completed(true)
-      setStage(6)
+      submitStep5();
+      setIsStage5Completed(true);
+      setStage(6);
     }
   };
 
@@ -250,17 +276,17 @@ const Availability = (props) => {
                       {i == 0 ? <div>From</div> : ""}
                       <select
                         className={
-                          weekWarnings[dayNames[index]][i]?.startingTime === ""
+                          weekWarnings[dayNames[index]][i]?.startTime === ""
                             ? "px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
                             : "px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2]  bg-[#ffe2e0]"
                         }
-                        value={timeRange.startingTime}
+                        value={timeRange.startTime}
                         onChange={(e) =>
                           handleTimeChange(
                             dayNames[index],
                             i,
                             e.target.value,
-                            "startingTime"
+                            "startTime"
                           )
                         }
                       >
@@ -278,17 +304,17 @@ const Availability = (props) => {
                       {i == 0 ? <div>To</div> : ""}
                       <select
                         className={
-                          weekWarnings[dayNames[index]][i]?.endingTime === ""
+                          weekWarnings[dayNames[index]][i]?.endTime === ""
                             ? "px-[14px] w-full py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
                             : "px-[14px] w-full py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2]  bg-[#ffe2e0]"
                         }
-                        value={timeRange.endingTime}
+                        value={timeRange.endTime}
                         onChange={(e) =>
                           handleTimeChange(
                             dayNames[index],
                             i,
                             e.target.value,
-                            "endingTime"
+                            "endTime"
                           )
                         }
                       >
@@ -328,18 +354,18 @@ const Availability = (props) => {
                   </div>
 
                   <div className="flex flex-row mt-2">
-                    {weekWarnings[dayNames[index]][i]?.startingTime === "" ? (
+                    {weekWarnings[dayNames[index]][i]?.startTime === "" ? (
                       <div className="flex-1"></div>
                     ) : (
                       <div className="text-[#a3120a] flex-1">
-                        {weekWarnings[dayNames[index]][i]?.startingTime}
+                        {weekWarnings[dayNames[index]][i]?.startTime}
                       </div>
                     )}
-                    {weekWarnings[dayNames[index]][i]?.endingTime === "" ? (
+                    {weekWarnings[dayNames[index]][i]?.endTime === "" ? (
                       ""
                     ) : (
                       <div className="ml-5 text-[#a3120a] flex-1">
-                        {weekWarnings[dayNames[index]][i]?.endingTime}
+                        {weekWarnings[dayNames[index]][i]?.endTime}
                       </div>
                     )}
                   </div>

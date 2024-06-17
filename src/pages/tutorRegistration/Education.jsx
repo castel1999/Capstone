@@ -4,23 +4,19 @@ import React, { useEffect, useState } from "react";
 import { app } from "../../firebase";
 import { useAuth } from "../../hooks/AuthContext";
 import { animateScroll } from "react-scroll";
+import { useMutation } from "@tanstack/react-query";
+import * as TutorApi from "../../api/TutorApi";
+import { toast } from "react-toastify";
 
 const Education = (props) => {
   const currentUser = useAuth().user.decodedToken.UserId;
   const current = new moment();
   const setStage = props.setStage;
   const setIsStage3Completed = props.setIsStage3Completed;
+  const educations = props.educations;
+  const setEducations = props.setEducations;
+  const tutorId = props.tutorId;
   const [notHave, setNotHave] = useState(false);
-  const [educations, setEducations] = useState([
-    {
-      university: "",
-      degree: "",
-      specialization: "",
-      yearStart: "",
-      yearEnd: "",
-      image: null,
-    },
-  ]);
   const [warnings, setWarnings] = useState(
     educations.map(() => ({
       university: "",
@@ -114,6 +110,35 @@ const Education = (props) => {
     setWarnings(updatedWarnings);
   };
 
+  const mutation = useMutation({
+    mutationFn: (variables) =>
+      TutorApi.registerTutorStep3(variables.targetValue, variables.tutorId),
+    onSuccess: (data) => {
+      setIsStage3Completed(true);
+      toast.success("Thêm học vấn thành công !");
+      setStage(4);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.log(error.message);
+    },
+  });
+
+  const submitStep3 = () => {
+    const targetValue = [];
+    educations?.map((edu) =>
+      targetValue.push({
+        title: edu.specialization,
+        description: edu.degree,
+        location: edu.university,
+        imageUrl: edu.image,
+        startDate: `${edu.yearStart}-01-01`,
+        endYear: `${edu.yearEnd}-01-01`,
+      })
+    );
+    mutation.mutate({ targetValue, tutorId });
+  };
+
   const handleSubmit = () => {
     const newWarnings = educations.map((edu) => ({
       university: edu.university === "" ? "Thông tin này là bắt buộc." : "",
@@ -146,7 +171,7 @@ const Education = (props) => {
       setIsStage3Completed(true);
       setStage(4);
     } else if (allFieldsValid) {
-      console.log("Educations:", educations);
+      submitStep3();
       setIsStage3Completed(true);
       setStage(4);
     }

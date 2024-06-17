@@ -1,15 +1,20 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 
-const Timetable = () => {
+const Timetable = (props) => {
+  const currUser = localStorage.getItem("role");
   const current = new moment();
-  const [timeDuration, setTimeDuration] = useState(25);
+  const selectedTime = props.selectedTime === null ? "" : props.selectedTime;
+  const setSelectedTime = props?.setSelectedTime;
   const [calendarDate, setCalendarDate] = useState(new moment());
   const [dayOfWeek, setDayOfWeek] = useState([]);
 
   useEffect(() => {
     initDayOfWeek(calendarDate);
   }, []);
+
+  console.log(current.diff(calendarDate, "day"));
 
   const initDayOfWeek = (calendarDate) => {
     const tempRow = [];
@@ -99,211 +104,65 @@ const Timetable = () => {
 
       <div className="flex flex-row pt-4 gap-2">
         {dayOfWeek?.map((day) => (
-          <div className="flex flex-col flex-1 border-t-4 border-theme py-4">
+          <div
+            className={`flex flex-col flex-1 border-t-4 ${
+              current.diff(day, "day") <= 0
+                ? "border-theme"
+                : "border-[#aeb5bc]"
+            }  py-4`}
+          >
             <div className="flex justify-center text-gray-500">
               {day?.format("ddd")}
             </div>
             <div className="flex justify-center text-gray-500">
               {day?.format("DD")}
             </div>
+
+            <div className="flex justify-center flex-col">
+              {current.diff(day, "day") <= 0 ? (
+                <>
+                  <div
+                    to={currUser === null ? "/login" : "/payment"}
+                    className={`flex justify-center underline font-medium cursor-pointer ${
+                      selectedTime?.time === "3:30" &&
+                      selectedTime?.day === day?.format("ddd")
+                        ? "border-2 border-black rounded-lg py-3"
+                        : "py-[14px]"
+                    }`}
+                    onClick={() => {
+                      setSelectedTime({
+                        day: day?.format("ddd"),
+                        time: "3:30",
+                      });
+                    }}
+                  >
+                    3:30
+                  </div>
+
+                  <div
+                    to={currUser === null ? "/login" : "/payment"}
+                    className={`flex justify-center underline font-medium cursor-pointer ${
+                      selectedTime?.time === "23:30" &&
+                      selectedTime?.day === day?.format("ddd")
+                        ? "border-2 border-black rounded-lg py-3"
+                        : "py-[14px]"
+                    }`}
+                    onClick={() => {
+                      setSelectedTime({
+                        day: day?.format("ddd"),
+                        time: "23:30",
+                      });
+                    }}
+                  >
+                    23:30
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
+            </div>
           </div>
         ))}
-      </div>
-
-      <div className="flex">
-        <div className="flex-1">
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            03:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-        </div>
-        <div className="flex-1">
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:00
-          </div>
-        </div>
-        <div className="flex-1"></div>
-        <div className="flex-1">
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            03:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-        </div>
-        <div className="flex-1">
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            03:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-        </div>
-        <div className="flex-1">
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            03:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-        </div>
-        <div className="flex-1">
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            00:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            01:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            02:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            03:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:00
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            22:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-          <div className="flex justify-center py underline font-medium py-3 cursor-pointer">
-            23:30
-          </div>
-        </div>
       </div>
     </div>
   );

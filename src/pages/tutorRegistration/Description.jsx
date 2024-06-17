@@ -1,21 +1,45 @@
+import { useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { animateScroll } from "react-scroll";
+import { toast } from "react-toastify";
+import * as TutorApi from "../../api/TutorApi";
 
 const Description = (props) => {
   const setStage = props.setStage;
   const setIsStage4Completed = props.setIsStage4Completed;
-  const [descriptions, setDescriptions] = useState({
-    introduction: "",
-    teachingExperience: "",
-    motivation: "",
-    interestingTitle: "",
-  });
+  const descriptions = props.descriptions;
+  const setDescriptions = props.setDescriptions;
+  const tutorId = props.tutorId;
   const [warnings, setWarnings] = useState({
     introduction: "",
     teachingExperience: "",
     motivation: "",
     interestingTitle: "",
   });
+
+  const mutation = useMutation({
+    mutationFn: (variables) =>
+      TutorApi.registerTutorStep4(variables.targetValue, variables.tutorId),
+    onSuccess: (data) => {
+      toast.success("Thêm thông tin hồ sơ thành công !");
+      setIsStage4Completed(true);
+      setStage(5);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.log(error.message);
+    },
+  });
+
+  const submitStep4 = () => {
+    const targetValue = {
+      description: descriptions.introduction,
+      attractiveTitle: descriptions.interestingTitle,
+      motivation: descriptions.motivation,
+      educationExperience: descriptions.teachingExperience,
+    }
+    mutation.mutate({targetValue, tutorId})
+  }
 
   const handleDescriptionChange = (field, value) => {
     setDescriptions({ ...descriptions, [field]: value });
@@ -43,9 +67,9 @@ const Description = (props) => {
 
     setWarnings(newWarnings);
     if (allValid) {
-      setIsStage4Completed(true)
-      console.log('Description: ', descriptions)
-      setStage(5)
+      submitStep4()
+      setIsStage4Completed(true);
+      setStage(5);
     }
   };
 

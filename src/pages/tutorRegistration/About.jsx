@@ -5,27 +5,51 @@ import { Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../../firebase";
-import {useAuth} from '../../hooks/AuthContext'
+import { useAuth } from "../../hooks/AuthContext";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import * as TutorApi from "../../api/TutorApi";
+import { toast } from "react-toastify";
 
 const About = (props) => {
+  const BASE_API_LINK = import.meta.env.VITE_API_LINK;
   const currentUser = useAuth().user.decodedToken.UserId;
+  const setTutorId = props.setTutorId;
   const setIsStage1Completed = props.setIsStage1Completed;
+  const about = props.about;
+  const setAbout = props.setAbout;
   const setStage = props.setStage;
-  const [profilePhoto, setProfilePhoto] = useState(null);
   const [warning, setWarning] = useState({
     profilePhoto: false,
     fullName: "",
     email: "",
     nationalId: "",
     videoUrl: "",
+    subjects: [""],
   });
-  const [about, setAbout] = useState({
-    profilePhoto: null,
-    fullName: "",
-    email: "",
-    nationalId: "",
-    subjects: ["Toán"],
-    videoUrl: "",
+
+  const {
+    isLoading: isSubjectLoading,
+    isError: isSubjectError,
+    data: subjectsData,
+    error: subjectError,
+  } = useQuery({
+    queryKey: ["subjects"],
+    queryFn: () => TutorApi.getAllSubjects(),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (variables) =>
+      TutorApi.registerTutorStep1(variables.data, variables.apiUrl),
+    onSuccess: (data) => {
+      setTutorId(data.tutorID);
+      setIsStage1Completed(true);
+      toast.success("Thêm thông tin cá nhân thành công !");
+      setStage(2);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.log(error.message);
+    },
   });
 
   const handleChange = (event) => {
@@ -50,12 +74,12 @@ const About = (props) => {
       storage,
       `Tutor registrations/${currentUser}/profilePhoto`
     );
-  
+
     if (event.target.files && event.target.files[0]) {
       try {
         await uploadBytes(storageRef, event.target.files[0]);
         const url = await getDownloadURL(storageRef);
-        setAbout({...about, profilePhoto: url });
+        setAbout({ ...about, profilePhoto: url });
         setWarning({ ...warning, profilePhoto: false });
       } catch (error) {
         console.error("Error uploading file: ", error);
@@ -66,7 +90,11 @@ const About = (props) => {
   const addSubject = () => {
     setAbout({
       ...about,
-      subjects: [...about.subjects, "Toán"],
+      subjects: [...about.subjects, ""],
+    });
+    setWarning({
+      ...warning,
+      subjects: [...warning.subjects, ""],
     });
   };
 
@@ -77,6 +105,13 @@ const About = (props) => {
       ...prev,
       subjects: newSubjects,
     }));
+
+    const newSubjectWarning = [...warning.subjects];
+    newSubjectWarning[index] = "";
+    setWarning((prev) => ({
+      ...prev,
+      subjects: newSubjectWarning,
+    }));
   };
 
   const removeSubject = (index) => {
@@ -85,6 +120,14 @@ const About = (props) => {
       ...about,
       subjects: updatedSubjects,
     });
+
+    const updatedSubjectsWarning = warning.subjects.filter(
+      (_, idx) => idx !== index
+    );
+    setWarning({
+      ...warning,
+      subjects: updatedSubjectsWarning,
+    });
   };
 
   const handleSubmit = () => {
@@ -92,6 +135,11 @@ const About = (props) => {
     const videoUrlRegex =
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\s*[^\/\n\s]+\/\s*|channel\/|user\/[^\/\n\s]+\/|)|youtu\.be\/)([^\/\n\s?&]+)/;
     const nationalRegex = /(0[0-9]{2}|[0-9]{3})([0-9]{1})([0-9]{2})([0-9]{6})/;
+
+    const subjectWarnings = () =>
+      about.subjects.map((subject) =>
+        subject === "" ? "Thông tin này là bắt buộc." : ""
+      );
 
     const newWarnings = {
       profilePhoto: about.profilePhoto === null ? true : false,
@@ -114,19 +162,19 @@ const About = (props) => {
           : !videoUrlRegex.test(about.videoUrl)
           ? "Bạn cần điền đúng format url Youtube"
           : "",
+      subjects: subjectWarnings(),
     };
-
     setWarning(newWarnings);
 
-    const allFieldsValid = !Object.values(newWarnings).some(
-      (value) => value !== false && value !== ""
+    const allFieldsValid = !Object.values(newWarnings).some((value) =>
+      Array.isArray(value)
+        ? value.some((v) => v !== "")
+        : value !== false && value !== ""
     );
 
-    if (allFieldsValid){
-      console.log('About information: ', about);
-      setIsStage1Completed(true)
-      setStage(2)
-    } 
+    if (allFieldsValid) {
+      submitStep1();
+    }
   };
 
   const extractVideoID = (url) => {
@@ -134,6 +182,24 @@ const About = (props) => {
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
     const match = url.match(regExp);
     return match && match[7].length === 11 ? match[7] : null;
+  };
+
+  const submitStep1 = () => {
+    let apiUrl = `${BASE_API_LINK}/TutorRegister/register?`;
+    apiUrl += about.subjects
+      .map(
+        (subject, index) => `${index !== 0 ? "&" : ""}tutorSubjectID=${subject}`
+      )
+      .join("");
+
+    const data = {
+      userId: currentUser,
+      identityNumber: about.nationalId,
+      videoUrl: about.videoUrl,
+    };
+
+    // Ensure apiUrl is updated before passing to mutation
+    mutation.mutate({ data, apiUrl });
   };
 
   return (
@@ -155,7 +221,10 @@ const About = (props) => {
                     JPG or PNG, max 5MB
                   </div>
                 ) : (
-                  <img className="w-28 h-28 rounded-md " src={about?.profilePhoto} />
+                  <img
+                    className="w-28 h-28 rounded-md "
+                    src={about?.profilePhoto}
+                  />
                 )}
 
                 <input
@@ -231,12 +300,12 @@ const About = (props) => {
 
           <label
             className={
-              profilePhoto === null
+              about.profilePhoto === null
                 ? "flex cursor-pointer mt-3 w-full bg-theme font-semibold justify-center border-2 border-black rounded-lg py-3 hover:bg-[#7E5FF4] text-white"
                 : "flex cursor-pointer mt-3 w-full bg-white font-semibold justify-center border-2 border-black rounded-lg py-3 hover:bg-[rgba(18,17,23,.06)]"
             }
           >
-            {profilePhoto === null ? (
+            {about.profilePhoto === null ? (
               <div>Tải ảnh</div>
             ) : (
               <div>Tải ảnh mới</div>
@@ -316,63 +385,59 @@ const About = (props) => {
         <div className="flex flex-col gap-3">
           <label htmlFor="subjects">Chọn môn học giảng dạy</label>
           {about.subjects.map((subject, index) => (
-            <div className="flex flex-row gap-3" key={""}>
-              <select
-                placeholder="Chọn môn học"
-                className="w-full px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
-                onChange={(e) => handleSubjectChange(e.target.value, index)}
-                value={subject}
-              >
-                <option key={"Toán"} value={"Toán"}>
-                  Toán
-                </option>
-                <option key={"Văn"} value={"Văn"}>
-                  Văn
-                </option>
-                <option key={"Sinh"} value={"Sinh"}>
-                  Sinh
-                </option>
-                <option key={"Vật lý"} value={"Vật lý"}>
-                  Vật lý
-                </option>
-                <option key={"Anh"} value={"Anh"}>
-                  Anh
-                </option>
-                <option key={"Địa lý"} value={"Địa lý"}>
-                  Địa lý
-                </option>
-                <option key={"Lịch sử"} value={"Lịch sử"}>
-                  Lịch sử
-                </option>
-                <option key={"IT"} value={"IT"}>
-                  IT
-                </option>
-              </select>
-
-              {about.subjects.length > 1 ? (
-                <div
-                  className="flex w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
-                  onClick={() => removeSubject(index)}
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-3" key={""}>
+                <select
+                  placeholder="Chọn môn học"
+                  className={`w-full px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] ${
+                    warning?.subjects[index] !== ""
+                      ? "border-[#a3120a] bg-[#ffe2e0]"
+                      : "hover:border-black"
+                  }`}
+                  onChange={(e) => handleSubjectChange(e.target.value, index)}
+                  value={subject}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                    className="w-full"
+                  <option key={""} value={""}>
+                    ----
+                  </option>
+                  {subjectsData?.map((subject, index) => (
+                    <option key={index} value={subject.subjectId}>
+                      {subject.title}
+                    </option>
+                  ))}
+                </select>
+
+                {about.subjects.length > 1 ? (
+                  <div
+                    className="flex w-10 hover:bg-[rgba(18,17,23,.06)] rounded-md cursor-pointer p-2"
+                    onClick={() => removeSubject(index)}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M16 3H8v2h8zM3 6h18v2h-2v13H5V8H3zm4 2h10v11H7zm2 2h2v7H9zm6 0h-2v7h2z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                      className="w-full"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16 3H8v2h8zM3 6h18v2h-2v13H5V8H3zm4 2h10v11H7zm2 2h2v7H9zm6 0h-2v7h2z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+              {warning?.subjects[index] !== "" ? (
+                <div className="text-[#a3120a]">{warning?.subjects[index]}</div>
               ) : (
                 ""
               )}
             </div>
           ))}
+
           <div
             className="font-semibold underline cursor-pointer"
             onClick={() => addSubject()}

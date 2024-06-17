@@ -79,20 +79,16 @@ const NavBar = () => {
               Về chúng tôi
             </NavLink>
 
-            {currUser === "Tutor" ? (
-              ""
-            ) : (
-              <NavLink
-                to="/become-tutor"
-                className={({ isActive }) =>
-                  isActive
-                    ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
-                    : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
-                }
-              >
-                Trở thành gia sư
-              </NavLink>
-            )}
+            <NavLink
+              to="/become-tutor"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                  : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+              }
+            >
+              Trở thành gia sư
+            </NavLink>
           </div>
         )}
 

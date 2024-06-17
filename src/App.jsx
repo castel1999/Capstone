@@ -35,6 +35,7 @@ import HomeAdmin from "./pages/admin/HomeAdmin";
 import AccountAdmin from "./pages/admin/AccountAdmin";
 import TutorRequestAdmin from "./pages/admin/TutorRequestAdmin";
 import TutorRequestDetail from "./pages/admin/TutorRequestDetail";
+import Payment from "./pages/Payment";
 
 function App() {
   return (
@@ -75,11 +76,11 @@ function App() {
             </Route>
             <Route path="/my-lessons" element={<MylessonPage />} />
             <Route path="/favorite" element={<FavoritePage />} />
-          </Route>
-
-          <Route element={<PrivateRoute allowedRoles={["Student"]} />}>
+            <Route path="/payment" element={<Payment />} />
             <Route path="/tutor-registration" element={<TutorRegistration />} />
           </Route>
+
+          <Route element={<PrivateRoute allowedRoles={["Student"]} />}></Route>
 
           <Route
             element={<PrivateRoute allowedRoles={["Admin", "Moderator"]} />}

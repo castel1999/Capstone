@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as TutorApi from "../api/TutorApi";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import Timetable from "../components/timetable/Timetable";
 import { Link, Events, animateScroll as scroll, scrollSpy } from "react-scroll";
 
@@ -11,6 +11,10 @@ const TutorDetail = () => {
   const [resumetab, setResumetab] = useState("education");
   const [section, setSection] = useState("introduction");
   const [showModal, setShowModal] = useState(false);
+  const [selectedTime, setSelectedTime] = useState({
+    day: "",
+    time: "",
+  });
 
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["tutorDetail"],
@@ -77,7 +81,10 @@ const TutorDetail = () => {
                 </div>
               </div>
 
-              <div className="p-2 bg-white hover:bg-[rgba(18,17,23,.06)] rounded-lg" onClick={() => setShowModal(false)}>
+              <div
+                className="p-2 bg-white hover:bg-[rgba(18,17,23,.06)] rounded-lg"
+                onClick={() => setShowModal(false)}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -93,8 +100,28 @@ const TutorDetail = () => {
                 </svg>
               </div>
             </div>
-            <div className="flex flex-1 h-[80%] overflow-y-scroll">
-              <Timetable />
+            <div className="flex flex-1 h-[80%] overflow-y-auto">
+              <Timetable
+                selectedTime={selectedTime}
+                setSelectedTime={setSelectedTime}
+              />
+            </div>
+
+            <div className="flex w-full h-fit justify-end p-4">
+              <NavLink
+                className={`flex ${
+                  selectedTime.day === "" && selectedTime.time === ""
+                    ? "bg-[#dcdce5] border-[#a8a8b6] text-[#6a697c] cursor-not-allowed"
+                    : "bg-theme border-black text-white cursor-pointer"
+                }  h-fit px-6 py-2 border-2  justify-center rounded-lg text-[18px]`}
+                to={
+                  selectedTime.day === "" && selectedTime.time === ""
+                    ? ""
+                    : "/payment"
+                }
+              >
+                Xác nhận thời gian
+              </NavLink>
             </div>
           </div>
         </div>
@@ -426,7 +453,13 @@ const TutorDetail = () => {
         </div>
         <div
           className="flex justify-center font-medium px-5 py-3 bg-[#F0631C] text-white shadow-buyButton rounded-lg border-2 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none duration-500"
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setShowModal(true),
+              setSelectedTime({
+                day: "",
+                time: "",
+              });
+          }}
         >
           Thuê ngay
         </div>
