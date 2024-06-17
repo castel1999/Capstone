@@ -272,12 +272,12 @@ const LoginPage = () => {
             />
             <span>Ghi nhớ tôi</span>
           </label>
-          <a
+          <Link
+            to="/reset"
             className="text-blue-600 hover:text-blue-700 hover:underline hover:underline-offset-4"
-            href="#!"
           >
             Quên mật khẩu?
-          </a>
+          </Link>
         </div>
         <div className="text-center md:text-left">
           <button

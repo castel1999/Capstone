@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { useState } from "react";
 
 const AboutPage = () => {
-  return (
-    <div>AboutPage</div>
-  )
-}
+  const [first, setfirst] = useState();
 
-export default AboutPage
+  console.log(first);
+
+  return (
+    <div>
+      <input type="text" onChange={(e) => setfirst(e.target.value)} />
+    </div>
+  );
+};
+
+export default AboutPage;
