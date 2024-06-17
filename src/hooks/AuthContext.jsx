@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-
+import { useUserStore } from "../lib/useUserStore";
 const AuthContext = createContext();
 
 const getRemainingTime = (exp) => {
@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }) => {
 
     return { role, token, decodedToken };
   });
-  console.log('user',user);
 
   // Token Expiration Handling
   useEffect(() => {
@@ -39,7 +38,6 @@ export const AuthProvider = ({ children }) => {
 
     return () => clearTimeout(timer);
   }, [user]);
-
   // Handling Storage Changes
   useEffect(() => {
     const handleStorageChange = () => {

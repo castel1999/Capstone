@@ -20,13 +20,16 @@ import { Block } from "@mui/icons-material";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { avatar } from "@material-tailwind/react";
+import { useUserStore } from "../lib/useUserStore";
+import LoadingVerTwo from "../utils/LoadingVer2";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
+  const { currentUser, isLoading, fetchCurrentUser } = useUserStore();
+  const userStore = useUserStore.getState();
   // form validation rules
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -75,7 +78,6 @@ const LoginPage = () => {
   const mutationEmail = useMutation({
     mutationFn: apiClient.loginByEmail,
     onSuccess: async (data) => {
-      console.log(data);
       if (!data) {
         console.error('No data received');
         return;
@@ -85,6 +87,7 @@ const LoginPage = () => {
         return;
       }
       const decodedToken = jwtDecode(data.accessToken);
+      const userId = decodedToken.UserId;
       localStorage.setItem('token', data.accessToken);
       localStorage.setItem('role', data.role);
       setUser({
@@ -96,7 +99,6 @@ const LoginPage = () => {
       try {
         // Get User data from API
         const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
-        console.log(currentUserInfo);
         if (currentUserInfo) {
           // Save or update data user into FireStore
           const userData = {
@@ -116,6 +118,7 @@ const LoginPage = () => {
       } catch (error) {
         console.log('Lỗi khi lưu dữ liệu vào Firestore:', error);
       }
+      // Fetch current user based on ID from token
       toast.success('Đăng nhập thành công!');
       navigate('/tutor-list');
     },
@@ -137,7 +140,7 @@ const LoginPage = () => {
       const decodedToken = jwtDecode(data.accessToken);
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("role", data.role);
-
+      localStorage.setItem("userId", data.userId);
       setUser({
         role: data.role,
         token: data.accessToken,
@@ -161,6 +164,7 @@ const LoginPage = () => {
           await setDoc(doc(db, "userchats", userData.userID), {
             chats: [],
           });
+          console.log(curr)
         } else {
           console.log("Không lấy được thông tin user");
         }
@@ -187,7 +191,9 @@ const LoginPage = () => {
   const onSubmit = handleSubmit((data) => {
     mutation.mutate(data);
   });
-
+  // if (isLoading) {
+  //   return <LoadingVerTwo />
+  // }
   return (
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm flex flex-col justify-center gap-5">
