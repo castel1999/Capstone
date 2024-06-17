@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import chatIcon from "../../assets/chat.svg";
 import hideIcon from "../../assets/delete.svg";
 import dot from "../../assets/dot.svg";
@@ -9,6 +9,12 @@ import defaultAvatar from "../../assets/default-avatar.jpg";
 import deleteIcon from "../../assets/wastebasket.svg";
 import block from "../../assets/block.svg";
 import EmojiPicker from "emoji-picker-react";
+import { useUserStore } from "../../lib/useUserStore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase";
+import { set } from "firebase/database";
+import LoadingVerTwo from "../../utils/LoadingVer2";
+import { jwtDecode } from "jwt-decode";
 
 const Chat = () => {
   const [showChat, setShowChat] = useState(false);
@@ -16,12 +22,46 @@ const Chat = () => {
   const [text, setText] = useState("");
   const logged = localStorage.getItem("token") !== null;
   const role = localStorage.getItem("role");
+  const { currentUser } = useUserStore();
   // Open dropdown chat 
   const [isOpen, setIsOpen] = useState(false);
+  const [chat, setChats] = useState([]);
+
+  useEffect(() => {
+    if (currentUser) {
+      const unsub = onSnapshot(doc(db, "userchats", currentUser.userID), (doc) => {
+        setChats(doc.data());
+      });
+      return () => {
+        unsub();
+      }
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      const unsub = onSnapshot(
+        doc(db, "userchats", currentUser.userID),
+        async (res) => {
+          const items = res.data().chats;
+          const promises = items.map(async (item) => {
+            const userDocRef = doc(db, "users", item.receiverId);
+            const userDocSnap = await getDoc(userDocRef);
+            const user = userDocSnap.data();
+            return { ...item, user };
+          });
+          const chatData = await Promise.all(promises);
+          setChats(chatData.sort((a, b) => b.lastMessageAt - a.lastMessageAt));
+        });
+
+      return () => {
+        unsub();
+      };
+    }
+  }, [currentUser]);
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-  // Open Emoji Picker
   const handleClickEmoji = () => {
     setShowEmoji(!showEmoji);
   };
@@ -73,191 +113,30 @@ const Chat = () => {
                 </div>
               </div>
               <div className="h-[90%] w-full flex flex-row bg-white rounded-lg">
-
                 <div className="flex flex-col h-full w-[35%] p-1 border-t-2 border-r-2  border-solid border-black overflow-y-auto">
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
+                  {Array.isArray(chat) ? chat.map((chat) => (
+                    <div key={chat.id} className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
+                      <img
+                        className="h-10 w-10 rounded-full"
+                        src={chat.user.avatar}
+                      />
+                      <div className="flex flex-col w-full">
+                        <div className=" w-full flex flex-row justify-between">
+                          <div className="text-[16px]">{chat.user.name}</div>
+                          <div className="text-[14px]">{chat.lastMessageAt}</div>
                         </div>
-                        <img src={dot} />
+                        <div className="w-full flex flex-row justify-between">
+                          <div className="text-[14px] truncate w-[180px]">
+                            {chat.lastMessage}
+                          </div>
+                          <img src={dot} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center bg-[#E2EAFD] rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        {/* <img src={dot} /> */}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        <img src={dot} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center bg-[#E2EAFD] rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        {/* <img src={dot} /> */}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        <img src={dot} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center bg-[#E2EAFD] rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        {/* <img src={dot} /> */}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        <img src={dot} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center bg-[#E2EAFD] rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        {/* <img src={dot} /> */}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        <img src={dot} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center bg-[#E2EAFD] rounded-lg">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={defaultAvatar}
-                    />
-                    <div className="flex flex-col w-full">
-                      <div className=" w-full flex flex-row justify-between">
-                        <div className="text-[16px]">Văn An</div>
-                        <div className="text-[14px]">3d</div>
-                      </div>
-                      <div className="w-full flex flex-row justify-between">
-                        <div className="text-[14px] truncate w-[180px]">
-                          ajaaaaaaaaaaaaaaaaaaaaaaaaahasldfjkaaskl
-                        </div>
-                        {/* <img src={dot} /> */}
-                      </div>
-                    </div>
-                  </div>
+                  )) : <div />}
                 </div>
                 <div className="w-[65%] relative flex flex-col border-t-2 border-solid border-black">
-                  <div className="flex flex-row w-full h-[15%] justify-between px-[10px] pt-[9px] pb-[5px] bg-[#DDDDDD] border-b border-gray-300 rounded-t-lg">
+                  <div className="flex flex-row w-full h-[15%] justify-between px-[10px] pt-[9px] pb-[5px] bg-[#DDDDDD] bg-opacity-20 border-b border-gray-300 rounded-t-lg">
                     <div className="flex items-center">
                       <img
                         className="h-10 w-10 rounded-full mr-4"
@@ -275,7 +154,7 @@ const Chat = () => {
                           </svg>
                         </button>
                         {isOpen && (
-                          <div className="absolute right-0 top-full w-auto bg-white shadow-lg rounded-lg">
+                          <div className="absolute z-[10] right-0 top-full w-auto bg-white shadow-lg rounded-lg">
                             <ul className="p-2">
                               <li className=" hover:bg-gray-100 whitespace-nowrap p-2 rounded flex items-center hover:font-bold hover:text-red-500 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" className="w-6 h-6 mr-2">
@@ -301,98 +180,35 @@ const Chat = () => {
                       </div>
                     </div>
                   </div>
+                  {/* Message Site */}
                   <div className="h-[90%] w-full px-4 py-6 flex flex-col-reverse gap-2 overflow-y-auto">
-                    <div className="flex flex-row items-center gap-[12px]">
-                      <img
-                        className="h-9 w-9 rounded-full"
-                        src={defaultAvatar}
-                      />
-                      <div className="max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#E2EAFD] rounded-t-xl rounded-ee-xl">
-                        as;ldkfjas;dlfkjasd;lfaaaa
+                    <div class="flex flex-row items-start gap-[12px] h-auto ">
+                      <img class="h-9 w-9 rounded-full" src="/src/assets/default-avatar.jpg"></img>
+                      <div class="max-w-[47%] flex flex-col gap-2">
+                        <div class="message-oppenent h-fit text-[18px] px-[16px] py-[8px] bg-[#DCDCDC] text-black rounded-t-xl rounded-br-xl rounded-es-xl rounded-bl-none">
+                          hello
+                        </div>
+                        <div class="relative message-oppenent h-fit text-[18px] text-white rounded-t-xl rounded-es-xl">
+                          <img class="w-full h-auto rounded-xl" src="/src/assets/default-avatar.jpg" alt="Tin nhắn có hình ảnh"></img>
+                        </div>
                       </div>
                     </div>
-
-                    <div className="flex flex-row-reverse items-center gap-[12px]">
-                      <div className="h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        as;ldkfjas;dlfkjasdaaaaaaa
+                    <div className="flex flex-col items-end gap-2 h-auto mb-5">
+                      <div className="message-oppenent h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
+                        hello
                       </div>
-                    </div>
-                    <div className="flex flex-row items-center gap-[12px]">
-                      <img
-                        className="h-9 w-9 rounded-full"
-                        src={defaultAvatar}
-                      />
-                      <div className="max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#E2EAFD] rounded-t-xl rounded-ee-xl">
-                        as;ldkfjas;dlfkjasd;lf
-                      </div>
-                    </div>
-
-                    <div className="flex flex-row-reverse items-center gap-[12px]">
-                      <div className="h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        as;ldkfjas;dlfkjasd;lfkajsd
-                      </div>
-                    </div>
-                    <div className="flex flex-row items-center gap-[12px]">
-                      <img
-                        className="h-9 w-9 rounded-full"
-                        src={defaultAvatar}
-                      />
-                      <div className="max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#E2EAFD] rounded-t-xl rounded-ee-xl">
-                        as;ldkfjas;dlfkjasd;lf
-                      </div>
-                    </div>
-
-                    <div className="flex flex-row-reverse items-center gap-[12px]">
-                      <div className="h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        as;ldkfjas;dlfkjasd;lfkajsd
-                      </div>
-                    </div>
-                    <div className="flex flex-row items-center gap-[12px]">
-                      <img
-                        className="h-9 w-9 rounded-full"
-                        src={defaultAvatar}
-                      />
-                      <div className="max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#E2EAFD] rounded-t-xl rounded-ee-xl">
-                        as;ldkfjas;dlfkjasd;lf
-                      </div>
-                    </div>
-
-                    <div className="flex flex-row-reverse items-center gap-[12px]">
-                      <div className="h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        as;ldkfjas;dlfkjasd;lfkajsd
-                      </div>
-                    </div>
-                    <div className="flex flex-row items-center gap-[12px]">
-                      <img
-                        className="h-9 w-9 rounded-full"
-                        src={defaultAvatar}
-                      />
-                      <div className="max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#E2EAFD] rounded-t-xl rounded-ee-xl">
-                        as;ldkfjas;dlfkjasd;lf
-                      </div>
-                    </div>
-
-                    <div className="flex flex-row-reverse items-center gap-[12px]">
-                      <div className="h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        as;ldkfjas;dlfkjasd;lfkajsd
-                      </div>
-                    </div>
-                    <div className="flex flex-row items-center gap-[12px]">
-                      <img
-                        className="h-9 w-9 rounded-full"
-                        src={defaultAvatar}
-                      />
-                      <div className="max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#E2EAFD] rounded-t-xl rounded-ee-xl">
-                        as;ldkfjas;dlfkjasd;lf
-                      </div>
-                    </div>
-
-                    <div className="flex flex-row-reverse items-center gap-[12px]">
-                      <div className="h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        as;ldkfjas;dlfkjasd;lfkajsd
+                      <div className=" relative message-oppenent h-fit max-w-[47%] text-[18px] text-white rounded-t-xl rounded-es-xl relative">
+                        <div className=" right-[120%] top-0">
+                          <img
+                            className="w-full h-auto rounded-xl"
+                            src={defaultAvatar}
+                            alt="Tin nhắn có hình ảnh"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
+                  {/* Input Site */}
                   <div className="flex flex-row h-1/10 w-full px-3 py-2 border-t-2 border-black gap-3 ">
                     <label className="flex align-items-center">
                       <img src={gallery} />
