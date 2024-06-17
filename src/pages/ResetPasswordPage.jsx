@@ -96,29 +96,12 @@ const ResetPasswordPage = () => {
             >
               Địa chỉ email
             </label>
-            <input
-              {...register("email")}
-              id="email"
-              className={`border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600 ${
-                errors.email ? "border-red-500" : ""
-              }`}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-
-          {/* OTP */}
-          <div className="mb-4 relative">
-            <label htmlFor="otp" className="text-black text-sm font-bold mb-2">
-              OTP
-            </label>
             <div className="flex flex-row">
               <input
-                {...register("otp")}
-                id="otp"
+                {...register("email")}
+                id="email"
                 className={`border-2 border-r border-black rounded-lg rounded-r-none py-2 px-4 w-full outline-none focus:border-blue-600 ${
-                  errors.otp ? "border-red-500" : ""
+                  errors.email ? "border-red-500" : ""
                 }`}
               />
               <div
@@ -128,94 +111,120 @@ const ResetPasswordPage = () => {
                 Lấy OTP
               </div>
             </div>
-            {errors.otp && (
-              <p className="text-red-500 text-sm">{errors.otp.message}</p>
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </div>
 
-          {/* New Password */}
-          <div className="mb-4 relative">
-            <label
-              htmlFor="newPassword"
-              className="text-black text-sm font-bold mb-2"
-            >
-              Mật khẩu mới
-            </label>
-            <div className="relative">
-              <input
-                {...register("newPassword")}
-                id="newPassword"
-                type={showPassword ? "text" : "password"}
-                className={`border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600 ${
-                  errors.newPassword ? "border-red-500" : ""
-                }`}
-              />
-              <div
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
-              >
-                {showPassword ? (
-                  <IoEyeOutline className="size-6" />
-                ) : (
-                  <IoEyeOffOutline className="size-6" />
+          {/* OTP */}
+
+          {getOTP.isSuccess ? (
+            <>
+              <div className="mb-4 relative">
+                <label
+                  htmlFor="otp"
+                  className="text-black text-sm font-bold mb-2"
+                >
+                  OTP
+                </label>
+
+                <input
+                  {...register("otp")}
+                  id="otp"
+                  className={`border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600 ${
+                    errors.otp ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.otp && (
+                  <p className="text-red-500 text-sm">{errors.otp.message}</p>
                 )}
               </div>
-            </div>
-            {errors.newPassword && (
-              <p className="text-red-500 text-sm">
-                {errors.newPassword.message}
-              </p>
-            )}
-          </div>
 
-          {/* Confirm New Password */}
-          <div className="mb-8 relative">
-            <label
-              htmlFor="confirmNewPassword"
-              className="text-black text-sm font-bold mb-2"
-            >
-              Nhập lại mật khẩu
-            </label>
-            <div className="relative">
-              <input
-                {...register("confirmNewPassword")}
-                id="confirmNewPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                className={`border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600 ${
-                  errors.confirmNewPassword ? "border-red-500" : ""
-                }`}
-              />
-              <div
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
-              >
-                {showConfirmPassword ? (
-                  <IoEyeOutline className="size-6" />
-                ) : (
-                  <IoEyeOffOutline className="size-6" />
+              <div className="mb-4 relative">
+                <label
+                  htmlFor="newPassword"
+                  className="text-black text-sm font-bold mb-2"
+                >
+                  Mật khẩu mới
+                </label>
+                <div className="relative">
+                  <input
+                    {...register("newPassword")}
+                    id="newPassword"
+                    type={showPassword ? "text" : "password"}
+                    className={`border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600 ${
+                      errors.newPassword ? "border-red-500" : ""
+                    }`}
+                  />
+                  <div
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
+                  >
+                    {showPassword ? (
+                      <IoEyeOutline className="size-6" />
+                    ) : (
+                      <IoEyeOffOutline className="size-6" />
+                    )}
+                  </div>
+                </div>
+                {errors.newPassword && (
+                  <p className="text-red-500 text-sm">
+                    {errors.newPassword.message}
+                  </p>
                 )}
               </div>
-            </div>
-            {errors.confirmNewPassword && (
-              <p className="text-red-500 text-sm">
-                {errors.confirmNewPassword.message}
-              </p>
-            )}
-          </div>
 
-          <div className="text-center md:text-left">
-            <button
-              className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
-              type="submit"
-              disabled={confirmForgotPass.isLoading}
-            >
-              {confirmForgotPass.isLoading ? (
-                <div className="cursor-progress">Loading</div>
-              ) : (
-                "Lấy lại mật khẩu"
-              )}
-            </button>
-          </div>
+              <div className="mb-8 relative">
+                <label
+                  htmlFor="confirmNewPassword"
+                  className="text-black text-sm font-bold mb-2"
+                >
+                  Nhập lại mật khẩu
+                </label>
+                <div className="relative">
+                  <input
+                    {...register("confirmNewPassword")}
+                    id="confirmNewPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className={`border-2 border-black rounded-lg py-2 px-4 w-full outline-none focus:border-blue-600 ${
+                      errors.confirmNewPassword ? "border-red-500" : ""
+                    }`}
+                  />
+                  <div
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center px-4 cursor-pointer"
+                  >
+                    {showConfirmPassword ? (
+                      <IoEyeOutline className="size-6" />
+                    ) : (
+                      <IoEyeOffOutline className="size-6" />
+                    )}
+                  </div>
+                </div>
+                {errors.confirmNewPassword && (
+                  <p className="text-red-500 text-sm">
+                    {errors.confirmNewPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="text-center md:text-left">
+                <button
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
+                  type="submit"
+                  disabled={confirmForgotPass.isLoading}
+                >
+                  {confirmForgotPass.isLoading ? (
+                    <div className="cursor-progress">Loading</div>
+                  ) : (
+                    "Lấy lại mật khẩu"
+                  )}
+                </button>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
         </form>
       </div>
     </section>
