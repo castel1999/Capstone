@@ -77,7 +77,7 @@ const Availability = (props) => {
   const handleTimeChange = (day, index, newTime, field) => {
     const updatedDay = weekSchedule[day].map((timeRange, i) => {
       if (i === index) {
-        return { ...timeRange, [field]: newTime };
+        return { ...timeRange, [field]: `${newTime}` };
       }
       return timeRange;
     });
@@ -133,10 +133,7 @@ const Availability = (props) => {
 
   const mutation = useMutation({
     mutationFn: (variables) =>
-      TutorApi.registerTutorStep5(
-        { request: variables.targetValue },
-        variables.tutorId
-      ),
+      TutorApi.registerTutorStep5(variables.targetValue, variables.tutorId),
     onSuccess: (data) => {
       setIsStage5Completed(true);
       toast.success("Thêm thời gian biểu thành công !");
@@ -157,6 +154,13 @@ const Availability = (props) => {
           tutorStartTimeEndTimRegisterRequests: weekSchedule[day],
         });
     });
+
+    targetValue?.map((day, index) => {
+      day?.tutorStartTimeEndTimRegisterRequests?.map((timeRange) => {
+        timeRange.startTime = `${timeRange.startTime}:00`;
+        timeRange.endTime = `${timeRange.endTime}:00`
+      })
+    } );
 
     mutation.mutate({ targetValue, tutorId });
   };
