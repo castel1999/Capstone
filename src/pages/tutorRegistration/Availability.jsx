@@ -11,9 +11,13 @@ const Availability = (props) => {
   const setIsStage5Completed = props.setIsStage5Completed;
   const weekSchedule = props.weekSchedule;
   const setWeekSchedule = props.setWeekSchedule;
+  const weekWarnings = props.weekWarnings;
+  const setWeekWarnings = props.setWeekWarnings;
+  const dayOfWeek = props.dayOfWeek;
+  const setDayOfWeek = props.setDayOfWeek;
   const tutorId = props.tutorId;
   const current = new moment();
-  const [dayOfWeek, setDayOfWeek] = useState(Array(7).fill(false));
+  
   const [total, setTotal] = useState(false);
   const dayNames = [
     "monday",
@@ -33,15 +37,6 @@ const Availability = (props) => {
     "Thứ bảy",
     "Chủ nhật",
   ];
-  const [weekWarnings, setWeekWarnings] = useState({
-    monday: [],
-    tuesday: [],
-    wednesday: [],
-    thursday: [],
-    friday: [],
-    saturday: [],
-    sunday: [],
-  });
 
   const addTimeRange = (day) => {
     const updatedWarning = [
@@ -77,7 +72,7 @@ const Availability = (props) => {
   const handleTimeChange = (day, index, newTime, field) => {
     const updatedDay = weekSchedule[day].map((timeRange, i) => {
       if (i === index) {
-        return { ...timeRange, [field]: `${newTime}` };
+        return { ...timeRange, [field]: newTime };
       }
       return timeRange;
     });
@@ -146,21 +141,23 @@ const Availability = (props) => {
   });
 
   const submitStep5 = () => {
-    const targetValue = [];
-    dayNames.map((day, index) => {
-      if (weekSchedule[day].length !== 0)
-        targetValue.push({
-          dayOfWeek: index !== 6 ? index + 2 : 0,
-          tutorStartTimeEndTimRegisterRequests: weekSchedule[day],
-        });
-    });
-
-    targetValue?.map((day, index) => {
-      day?.tutorStartTimeEndTimRegisterRequests?.map((timeRange) => {
-        timeRange.startTime = `${timeRange.startTime}:00`;
-        timeRange.endTime = `${timeRange.endTime}:00`
+    const targetValue = dayNames
+      .map((day, index) => {
+        if (weekSchedule[day].length !== 0 && dayOfWeek[index]) {
+          return {
+            dayOfWeek: index !== 6 ? index + 2 : 0,
+            tutorStartTimeEndTimRegisterRequests: weekSchedule[day].map(
+              (timeRange) => ({
+                ...timeRange,
+                startTime: `${timeRange.startTime}:00`,
+                endTime: `${timeRange.endTime}:00`,
+              })
+            ),
+          };
+        }
+        return null;
       })
-    } );
+      .filter(Boolean);
 
     mutation.mutate({ targetValue, tutorId });
   };
@@ -218,9 +215,8 @@ const Availability = (props) => {
 
     if (areAllWarningsEmpty()) {
       submitStep5();
-      setIsStage5Completed(true);
-      setStage(6);
     }
+    else animateScroll.scrollToTop({ duration: 400, smooth: true });
   };
 
   useEffect(() => {

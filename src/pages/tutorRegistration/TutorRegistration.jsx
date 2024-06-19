@@ -53,6 +53,16 @@ const TutorRegistration = () => {
     saturday: [],
     sunday: [],
   });
+  const [weekWarnings, setWeekWarnings] = useState({
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+  });
+  const [dayOfWeek, setDayOfWeek] = useState(Array(7).fill(false));
   const [price, setPrice] = useState(0);
   const [stage, setStage] = useState(1);
   const [tutorId, setTutorId] = useState("");
@@ -157,7 +167,9 @@ const TutorRegistration = () => {
             <div className="flex justify-center items-center h-5 w-5 bg-black text-white rounded-md">
               6
             </div>
-          ) : ''}
+          ) : (
+            ""
+          )}
           <div className="text-[18px]">Giá cả</div>
         </div>
       </div>
@@ -218,6 +230,10 @@ const TutorRegistration = () => {
                 weekSchedule={weekSchedule}
                 setWeekSchedule={setWeekSchedule}
                 tutorId={tutorId}
+                weekWarnings={weekWarnings}
+                setWeekWarnings={setWeekWarnings}
+                dayOfWeek={dayOfWeek}
+                setDayOfWeek={setDayOfWeek}
               />
             ) : (
               ""
