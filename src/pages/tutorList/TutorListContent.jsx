@@ -4,12 +4,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/avatar.png";
 import CloseIcon from "@mui/icons-material/Close";
+import { FaStar } from "react-icons/fa";
+import { CiHeart } from "react-icons/ci";
 import Loading from "../../utils/LoadingVer2";
 import { useAuth } from "../../hooks/AuthContext";
 import { useUserStore } from "../../lib/useUserStore";
 import { set, update } from "firebase/database";
 import { jwtDecode } from "jwt-decode";
-import { arrayUnion, collection, serverTimestamp, setDoc, getDoc, updateDoc, onSnapshot } from "firebase/firestore";
+import {
+  arrayUnion,
+  collection,
+  serverTimestamp,
+  setDoc,
+  getDoc,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { doc } from "firebase/firestore";
 const TutorListContent = ({ data }) => {
@@ -21,12 +31,12 @@ const TutorListContent = ({ data }) => {
   const { currentUser, isLoading, fetchCurrentUser } = useUserStore();
   const [userChats, setUserChats] = useState([]);
 
-  // Kiểm tra chats thay đổi 
+  // Kiểm tra chats thay đổi
   useEffect(() => {
-    let unsubscribe = () => { };
+    let unsubscribe = () => {};
 
     if (currentUser) {
-      const userChatsDocRef = doc(db, 'userchats', currentUser.userID);
+      const userChatsDocRef = doc(db, "userchats", currentUser.userID);
       unsubscribe = onSnapshot(userChatsDocRef, (snapshot) => {
         const docData = snapshot.data();
         if (docData) {
@@ -40,19 +50,17 @@ const TutorListContent = ({ data }) => {
   }, [currentUser]);
 
   const isReceiverInChats = (chats, receiverId) => {
-    return chats?.some(chat => chat.receiverId === receiverId);
-  }
+    return chats?.some((chat) => chat.receiverId === receiverId);
+  };
   const token = localStorage.getItem("token");
   const handleChat = async (tutor) => {
     setSelectedTutor(tutor);
     console.log(selectedTutor);
     if (!token) {
       navigate("/login");
-    }
-    else if (isReceiverInChats(userChats, selectedTutor.userId)) {
+    } else if (isReceiverInChats(userChats, selectedTutor.userId)) {
       console.log("Da ton tai trong chats");
-    }
-    else {
+    } else {
       setIsLoadingModal(true);
       setSelectedTutor(tutor);
       setIsOpen(true);
@@ -65,13 +73,13 @@ const TutorListContent = ({ data }) => {
   };
   const handleClose = () => {
     setIsOpen(false);
-  }
+  };
   // Handle Send First Message
   const handleSendMessage = async () => {
     const chatRef = collection(db, "chats");
-    const userChatsRef = collection(db, "userchats")
+    const userChatsRef = collection(db, "userchats");
     try {
-      const newChatRef = doc(chatRef)
+      const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
         createAt: serverTimestamp(),
         messages: [],
@@ -82,7 +90,7 @@ const TutorListContent = ({ data }) => {
           lastMessage: message,
           receiverId: currentUser.userID,
           updatedAt: Date.now(),
-        })
+        }),
       });
       await updateDoc(doc(userChatsRef, currentUser.userID), {
         chats: arrayUnion({
@@ -90,7 +98,7 @@ const TutorListContent = ({ data }) => {
           lastMessage: message,
           receiverId: selectedTutor.userId,
           updatedAt: Date.now(),
-        })
+        }),
       });
       setIsOpen(false);
     } catch (error) {
@@ -111,6 +119,9 @@ const TutorListContent = ({ data }) => {
       setIsLoadingModal(true);
     }
   }, [isLoading]);
+
+  const lorem =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sodales, urna sed efficitur sodales, diam justo finibus erat, vel vestibulum odio sapien ut turpis. Mauris tincidunt finibus velit vel lobortis. Curabitur nisi purus, convallis quis nisi eget, feugiat tincidunt nisi. Nunc fringilla, velit sed dignissim blandit, mi arcu rutrum dui, ut elementum leo neque at nisl. Vestibulum semper tortor libero, at molestie eros ullamcorper at. Nam molestie dictum augue, nec scelerisque ipsum mattis quis. Pellentesque in urna sit amet ante cursus finibus eu quis sapien. Proin venenatis interdum tortor in scelerisque. Donec vitae ornare sapien. Morbi convallis dictum suscipit.";
   return (
     <div className="flex flex-col gap-5">
       {Array.isArray(data) && data.length > 0 ? (
@@ -131,14 +142,30 @@ const TutorListContent = ({ data }) => {
                 {item?.tutorName}
               </div>
               <div className="flex flex-row items-center gap-2 text-sm text-gray-400">
-                {item?.level}
+                {item?.subjects?.map((item) => item?.title).join(", ")}
               </div>
-              <div className="line-clamp-4">{item?.description}</div>
+              <div className="line-clamp-4">
+                {item?.description === null ? lorem : item?.description}
+              </div>
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex flex-row">
-                <div className="flex flex-col gap-1 w-28">
-                  <div className="font-semibold text-2xl">${item?.pricePerHour}</div>
+                <div className="flex flex-row gap-7 justify-center items-center">
+                  <div className="font-semibold text-2xl w-16">
+                    {item?.ratings.length === 0 ? (
+                      "New"
+                    ) : (
+                      <div>
+                        <FaStar /> {item?.ratings}
+                      </div>
+                    )}
+                  </div>
+                  <div className="font-semibold text-2xl w-20">
+                    ${item?.pricePerHour}
+                  </div>
+                  <div className="font-semibold text-2xl w-10">
+                    <CiHeart />
+                  </div>
                 </div>
               </div>
               <div className="flex flex-col gap-3 text-center mt-10">
@@ -150,7 +177,8 @@ const TutorListContent = ({ data }) => {
                 </div>
                 <div
                   onClick={() => handleChat(item)}
-                  className="border-2 border-gray-400 rounded-lg p-3 hover:bg-gray-100 cursor-pointer">
+                  className="border-2 border-gray-400 rounded-lg p-3 hover:bg-gray-100 cursor-pointer"
+                >
                   Nhắn tin
                 </div>
               </div>
@@ -164,30 +192,58 @@ const TutorListContent = ({ data }) => {
               style={{
                 overlay: { opacity: isOpen ? 1 : 0 },
                 content: {
-                  opacity: isOpen ? 1 : 0, transform: isOpen ? 'scale(1)' : 'scale(0.9)'
-                }
-              }
-              }
+                  opacity: isOpen ? 1 : 0,
+                  transform: isOpen ? "scale(1)" : "scale(0.9)",
+                },
+              }}
             >
               {isLoadingModal ? (
                 <Loading />
               ) : (
                 <Box sx={{ width: 500, padding: 3 }} className="relative">
-                  <CloseIcon onClick={handleClose} className=" z-50 absolute top-8 right-8 cursor-pointer" />
+                  <CloseIcon
+                    onClick={handleClose}
+                    className=" z-50 absolute top-8 right-8 cursor-pointer"
+                  />
                   <div className="h-auto flex flex-col bg-white p-5 rounded-md relative z-10 w-auto">
                     <div className="my-5 flex flex-col items-center justify-center">
-                      <img style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover' }} src={selectedTutor?.avatar} alt="" />
-                      <h2 className=" text-center font-bold my-4 text-[32px]">{selectedTutor ? selectedTutor.tutorName : ""}</h2>
+                      <img
+                        style={{
+                          width: "120px",
+                          height: "120px",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                        src={selectedTutor?.avatar}
+                        alt=""
+                      />
+                      <h2 className=" text-center font-bold my-4 text-[32px]">
+                        {selectedTutor ? selectedTutor.tutorName : ""}
+                      </h2>
                       <p className="flex text-center justify-center items-center mb-8">
-                        Bạn hãy cho tôi biết bạn đang gặp khó khăn ở đâu. Tôi sẽ giúp bạn.
+                        Bạn hãy cho tôi biết bạn đang gặp khó khăn ở đâu. Tôi sẽ
+                        giúp bạn.
                       </p>
                     </div>
                     <div>
-                      <h2 className="font-bold" id="modal-modal-title">GỬI TIN NHẮN ĐẦU TIÊN</h2>
-                      <textarea id="modal-modal-description" rows="5" onChange={(e) => setMessage(e.target.value)} className="w-full p-2 border rounded-md" placeholder="Message..."></textarea>
+                      <h2 className="font-bold" id="modal-modal-title">
+                        GỬI TIN NHẮN ĐẦU TIÊN
+                      </h2>
+                      <textarea
+                        id="modal-modal-description"
+                        rows="5"
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Message..."
+                      ></textarea>
                     </div>
                     <div className="flex w-full justify-end gap-3">
-                      <button className="bg-[#6b48f2] hover:bg-blue-700 rounded-lg text-white w-full my-3 font-bold py-3 px-4" onClick={handleSendMessage}>Gửi tin nhắn</button>
+                      <button
+                        className="bg-[#6b48f2] hover:bg-blue-700 rounded-lg text-white w-full my-3 font-bold py-3 px-4"
+                        onClick={handleSendMessage}
+                      >
+                        Gửi tin nhắn
+                      </button>
                     </div>
                   </div>
                 </Box>
@@ -196,9 +252,11 @@ const TutorListContent = ({ data }) => {
           </div>
         ))
       ) : (
-        <div className="text-center text-gray-600">No tutors match the search query</div>
+        <div className="text-center text-gray-600">
+          No tutors match the search query
+        </div>
       )}
-    </div >
+    </div>
   );
 };
 

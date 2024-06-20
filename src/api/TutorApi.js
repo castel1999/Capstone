@@ -5,19 +5,27 @@ export const getTutorDetail = async (tutorId) => {
   return response.json();
 };
 
-export const getTutorDetail2 = async (tutorId) => {
-  // const response = await fetch(`${BASE_API_LINK}/Admin/get/tutor/${tutorId}`);
-  const response = await fetch(`https://66479db42bb946cf2f9e5c01.mockapi.io/tutor-detail/${tutorId}`);
+export const getTutorSubject = async (tutorId) => {
+  const response = await fetch(
+    `${BASE_API_LINK}/Admin/get/tutor-subjects/tutor/${tutorId}`
+  );
   return response.json();
 };
 
+export const getTutorDetail2 = async (tutorId) => {
+  // const response = await fetch(`${BASE_API_LINK}/Admin/get/tutor/${tutorId}`);
+  const response = await fetch(
+    `https://66479db42bb946cf2f9e5c01.mockapi.io/tutor-detail/${tutorId}`
+  );
+  return response.json();
+};
 
 export const getUserDetail = async (userId) => {
   const response = await fetch(`${BASE_API_LINK}/Account/get/${userId}`);
   return response.json();
 };
 
-export const getTutorList = async ({ page = 1, pageSize = 10 } = {}) => {
+export const getTutorList = async ({ page, pageSize } = {}) => {
   const response = await fetch(
     `${BASE_API_LINK}/TutorData/get/all/v2?page=${page}&pageSize=${pageSize}`
   );
@@ -31,23 +39,23 @@ export const getTutorList = async ({ page = 1, pageSize = 10 } = {}) => {
   }
 
   const tutors = await Promise.all(
-    responseBody.results.map(async (tutor) => {
-      const tutorDetail = await getTutorDetail(tutor.tutorId);
-      const userDetail = await getUserDetail(tutorDetail.userId);
+    responseBody?.results?.map(async (tutor) => {
+      const tutorDetail = await getTutorDetail(tutor?.tutorId);
+      const userDetail = await getUserDetail(tutorDetail?.userId);
       return {
         ...tutor,
-        tutorName: userDetail.value.fullName,
-        avatar: userDetail.value.imageUrl,
+        tutorName: userDetail?.value?.fullName,
+        avatar: userDetail?.value?.imageUrl,
       };
     })
   );
 
   return {
     results: tutors,
-    pageNumber: responseBody.pageNumber,
-    pageSize: responseBody.pageSize,
-    totalPages: responseBody.totalPages,
-    totalRecords: responseBody.totalRecords,
+    pageNumber: responseBody?.pageNumber,
+    pageSize: responseBody?.pageSize,
+    totalPages: responseBody?.totalPages,
+    totalRecords: responseBody?.totalRecords,
   };
 };
 
@@ -75,13 +83,16 @@ export const registerTutorStep1 = async (data, apiUrl) => {
 };
 
 export const registerTutorStep2 = async (data, tutorId) => {
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/certificate/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/register/certificate/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -93,14 +104,17 @@ export const registerTutorStep2 = async (data, tutorId) => {
 };
 
 export const registerTutorStep3 = async (data, tutorId) => {
-  console.log(data)
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/experiences/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  console.log(data);
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/register/experiences/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -112,14 +126,17 @@ export const registerTutorStep3 = async (data, tutorId) => {
 };
 
 export const registerTutorStep4 = async (data, tutorId) => {
-  console.log(data)
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/sub-tutor/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  console.log(data);
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/register/sub-tutor/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -131,14 +148,17 @@ export const registerTutorStep4 = async (data, tutorId) => {
 };
 
 export const registerTutorStep5 = async (data, tutorId) => {
-  console.log(JSON.stringify(data))
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/create/slot-schedule-v2/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  console.log(JSON.stringify(data));
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/create/slot-schedule-v2/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -150,7 +170,7 @@ export const registerTutorStep5 = async (data, tutorId) => {
 };
 
 export const registerTutorStep6 = async (data) => {
-  console.log(JSON.stringify(data))
+  console.log(JSON.stringify(data));
   const response = await fetch(`${BASE_API_LINK}/TutorRegister/confirm`, {
     method: "POST",
     headers: {
@@ -167,4 +187,3 @@ export const registerTutorStep6 = async (data) => {
   const responseBody = await response.json();
   return responseBody;
 };
-

@@ -57,7 +57,13 @@ const LoginPage = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       // Get User data from API
-      const { displayName: name, uid: googleId, email, photoURL, emailVerified } = user;
+      const {
+        displayName: name,
+        uid: googleId,
+        email,
+        photoURL,
+        emailVerified,
+      } = user;
       const userdata = {
         googleId,
         imageUrl: photoURL,
@@ -68,7 +74,7 @@ const LoginPage = () => {
       console.log(userdata);
       mutationEmail.mutate(userdata);
     } catch (error) {
-      console.error('Error during login', error);
+      console.error("Error during login", error);
     }
   };
 
@@ -79,23 +85,23 @@ const LoginPage = () => {
     mutationFn: apiClient.loginByEmail,
     onSuccess: async (data) => {
       if (!data) {
-        console.error('No data received');
+        console.error("No data received");
         return;
       }
       if (!data.accessToken) {
-        console.error('No access token received');
+        console.error("No access token received");
         return;
       }
       const decodedToken = jwtDecode(data.accessToken);
       const userId = decodedToken.UserId;
-      localStorage.setItem('token', data.accessToken);
-      localStorage.setItem('role', data.role);
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("role", data.role);
       setUser({
         role: data.role,
         token: data.accessToken,
         decodedToken,
       });
-      await queryClient.invalidateQueries('getCurrentUser');
+      await queryClient.invalidateQueries("getCurrentUser");
       try {
         // Get User data from API
         const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
@@ -103,32 +109,32 @@ const LoginPage = () => {
           // Save or update data user into FireStore
           const userData = {
             userID: data.userId,
-            avatar: currentUserInfo.value.imageUrl || '',
-            name: currentUserInfo.value.fullName || '',
+            avatar: currentUserInfo.value.imageUrl || "",
+            name: currentUserInfo.value.fullName || "",
             lastLogin: serverTimestamp(),
             blockedUser: [],
           };
-          await setDoc(doc(db, 'users', userData.userID), userData);
-          await setDoc(doc(db, 'userchats', userData.userID), {
+          await setDoc(doc(db, "users", userData.userID), userData);
+          await setDoc(doc(db, "userchats", userData.userID), {
             chats: [],
           });
         } else {
-          console.log('Không lấy được thông tin user');
+          console.log("Không lấy được thông tin user");
         }
       } catch (error) {
-        console.log('Lỗi khi lưu dữ liệu vào Firestore:', error);
+        console.log("Lỗi khi lưu dữ liệu vào Firestore:", error);
       }
       // Fetch current user based on ID from token
-      toast.success('Đăng nhập thành công!');
-      navigate('/tutor-list');
+      toast.success("Đăng nhập thành công!");
+      navigate("/tutor-list");
     },
     onError: (error) => {
       if (error.status === 400) {
-        toast.error('Sai tên đăng nhập hoặc mật khẩu!');
+        toast.error("Sai tên đăng nhập hoặc mật khẩu!");
       } else if (error.status === 404) {
-        toast.error('Tài khoản không tồn tại!');
+        toast.error("Tài khoản không tồn tại!");
       } else if (error.status === 500) {
-        toast.error('Lỗi máy chủ nội bộ!');
+        toast.error("Lỗi máy chủ nội bộ!");
       }
       console.log(error.message);
     },
@@ -164,7 +170,7 @@ const LoginPage = () => {
           await setDoc(doc(db, "userchats", userData.userID), {
             chats: [],
           });
-          console.log(curr)
+          console.log(curr);
         } else {
           console.log("Không lấy được thông tin user");
         }
@@ -290,6 +296,15 @@ const LoginPage = () => {
               "Đăng nhập"
             )}
           </button>
+        </div>
+        <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
+          Chưa có tài khoản?{" "}
+          <Link
+            className="text-red-600 hover:underline hover:underline-offset-4"
+            to="/signup"
+          >
+            Đăng Ký
+          </Link>
         </div>
       </div>
     </section>
