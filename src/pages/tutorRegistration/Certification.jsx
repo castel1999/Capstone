@@ -204,7 +204,7 @@ const Certification = (props) => {
       setStage(3);
     } else if (allFieldsValid) {
       submitStep2();
-    }
+    } else animateScroll.scrollToTop({ duration: 400, smooth: true });
   };
 
   return (

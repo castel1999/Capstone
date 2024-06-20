@@ -68,9 +68,7 @@ const Description = (props) => {
     setWarnings(newWarnings);
     if (allValid) {
       submitStep4()
-      setIsStage4Completed(true);
-      setStage(5);
-    }
+    } else animateScroll.scrollToTop({ duration: 400, smooth: true });
   };
 
   useEffect(() => {

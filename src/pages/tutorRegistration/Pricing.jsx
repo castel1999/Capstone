@@ -5,6 +5,7 @@ import * as TutorApi from "../../api/TutorApi";
 import { toast } from "react-toastify";
 
 const Pricing = (props) => {
+  const setIsStageAllCompleted = props.setIsStageAllCompleted;
   const setStage = props.setStage;
   const price = props.price;
   const setPrice = props.setPrice;
@@ -20,6 +21,7 @@ const Pricing = (props) => {
       TutorApi.registerTutorStep6(variables.targetValue),
     onSuccess: (data) => {
       toast.success("Hoàn tất đăng ký !");
+      setIsStageAllCompleted(true)
     },
     onError: (error) => {
       toast.error(error.message);

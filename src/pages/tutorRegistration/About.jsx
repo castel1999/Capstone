@@ -9,6 +9,7 @@ import { useAuth } from "../../hooks/AuthContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as TutorApi from "../../api/TutorApi";
 import { toast } from "react-toastify";
+import { animateScroll } from "react-scroll";
 
 const About = (props) => {
   const BASE_API_LINK = import.meta.env.VITE_API_LINK;
@@ -174,7 +175,7 @@ const About = (props) => {
 
     if (allFieldsValid) {
       submitStep1();
-    }
+    } else animateScroll.scrollToTop({ duration: 400, smooth: true });
   };
 
   const extractVideoID = (url) => {

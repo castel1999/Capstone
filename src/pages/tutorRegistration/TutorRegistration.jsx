@@ -7,6 +7,7 @@ import Education from "./Education";
 import Description from "./Description";
 import Availability from "./Availability";
 import Pricing from "./Pricing";
+import FinishPage from "./FinishPage";
 
 const TutorRegistration = () => {
   const [about, setAbout] = useState({
@@ -52,9 +53,19 @@ const TutorRegistration = () => {
     saturday: [],
     sunday: [],
   });
+  const [weekWarnings, setWeekWarnings] = useState({
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+  });
+  const [dayOfWeek, setDayOfWeek] = useState(Array(7).fill(false));
   const [price, setPrice] = useState(0);
   const [stage, setStage] = useState(1);
-  const [tutorId, setTutorId] = useState('')
+  const [tutorId, setTutorId] = useState("");
   const [isStage1Completed, setIsStage1Completed] = useState(false);
   const [isStage2Completed, setIsStage2Completed] = useState(false);
   const [isStage3Completed, setIsStage3Completed] = useState(false);
@@ -81,7 +92,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={isStage1Completed ? () => setStage(2) : ''}
+          onClick={isStage1Completed ? () => setStage(2) : ""}
         >
           {stage < 2 ? (
             <div className="flex justify-center items-center h-5 w-5">2</div>
@@ -98,7 +109,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={isStage2Completed ? () => setStage(3) : ''}
+          onClick={isStage2Completed ? () => setStage(3) : ""}
         >
           {stage < 3 ? (
             <div className="flex justify-center items-center h-5 w-5">3</div>
@@ -114,7 +125,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={isStage3Completed ? () => setStage(4) : ''}
+          onClick={isStage3Completed ? () => setStage(4) : ""}
         >
           {stage < 4 ? (
             <div className="flex justify-center items-center h-5 w-5">4</div>
@@ -130,7 +141,7 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={isStage4Completed ? () => setStage(5) : ''}
+          onClick={isStage4Completed ? () => setStage(5) : ""}
         >
           {stage < 5 ? (
             <div className="flex justify-center items-center h-5 w-5">5</div>
@@ -146,28 +157,100 @@ const TutorRegistration = () => {
         </div>
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"
-          onClick={isStage5Completed ? () => setStage(6) : ''}
+          onClick={isStage5Completed ? () => setStage(6) : ""}
         >
-          {stage < 6 ? (
+          {isStageAllCompleted ? (
+            <img className="h-5 w-5 bg-black rounded-md p-1" src={check} />
+          ) : stage < 6 ? (
             <div className="flex justify-center items-center h-5 w-5">6</div>
           ) : stage === 6 ? (
             <div className="flex justify-center items-center h-5 w-5 bg-black text-white rounded-md">
               6
             </div>
           ) : (
-            <img className="h-5 w-5 bg-black rounded-md p-1" src={check} />
+            ""
           )}
           <div className="text-[18px]">Giá cả</div>
         </div>
       </div>
 
       <div className="w-[50%]">
-        {stage === 1 ? (<About setIsStage1Completed={setIsStage1Completed} setStage={setStage} about={about} setAbout={setAbout} setTutorId={setTutorId}/>) : ''}
-        {stage === 2 ? (<Certification setIsStage2Completed={setIsStage2Completed} setStage={setStage} tutorId={tutorId} certifications={certifications} setCertifications={setCertifications}/>) : ''}
-        {stage === 3 ? (<Education setIsStage3Completed={setIsStage3Completed} setStage={setStage} educations={educations} setEducations={setEducations} tutorId={tutorId}/>) : ''}
-        {stage === 4 ? (<Description setIsStage4Completed={setIsStage4Completed} setStage={setStage} descriptions={descriptions} setDescriptions={setDescriptions} tutorId={tutorId}/>) : ''}
-        {stage === 5 ? (<Availability setIsStage5Completed={setIsStage5Completed} setStage={setStage} weekSchedule={weekSchedule} setWeekSchedule={setWeekSchedule} tutorId={tutorId}/>) : ''}
-        {stage === 6 ? (<Pricing setIsStageAllCompleted={setIsStageAllCompleted} setStage={setStage} price={price} setPrice={setPrice} tutorId={tutorId}/>) : ''}
+        {isStageAllCompleted ? (
+          <FinishPage />
+        ) : (
+          <>
+            {stage === 1 ? (
+              <About
+                setIsStage1Completed={setIsStage1Completed}
+                setStage={setStage}
+                about={about}
+                setAbout={setAbout}
+                setTutorId={setTutorId}
+              />
+            ) : (
+              ""
+            )}
+            {stage === 2 ? (
+              <Certification
+                setIsStage2Completed={setIsStage2Completed}
+                setStage={setStage}
+                tutorId={tutorId}
+                certifications={certifications}
+                setCertifications={setCertifications}
+              />
+            ) : (
+              ""
+            )}
+            {stage === 3 ? (
+              <Education
+                setIsStage3Completed={setIsStage3Completed}
+                setStage={setStage}
+                educations={educations}
+                setEducations={setEducations}
+                tutorId={tutorId}
+              />
+            ) : (
+              ""
+            )}
+            {stage === 4 ? (
+              <Description
+                setIsStage4Completed={setIsStage4Completed}
+                setStage={setStage}
+                descriptions={descriptions}
+                setDescriptions={setDescriptions}
+                tutorId={tutorId}
+              />
+            ) : (
+              ""
+            )}
+            {stage === 5 ? (
+              <Availability
+                setIsStage5Completed={setIsStage5Completed}
+                setStage={setStage}
+                weekSchedule={weekSchedule}
+                setWeekSchedule={setWeekSchedule}
+                tutorId={tutorId}
+                weekWarnings={weekWarnings}
+                setWeekWarnings={setWeekWarnings}
+                dayOfWeek={dayOfWeek}
+                setDayOfWeek={setDayOfWeek}
+              />
+            ) : (
+              ""
+            )}
+            {stage === 6 ? (
+              <Pricing
+                setIsStageAllCompleted={setIsStageAllCompleted}
+                setStage={setStage}
+                price={price}
+                setPrice={setPrice}
+                tutorId={tutorId}
+              />
+            ) : (
+              ""
+            )}
+          </>
+        )}
       </div>
     </div>
   );

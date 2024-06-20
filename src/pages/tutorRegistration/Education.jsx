@@ -172,9 +172,7 @@ const Education = (props) => {
       setStage(4);
     } else if (allFieldsValid) {
       submitStep3();
-      setIsStage3Completed(true);
-      setStage(4);
-    }
+    } else animateScroll.scrollToTop({ duration: 400, smooth: true });
   };
 
   const handleGoback = () => {

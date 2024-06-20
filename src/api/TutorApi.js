@@ -104,17 +104,13 @@ export const registerTutorStep2 = async (data, tutorId) => {
 };
 
 export const registerTutorStep3 = async (data, tutorId) => {
-  console.log(data);
-  const response = await fetch(
-    `${BASE_API_LINK}/TutorRegister/register/experiences/${tutorId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/experiences/${tutorId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -126,17 +122,13 @@ export const registerTutorStep3 = async (data, tutorId) => {
 };
 
 export const registerTutorStep4 = async (data, tutorId) => {
-  console.log(data);
-  const response = await fetch(
-    `${BASE_API_LINK}/TutorRegister/register/sub-tutor/${tutorId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/sub-tutor/${tutorId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -148,17 +140,13 @@ export const registerTutorStep4 = async (data, tutorId) => {
 };
 
 export const registerTutorStep5 = async (data, tutorId) => {
-  console.log(JSON.stringify(data));
-  const response = await fetch(
-    `${BASE_API_LINK}/TutorRegister/create/slot-schedule-v2/${tutorId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/create/slot-schedule-v2/${tutorId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -170,7 +158,6 @@ export const registerTutorStep5 = async (data, tutorId) => {
 };
 
 export const registerTutorStep6 = async (data) => {
-  console.log(JSON.stringify(data));
   const response = await fetch(`${BASE_API_LINK}/TutorRegister/confirm`, {
     method: "POST",
     headers: {
