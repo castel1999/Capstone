@@ -36,6 +36,7 @@ import AccountAdmin from "./pages/admin/AccountAdmin";
 import TutorRequestAdmin from "./pages/admin/TutorRequestAdmin";
 import TutorRequestDetail from "./pages/admin/TutorRequestDetail";
 import Payment from "./pages/Payment";
+import TutorManagement from "./pages/tutorManagement/TutorManagement";
 
 function App() {
   return (
@@ -80,7 +81,9 @@ function App() {
             <Route path="/tutor-registration" element={<TutorRegistration />} />
           </Route>
 
-          <Route element={<PrivateRoute allowedRoles={["Student"]} />}></Route>
+          <Route element={<PrivateRoute allowedRoles={["Tutor"]} />}>
+            <Route path="/tutor-management" element={<TutorManagement />} />
+          </Route>
 
           <Route
             element={<PrivateRoute allowedRoles={["Admin", "Moderator"]} />}

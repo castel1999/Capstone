@@ -335,7 +335,7 @@ const Education = (props) => {
                   -{" "}
                   <input
                     className={
-                      warnings[index].yearStart === ""
+                      warnings[index].yearEnd === ""
                         ? "flex-1 px-[14px] py-[10px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
                         : "flex-1 px-[14px] py-[10px] border-2 border-[#a3120a] rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] bg-[#ffe2e0]"
                     }
