@@ -70,8 +70,8 @@ const TutorListContent = ({ data }) => {
       setIsLoadingModal(false);
     }
   };
-  const handleRent = () => {
-    navigate("/tutor-detail/3");
+  const handleRent = (tutorId) => {
+    navigate(`/tutor-detail/${tutorId}`);
   };
   const handleClose = () => {
     setIsOpen(false);
@@ -180,7 +180,7 @@ const TutorListContent = ({ data }) => {
               </div>
               <div className="flex flex-col gap-3 text-center mt-10">
                 <div
-                  onClick={handleRent}
+                  onClick={() => handleRent(item.tutorId)}
                   className="border-2 border-black rounded-lg p-3 text-white bg-theme cursor-pointer hover:opacity-90"
                 >
                   Thuê

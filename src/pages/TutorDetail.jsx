@@ -18,8 +18,10 @@ const TutorDetail = () => {
 
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["tutorDetail"],
-    queryFn: () => TutorApi.getTutorDetail2(3),
+    queryFn: () => TutorApi.getTutorDetail(id),
   });
+
+  console.log(data)
 
   useEffect(() => {
     Events.scrollEvent.register("begin", (to, element) => {
@@ -439,7 +441,7 @@ const TutorDetail = () => {
           </div>
         </div>
       </div>
-      <div className="sticky top-[88px] flex mt-[48px] flex-col w-[40%] h-fit p-6 border-2 border-black rounded-lg gap-6">
+      {/* <div className="sticky top-[88px] flex mt-[48px] flex-col w-[40%] h-fit p-6 border-2 border-black rounded-lg gap-6">
         <div className="relative w-full overflow-hidden pt-[56.25%] rounded-md">
           <iframe
             className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
@@ -466,7 +468,7 @@ const TutorDetail = () => {
         <div className="flex justify-center font-medium px-5 py-3 bg-[#ffffff] text-black shadow-button rounded-lg border-2 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none duration-500">
           Nhắn tin
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
