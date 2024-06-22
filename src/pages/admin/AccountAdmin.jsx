@@ -20,7 +20,7 @@ const AccountAdmin = () => {
     return <div>Loading...</div>;
   }
 
-  const rows = data.map((item, index) => ({
+  const rows = data?.map((item, index) => ({
     id: index + 1,
     avatar: item?.imageUrl,
     name: item?.name,
