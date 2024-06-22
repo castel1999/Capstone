@@ -10,7 +10,9 @@ const getRemainingTime = (exp) => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const [showChat, setShowChat] = useState(false);
   const [user, setUser] = useState(() => {
+
     const token = localStorage.getItem("token");
     if (!token) return null;
 
@@ -64,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, showChat, setShowChat }}>
       {children}
     </AuthContext.Provider>
   );

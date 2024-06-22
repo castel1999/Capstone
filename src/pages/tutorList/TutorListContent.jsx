@@ -1,6 +1,6 @@
 import { Box, Button, Input } from "@mui/material";
 import Modal from "react-modal";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/avatar.png";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,7 +23,7 @@ import {
 import { db } from "../../firebase";
 import { doc } from "firebase/firestore";
 import dAva from "../../assets/DefaultAva.png";
-
+import Chat from "../../components/chat/Chat";
 const TutorListContent = ({ data }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -32,10 +32,10 @@ const TutorListContent = ({ data }) => {
   const [isLoadingModal, setIsLoadingModal] = useState(false);
   const { currentUser, isLoading, fetchCurrentUser } = useUserStore();
   const [userChats, setUserChats] = useState([]);
-
+  const { setShowChat } = useAuth();
   // Kiểm tra chats thay đổi
   useEffect(() => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     if (currentUser) {
       const userChatsDocRef = doc(db, "userchats", currentUser.userID);
@@ -57,12 +57,13 @@ const TutorListContent = ({ data }) => {
   const token = localStorage.getItem("token");
   const handleChat = async (tutor) => {
     setSelectedTutor(tutor);
-    console.log(selectedTutor);
     if (!token) {
       navigate("/login");
-    } else if (isReceiverInChats(userChats, selectedTutor.userId)) {
-      console.log("Da ton tai trong chats");
-    } else {
+    }
+    else if (isReceiverInChats(userChats, selectedTutor.userId)) {
+      setShowChat(true);
+    }
+    else {
       setIsLoadingModal(true);
       setSelectedTutor(tutor);
       setIsOpen(true);
@@ -84,11 +85,18 @@ const TutorListContent = ({ data }) => {
       const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
         createAt: serverTimestamp(),
-        messages: [],
+        messages: arrayUnion(
+          {
+            senderId: currentUser.userID,
+            text: message,
+            createdAt: new Date(),
+          }
+        )
       });
       await updateDoc(doc(userChatsRef, selectedTutor.userId), {
         chats: arrayUnion({
           chatId: newChatRef.id,
+          isSeen: false,
           lastMessage: message,
           receiverId: currentUser.userID,
           updatedAt: Date.now(),
@@ -97,7 +105,8 @@ const TutorListContent = ({ data }) => {
       await updateDoc(doc(userChatsRef, currentUser.userID), {
         chats: arrayUnion({
           chatId: newChatRef.id,
-          lastMessage: message,
+          isSeen: false,
+          lastMessage: ` Bạn: ${message} `,
           receiverId: selectedTutor.userId,
           updatedAt: Date.now(),
         }),
@@ -261,5 +270,4 @@ const TutorListContent = ({ data }) => {
     </div>
   );
 };
-
 export default TutorListContent;
