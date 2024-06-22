@@ -93,7 +93,7 @@ function App() {
               <Route path="accounts" element={<AccountAdmin />} />
               <Route path="tutor-request" element={<TutorRequestAdmin />} />
               <Route
-                path="tutor-request-detail/:tutorId"
+                path="tutor-request-detail"
                 element={<TutorRequestDetail />}
               />
             </Route>

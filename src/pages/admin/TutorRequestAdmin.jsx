@@ -23,26 +23,24 @@ const TutorRequestAdmin = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["getAccountData"],
-    queryFn: AdminAPI.getUsers,
+    queryKey: ["getTutorRegisterList"],
+    queryFn: AdminAPI.getTutorRegisterList,
   });
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  const rows = data.map((item, index) => ({
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  const rows = data?.value?.map((item, index) => ({
     id: index + 1,
-    tutorId: item?.id,
+    // tutorId: item?.name,
     avatar: item?.imageUrl,
     name: item?.name,
     email: item?.email,
-    phoneNumber: item?.phoneNumber || "null",
-    dateOfBirth: moment(item?.dateOfBirth?.split("T")[0]).format("DD-MM-YYYY"),
-    createdAt: moment(item?.createdAt?.split("T")[0]).format(
-      "DD-MM-YYYY, h:mm:ss a"
-    ),
-    isPremium: item?.isPremium ? "Premium" : "Thường",
     status: item?.status,
   }));
 
@@ -60,10 +58,6 @@ const TutorRequestAdmin = () => {
     },
     { field: "name", headerName: "Tên", width: 200 },
     { field: "email", headerName: "Email", width: 230 },
-    { field: "phoneNumber", headerName: "Số điện thoại", width: 130 },
-    { field: "dateOfBirth", headerName: "Ngày sinh", width: 150 },
-    { field: "createdAt", headerName: "Ngày tạo tài khoản", width: 150 },
-    { field: "isPremium", headerName: "Loại tài khoản", width: 150 },
     { field: "status", headerName: "Trạng thái", width: 100 },
     {
       field: "details",
@@ -73,7 +67,9 @@ const TutorRequestAdmin = () => {
           variant="contained"
           color="primary"
           onClick={() =>
-            navigate(`/dashboard/tutor-request-detail/${params.row.tutorId}`)
+            navigate(`/dashboard/tutor-request-detail`, {
+              state: params.row,
+            })
           }
         >
           <IoEyeOutline className="size-6" />
