@@ -34,7 +34,7 @@ import Dasboard from "./pages/admin/Dasboard";
 import HomeAdmin from "./pages/admin/HomeAdmin";
 import AccountAdmin from "./pages/admin/AccountAdmin";
 import TutorRequestAdmin from "./pages/admin/TutorRequestAdmin";
-import TutorRequestDetail from "./pages/admin/TutorRequestDetail";
+import TutorRequestDetail from "./pages/admin/TutorRequestDetail/TutorRequestDetail";
 import Payment from "./pages/Payment";
 import TutorManagement from "./pages/tutorManagement/TutorManagement";
 
@@ -93,7 +93,7 @@ function App() {
               <Route path="accounts" element={<AccountAdmin />} />
               <Route path="tutor-request" element={<TutorRequestAdmin />} />
               <Route
-                path="tutor-request-detail"
+                path="tutor-request-detail/:tutorId"
                 element={<TutorRequestDetail />}
               />
             </Route>

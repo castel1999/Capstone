@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { Box, Pagination as MuiPagination } from "@mui/material";
 import * as AdminAPI from "../../api/AdminAPI";
+import dAva from "../../assets/DefaultAva.png";
+
 
 const AccountAdmin = () => {
   const {
@@ -22,7 +24,7 @@ const AccountAdmin = () => {
 
   const rows = data?.map((item, index) => ({
     id: index + 1,
-    avatar: item?.imageUrl,
+    avatar: item?.imageUrl ||dAva,
     name: item?.name,
     email: item?.email,
     phoneNumber: item?.phoneNumber || "null",

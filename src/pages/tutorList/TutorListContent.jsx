@@ -22,6 +22,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { doc } from "firebase/firestore";
+import dAva from "../../assets/DefaultAva.png";
 import Chat from "../../components/chat/Chat";
 const TutorListContent = ({ data }) => {
   const navigate = useNavigate();
@@ -142,7 +143,7 @@ const TutorListContent = ({ data }) => {
           >
             <div>
               <img
-                src={item?.avatar}
+                src={item?.avatar ? item?.avatar : dAva}
                 alt="Avatar"
                 className="object-cover border rounded-md size-40"
               />

@@ -48,7 +48,7 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
         className={`text-xl py-2 ${
           currentPage === 1
             ? "cursor-not-allowed text-gray-400"
-            : "cursor-pointer hover:text-red-500"
+            : "cursor-pointer hover:text-dark-purple"
         }`}
       >
         <MdKeyboardDoubleArrowLeft />
@@ -56,10 +56,10 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
       <button
         onClick={() => paginate(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`text-xl px-4 py-2 ${
+        className={`text-xl py-2 ${
           currentPage === 1
             ? "cursor-not-allowed text-gray-400"
-            : "cursor-pointer hover:text-red-500"
+            : "cursor-pointer hover:text-dark-purple"
         }`}
       >
         <MdNavigateBefore />
@@ -68,8 +68,8 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
         <div
           key={number}
           onClick={() => paginate(number)}
-          className={`cursor-pointer px-4 py-2 ${
-            number === currentPage ? "font-semibold border-2 rounded-lg border-red-500 text-red-500" : ""
+          className={`cursor-pointer px-4 py-2 hover:text-dark-purple hover:font-semibold ${
+            number === currentPage ? "font-semibold border-2 rounded-lg border-dark-purple text-dark-purple" : ""
           }`}
         >
           {number}
@@ -78,10 +78,10 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
       <button
         onClick={() => paginate(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`text-xl px-4 py-2 ${
+        className={`text-xl py-2 ${
           currentPage === totalPages
             ? "cursor-not-allowed text-gray-400"
-            : "cursor-pointer hover:text-red-500"
+            : "cursor-pointer hover:text-dark-purple"
         }`}
       >
         <MdNavigateNext />
@@ -92,7 +92,7 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
         className={`text-xl py-2 ${
           currentPage === totalPages
             ? "cursor-not-allowed text-gray-400"
-            : "cursor-pointer hover:text-red-500"
+            : "cursor-pointer hover:text-dark-purple"
         }`}
       >
         <MdKeyboardDoubleArrowRight />

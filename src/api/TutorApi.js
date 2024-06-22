@@ -104,13 +104,16 @@ export const registerTutorStep2 = async (data, tutorId) => {
 };
 
 export const registerTutorStep3 = async (data, tutorId) => {
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/experiences/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/register/experiences/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -122,13 +125,16 @@ export const registerTutorStep3 = async (data, tutorId) => {
 };
 
 export const registerTutorStep4 = async (data, tutorId) => {
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/register/sub-tutor/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/register/sub-tutor/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -140,13 +146,16 @@ export const registerTutorStep4 = async (data, tutorId) => {
 };
 
 export const registerTutorStep5 = async (data, tutorId) => {
-  const response = await fetch(`${BASE_API_LINK}/TutorRegister/create/slot-schedule-v2/${tutorId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_API_LINK}/TutorRegister/create/slot-schedule-v2/${tutorId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -173,4 +182,32 @@ export const registerTutorStep6 = async (data) => {
 
   const responseBody = await response.json();
   return responseBody;
+};
+
+export const getTutorListTest = async () => {
+  const response = await fetch(`${BASE_API_LINK}/TutorData/get/all`);
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(responseBody.message);
+    error.status = response.status; // Add status code to error object
+    throw error;
+  }
+
+  const tutors = await Promise.all(
+    responseBody?.map(async (tutor) => {
+      const tutorDetail = await getTutorDetail(tutor?.tutorId);
+      const userDetail = await getUserDetail(tutorDetail?.userId);
+      return {
+        ...tutor,
+        tutorName: userDetail?.value?.fullName,
+        avatar: userDetail?.value?.imageUrl,
+      };
+    })
+  );
+
+  return {
+    results: tutors,
+  };
 };
