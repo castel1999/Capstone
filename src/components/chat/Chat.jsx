@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import chatIcon from "../../assets/chat.svg";
 import hideIcon from "../../assets/delete.svg";
 import dot from "../../assets/dot.svg";
@@ -10,33 +10,61 @@ import deleteIcon from "../../assets/wastebasket.svg";
 import block from "../../assets/block.svg";
 import EmojiPicker from "emoji-picker-react";
 import { useUserStore } from "../../lib/useUserStore";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
-import { set } from "firebase/database";
+import { set, update } from "firebase/database";
 import LoadingVerTwo from "../../utils/LoadingVer2";
 import { jwtDecode } from "jwt-decode";
-
+import { useAuth } from "../../hooks/AuthContext";
+import { useChatStore } from "../../lib/useChatStore"
+import upload from "../../lib/uploadImg";
 const Chat = () => {
-  const [showChat, setShowChat] = useState(false);
+  const { showChat } = useAuth();
+  const { setShowChat } = useAuth();
   const [showEmoji, setShowEmoji] = useState(false);
   const [text, setText] = useState("");
   const logged = localStorage.getItem("token") !== null;
   const role = localStorage.getItem("role");
   const { currentUser } = useUserStore();
+  const [currentOpponent, setCurrentOponet] = useState(null);
   // Open dropdown chat 
   const [isOpen, setIsOpen] = useState(false);
-  const [chat, setChats] = useState([]);
-
+  const [chat, setChat] = useState([]);
+  const [chatLists, setChatLists] = useState([])
+  const [message, setMessage] = useState([]);
+  const [img, setImg] = useState({
+    file: null,
+    url: "",
+  })
+  const { chatId, user, changeChat, isCurrentUserBlocked, isRecieverBlocked, setPermanentChatId } = useChatStore();
+  console.log(chatId, user);
   useEffect(() => {
     if (currentUser) {
       const unsub = onSnapshot(doc(db, "userchats", currentUser.userID), (doc) => {
-        setChats(doc.data());
+        setChat(doc.data());
       });
       return () => {
         unsub();
       }
     }
   }, [currentUser]);
+  useEffect(() => {
+    if (chatId) {
+      // Tạo một hàm bất đồng bộ bên trong useEffect
+      const fetchData = async () => {
+        const unSub = onSnapshot(doc(db, "chats", chatId), async (res) => {
+          console.log("Fetched chat:", res.data());
+          setChat(res.data());
+        });
+        return unSub; // Trả về hàm dọn dẹp
+      };
+
+      // Gọi hàm bất đồng bộ và xử lý hàm dọn dẹp
+      fetchData().then(unSub => {
+        return () => unSub();
+      });
+    }
+  }, [chatId]);
 
   useEffect(() => {
     if (currentUser) {
@@ -51,7 +79,7 @@ const Chat = () => {
             return { ...item, user };
           });
           const chatData = await Promise.all(promises);
-          setChats(chatData.sort((a, b) => b.lastMessageAt - a.lastMessageAt));
+          setChatLists(chatData.sort((a, b) => b.lastMessageAt - a.lastMessageAt));
         });
 
       return () => {
@@ -69,6 +97,76 @@ const Chat = () => {
   const handleEmojiOneClick = (e) => {
     setText((prev) => prev + e.emoji);
   }
+  // Handle Send Message 
+  const handleSendMessage = async () => {
+    if (text.trim() === "") return;
+    let imgUrl = null;
+    try {
+      if (img.file) {
+        imgUrl = await upload(img.file);
+      }
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.userID,
+          text,
+          createdAt: new Date(),
+          ...(imgUrl && { img: imgUrl }),
+        }),
+      });
+      const promises = [currentUser.userID, user.userID].map(async (id) => {
+        const userChatsRef = doc(db, "userchats", id);
+        const userChatsSnapshot = await getDoc(userChatsRef);
+        if (userChatsSnapshot.exists()) {
+          const userChatsData = userChatsSnapshot.data();
+          const chatIndex = userChatsData.chats.findIndex((c) => c.chatId === chatId);
+          if (chatIndex !== -1) {
+            userChatsData.chats[chatIndex].lastMessage = text;
+            userChatsData.chats[chatIndex].isSeen = id === currentUser.userID ? true : false;
+            userChatsData.chats[chatIndex].updatedAt = Date.now();
+            // await updateDoc(userChatsRef, {
+            //   chats: userChatsData.chats,
+            // });
+          }
+        }
+      });
+      const results = await Promise.allSettled(promises);
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          console.error('Error with promise:', result.reason);
+        }
+      });
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    } finally {
+      setImg({
+        file: null,
+        url: "",
+      });
+      setText("")
+    }
+  };
+  // Handle Click into the component user 
+  const handleOponentClick = async (chat) => {
+    const userChats = chatLists.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId == chat.chatId
+    );
+    //
+    userChats[chatIndex].isSeen = true;
+    const userChatsRef = doc(db, "userchats", currentUser.userID);
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+      changeChat(chat.chatId, chat.user);
+      setPermanentChatId(chat.chatId)
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <>
       {logged && role !== "Admin" && role !== "Moderator" ? (
@@ -114,15 +212,15 @@ const Chat = () => {
               </div>
               <div className="h-[90%] w-full flex flex-row bg-white rounded-lg">
                 <div className="flex flex-col h-full w-[35%] p-1 border-t-2 border-r-2  border-solid border-black overflow-y-auto">
-                  {Array.isArray(chat) ? chat.map((chat) => (
-                    <div key={chat.id} className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
+                  {Array.isArray(chatLists) ? chatLists.map((chat) => (
+                    <div key={chat.id} onClick={() => handleOponentClick(chat)} className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
                       <img
                         className="h-10 w-10 rounded-full"
                         src={chat.user.avatar}
                       />
                       <div className="flex flex-col w-full">
                         <div className=" w-full flex flex-row justify-between">
-                          <div className="text-[16px]">{chat.user.name}</div>
+                          <div className="text-[16px] font-bold text-extra-bold">{chat.user.name}</div>
                           <div className="text-[14px]">{chat.lastMessageAt}</div>
                         </div>
                         <div className="w-full flex flex-row justify-between">
@@ -140,9 +238,9 @@ const Chat = () => {
                     <div className="flex items-center">
                       <img
                         className="h-10 w-10 rounded-full mr-4"
-                        src={defaultAvatar}
+                        src={currentOpponent ? currentOpponent.avatar : ""}
                       />
-                      <div className="text-[16px]">Văn An</div>
+                      <div className="text-[16px]">{currentOpponent ? currentOpponent.name : ""}</div>
                     </div>
                     <div className="relative">
                       <div className="flex h-fit w-fit  items-center rounded-full ">
@@ -181,32 +279,38 @@ const Chat = () => {
                     </div>
                   </div>
                   {/* Message Site */}
-                  <div className="h-[90%] w-full px-4 py-6 flex flex-col-reverse gap-2 overflow-y-auto">
-                    <div class="flex flex-row items-start gap-[12px] h-auto ">
-                      <img class="h-9 w-9 rounded-full" src="/src/assets/default-avatar.jpg"></img>
-                      <div class="max-w-[47%] flex flex-col gap-2">
-                        <div class="message-oppenent h-fit text-[18px] px-[16px] py-[8px] bg-[#DCDCDC] text-black rounded-t-xl rounded-br-xl rounded-es-xl rounded-bl-none">
-                          hello
+                  <div className="h-[90%] w-full px-4 py-6 flex flex-col gap-2 overflow-y-auto">
+                    {chat?.messages?.map((message) => {
+                      console.log("Rending message:", message);
+                      const isCurrentUser = message.senderId === currentUser.userID;
+                      return (
+                        <div className={`flex flex-row gap-4 h-auto ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+                          {message.senderId !== currentUser.userID && (
+                            <img className="h-9 w-9 rounded-full" src="/src/assets/default-avatar.jpg" />
+                          )}
+                          <div className="max-w-[47%] flex flex-col gap-2">
+                            <div className={`${isCurrentUser ? 'order-last' : 'order-first'} flex justify-between`}>
+                              <div
+                                className={`${!isCurrentUser
+                                  ? 'message-opponent text-lg px-4 py-2 bg-gray-300 text-black rounded-t-xl rounded-br-xl rounded-bl-none flex justify-start'
+                                  : 'hidden'
+                                  }`}
+                              >
+                                {!isCurrentUser && message.text}
+                              </div>
+                              <div
+                                className={`${isCurrentUser
+                                  ? 'message-owner flex-end w-full text-lg px-4 py-2 bg-purple-700 text-white rounded-t-xl rounded-bl-xl rounded-br-none flex justify-end'
+                                  : 'hidden'
+                                  }`}
+                              >
+                                {isCurrentUser && message.text}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div class="relative message-oppenent h-fit text-[18px] text-white rounded-t-xl rounded-es-xl">
-                          <img class="w-full h-auto rounded-xl" src="/src/assets/default-avatar.jpg" alt="Tin nhắn có hình ảnh"></img>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2 h-auto mb-5">
-                      <div className="message-oppenent h-fit max-w-[47%] text-[18px] px-[16px] py-[8px] bg-[#6B48F2] text-white rounded-t-xl rounded-es-xl">
-                        hello
-                      </div>
-                      <div className=" relative message-oppenent h-fit max-w-[47%] text-[18px] text-white rounded-t-xl rounded-es-xl relative">
-                        <div className=" right-[120%] top-0">
-                          <img
-                            className="w-full h-auto rounded-xl"
-                            src={defaultAvatar}
-                            alt="Tin nhắn có hình ảnh"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
                   {/* Input Site */}
                   <div className="flex flex-row h-1/10 w-full px-3 py-2 border-t-2 border-black gap-3 ">
@@ -233,7 +337,9 @@ const Chat = () => {
                         </div>
                       )}
                     </div>
-                    <img src={send} />
+                    <button onClick={handleSendMessage}>
+                      <img src={send} />
+                    </button>
                   </div>
                 </div>
               </div>

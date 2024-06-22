@@ -15,7 +15,7 @@ import { jwtDecode } from "jwt-decode";
 import logo from "../assets/logo.png";
 import loginBG from "../assets/loginBG.png";
 import { db } from "../firebase";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { Block } from "@mui/icons-material";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
@@ -109,9 +109,14 @@ const LoginPage = () => {
             blockedUser: [],
           };
           await setDoc(doc(db, 'users', userData.userID), userData);
-          await setDoc(doc(db, 'userchats', userData.userID), {
-            chats: [],
-          });
+          // Check if the 'userchats' document exists before updating it
+          const userChatsRef = doc(db, 'userchats', userData.userID);
+          const userChatsSnap = await getDoc(userChatsRef);
+          if (!userChatsSnap.exists()) {
+            await setDoc(userChatsRef, {
+              chats: [],
+            });
+          }
         } else {
           console.log('Không lấy được thông tin user');
         }
@@ -191,9 +196,6 @@ const LoginPage = () => {
   const onSubmit = handleSubmit((data) => {
     mutation.mutate(data);
   });
-  // if (isLoading) {
-  //   return <LoadingVerTwo />
-  // }
   return (
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm flex flex-col justify-center gap-5">
