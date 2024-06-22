@@ -8,13 +8,15 @@ import Pagination from "./Pagination";
 const TutorListPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(1000000);
-  const [filteredData, setFilteredData] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(5);
+  const [searchUser, setSearchUser] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [sortOption, setSortOption] = useState("");
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["tutorListData", page, pageSize],
+    queryKey: ["tutorListData"],
     queryFn: () => TutorApi.getTutorList({ page, pageSize }),
   });
 
@@ -22,13 +24,49 @@ const TutorListPage = () => {
     return <div>...Loading</div>;
   }
 
-  // get current post
-  const indexOfLastPost = currentPage * postsPerPage; // 1 * 10 = 10
-  const indexOfFirstPost = indexOfLastPost - postsPerPage; // 10 - 10 = 0
-  const currentPosts = filteredData?.slice(indexOfFirstPost, indexOfLastPost); // 0 to 10
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+
+  const filteredData = data?.results?.filter((item) => {
+    const matchesName = item.tutorName.toLowerCase().includes(searchUser.toLowerCase());
+    const matchesSubject = selectedSubject ? item.subjects.some(subject => subject.title === selectedSubject) : true;
+    return matchesName && matchesSubject;
+  });
+
+  const sortedData = filteredData?.sort((a, b) => {
+    switch (sortOption) {
+      case "priceHighToLow":
+        return b.pricePerHour - a.pricePerHour;
+      case "priceLowToHigh":
+        return a.pricePerHour - b.pricePerHour;
+      case "bestRating":
+        const avgRatingA = a.ratings.reduce((acc, rating) => acc + rating.score, 0) / (a.ratings.length || 1);
+        const avgRatingB = b.ratings.reduce((acc, rating) => acc + rating.score, 0) / (b.ratings.length || 1);
+        return avgRatingB - avgRatingA;
+      default:
+        return 0;
+    }
+  });
+
+  const currentPosts = sortedData?.slice(indexOfFirstPost, indexOfLastPost);
+
+  const handleSearchInput = (event) => {
+    setSearchUser(event.target.value);
+  };
+
+  const handleSubjectFilter = (event) => {
+    setSelectedSubject(event.target.value);
+  };
+
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+  };
 
   const paginate = (pageNumber) => {
-    if (pageNumber > 0 && pageNumber <= Math.ceil(filteredData.length / postsPerPage)) {
+    if (
+      pageNumber > 0 &&
+      pageNumber <= Math.ceil(data?.results?.length / postsPerPage)
+    ) {
       setCurrentPage(pageNumber);
     }
   };
@@ -37,15 +75,16 @@ const TutorListPage = () => {
     <div className="flex flex-row px-10 py-5">
       <div>
         <TutorListFilter
-          data={data?.results}
-          setFilteredData={setFilteredData}
+          onSearchChange={handleSearchInput}
+          onSubjectChange={handleSubjectFilter}
+          onSortChange={handleSortChange}
         />
       </div>
       <div className="flex-1">
         <TutorListContent data={currentPosts} />
         <Pagination
           postsPerPage={postsPerPage}
-          totalPosts={filteredData?.length}
+          totalPosts={sortedData?.length}
           paginate={paginate}
           currentPage={currentPage}
         />

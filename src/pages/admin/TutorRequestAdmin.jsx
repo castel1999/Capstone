@@ -13,6 +13,8 @@ import { Box, Pagination as MuiPagination, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import * as AdminAPI from "../../api/AdminAPI";
 import { IoEyeOutline } from "react-icons/io5";
+import dAva from "../../assets/DefaultAva.png";
+
 
 const TutorRequestAdmin = () => {
   const navigate = useNavigate();
@@ -35,10 +37,10 @@ const TutorRequestAdmin = () => {
     return <div>Error: {error.message}</div>;
   }
 
-  const rows = data?.value?.map((item, index) => ({
+  const rows = data?.map((item, index) => ({
     id: index + 1,
-    // tutorId: item?.name,
-    avatar: item?.imageUrl,
+    tutorId: item?.tutorId,
+    avatar: item?.imageUrl ||dAva,
     name: item?.name,
     email: item?.email,
     status: item?.status,
@@ -67,7 +69,7 @@ const TutorRequestAdmin = () => {
           variant="contained"
           color="primary"
           onClick={() =>
-            navigate(`/dashboard/tutor-request-detail`, {
+            navigate(`/dashboard/tutor-request-detail/${params.row.tutorId}`, {
               state: params.row,
             })
           }
