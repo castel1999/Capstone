@@ -184,6 +184,80 @@ export const registerTutorStep6 = async (data) => {
   return responseBody;
 };
 
+export const getTutorInformation = async (tutorId) => {
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/get/tutor-step1/${tutorId}`);
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error ${response.status}: ${errorBody}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+export const getTutorCertificates = async (tutorId) => {
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/get/tutor-step2/${tutorId}`);
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error ${response.status}: ${errorBody}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+export const getTutorEducations = async (tutorId) => {
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/get/tutor-step3/${tutorId}`);
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error ${response.status}: ${errorBody}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+export const getTutorDescriptions = async (tutorId) => {
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/get/tutor-step4/${tutorId}`);
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error ${response.status}: ${errorBody}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+export const getTutorSchedule = async (tutorId) => {
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/get/tutor-step5/${tutorId}`);
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error ${response.status}: ${errorBody}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+export const getTutorPrice = async (tutorId) => {
+  const response = await fetch(`${BASE_API_LINK}/TutorRegister/get/tutor-step6/${tutorId}`);
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP error ${response.status}: ${errorBody}`);
+  }
+
+  const responseBody = await response.json();
+  return responseBody;
+};
+
+
+
 export const getTutorListTest = async () => {
   const response = await fetch(`${BASE_API_LINK}/TutorData/get/all`);
 

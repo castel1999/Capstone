@@ -16,12 +16,67 @@ const TutorDetail = () => {
     time: "",
   });
 
-  const { isLoading, isError, data, error } = useQuery({
-    queryKey: ["tutorDetail"],
-    queryFn: () => TutorApi.getTutorDetail(id),
+  const {
+    isLoading: informationIsLoading,
+    isError: informationIsError,
+    data: informationData,
+    error: informationError,
+  } = useQuery({
+    queryKey: ["tutorInformation"],
+    queryFn: () => TutorApi.getTutorInformation(id),
   });
 
-  console.log(data)
+  console.log(informationData);
+
+  const {
+    isLoading: certificateIsLoading,
+    isError: certificateIsError,
+    data: certificateData,
+    error: certificateError,
+  } = useQuery({
+    queryKey: ["tutorCertificate"],
+    queryFn: () => TutorApi.getTutorCertificates(id),
+  });
+
+  const {
+    isLoading: educationIsLoading,
+    isError: educationIsError,
+    data: educationData,
+    error: educationError,
+  } = useQuery({
+    queryKey: ["tutorEducation"],
+    queryFn: () => TutorApi.getTutorEducations(id),
+  });
+
+  const {
+    isLoading: descriptionIsLoading,
+    isError: descriptionIsError,
+    data: descriptionData,
+    error: descriptionError,
+  } = useQuery({
+    queryKey: ["tutorDescription"],
+    queryFn: () => TutorApi.getTutorDescriptions(id),
+  });
+
+  const {
+    isLoading: scheduleIsLoading,
+    isError: scheduleIsError,
+    data: scheduleData,
+    error: scheduleError,
+  } = useQuery({
+    queryKey: ["tutorSchedule"],
+    queryFn: () => TutorApi.getTutorSchedule(id),
+  });
+
+  const {
+    isLoading: priceIsLoading,
+    isError: priceIsError,
+    data: priceData,
+    error: priceError,
+  } = useQuery({
+    queryKey: ["tutorPrice"],
+    queryFn: () => TutorApi.getTutorPrice(id),
+  });
 
   useEffect(() => {
     Events.scrollEvent.register("begin", (to, element) => {
@@ -60,6 +115,13 @@ const TutorDetail = () => {
 
   const modalRef = useRef();
 
+  const extractVideoID = (url) => {
+    const regExp =
+      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    const match = url?.match(regExp);
+    return match && match[7]?.length === 11 ? match[7] : null;
+  };
+
   return (
     <div className="flex flex-row justify-between mx-auto max-w-[90%]">
       {showModal ? (
@@ -73,8 +135,8 @@ const TutorDetail = () => {
                 <img
                   className="w-[32px] h-[32px] rounded-lg"
                   src={
-                    data?.img != null
-                      ? data?.img
+                    informationData?.img != null
+                      ? informationData?.img
                       : "https://firebasestorage.googleapis.com/v0/b/capstone-c0906.appspot.com/o/defaultAva%2FDefaultAva.png?alt=media&token=7f4275d1-05c3-41ca-9ec4-091800bb5895"
                   }
                 />
@@ -104,6 +166,7 @@ const TutorDetail = () => {
             </div>
             <div className="flex flex-1 h-[80%] overflow-y-auto">
               <Timetable
+                data={scheduleData}
                 selectedTime={selectedTime}
                 setSelectedTime={setSelectedTime}
               />
@@ -135,18 +198,18 @@ const TutorDetail = () => {
           <img
             className="w-[160px] h-[160px] rounded-lg"
             src={
-              data?.img != null
-                ? data?.img
+              informationData?.img != null
+                ? informationData?.img
                 : "https://firebasestorage.googleapis.com/v0/b/capstone-c0906.appspot.com/o/defaultAva%2FDefaultAva.png?alt=media&token=7f4275d1-05c3-41ca-9ec4-091800bb5895"
             }
           />
           <div className="flex flex-col">
             <div className="flex flex-col mb-3">
               <div className="h-fit text-[32px] font-semibold leading-tight">
-                {data?.fullname}
+                {informationData?.name}
               </div>
               <div className="text-[16px] font-normal">
-                {data?.introduction}
+                {descriptionData?.attractiveTitle}
               </div>
             </div>
 
@@ -165,7 +228,7 @@ const TutorDetail = () => {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                Giáo viên dạy môn {data?.subject}
+                Giáo viên dạy môn {informationData?.subjects[0]}
               </div>
               <div className="flex flex-row gap-2 text-[14px] font-light">
                 <svg
@@ -181,7 +244,7 @@ const TutorDetail = () => {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                {data?.taughtLesson} buổi học đã dạy
+                {/* {data?.taughtLesson} buổi học đã dạy */}
               </div>
               <div className="flex flex-row gap-2 text-[14px] font-light">
                 <svg
@@ -197,8 +260,8 @@ const TutorDetail = () => {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                {data?.lessonInTwoDays} học sinh liên hệ giảng viên này trong 48
-                tiếng qua
+                {/* {data?.lessonInTwoDays} học sinh liên hệ giảng viên này trong 48
+                tiếng qua */}
               </div>
             </div>
           </div>
@@ -276,7 +339,10 @@ const TutorDetail = () => {
                   : "text-base font-extralight whitespace-pre-wrap h-[80%] pt-8"
               }
             >
-              {data?.description}
+              {descriptionData?.description}
+              {descriptionData?.educationExperience}
+              {descriptionData?.motivation}
+              {descriptionData?.attractiveTitle}
             </div>
             <div
               className="text-base w-fit font-semibold underline hover:text-theme cursor-pointer"
@@ -289,7 +355,7 @@ const TutorDetail = () => {
 
         <div id="schedule" className="flex flex-col">
           <div className="text-2xl font-semibold mb-4">Lịch trình</div>
-          <Timetable />
+          <Timetable data={scheduleData} />
         </div>
 
         <div id="resume" className="flex flex-col py-12">
@@ -311,17 +377,6 @@ const TutorDetail = () => {
               </div>
               <div
                 className="flex flex-col"
-                onClick={() => setResumetab("work")}
-              >
-                <div className="flex justify-center items-center px-4 py-2 font-medium hover:bg-[#ebebf1] rounded-md cursor-pointer">
-                  Kinh nghiệm làm việc
-                </div>
-                <div
-                  className={resumetab === "work" ? "bg-theme w-full h-1" : ""}
-                />
-              </div>
-              <div
-                className="flex flex-col"
                 onClick={() => setResumetab("certificate")}
               >
                 <div className="flex justify-center items-center px-4 py-2 font-medium hover:bg-[#ebebf1] rounded-md cursor-pointer">
@@ -335,60 +390,70 @@ const TutorDetail = () => {
               </div>
             </div>
             <div className="flex flex-col">
-              <div className="flex flex-row pt-4 gap-6">
-                <div className="text-[#4d4c5c] font-normal">2015 — 2018</div>
-                <div className="flex flex-col gap-1">
-                  <div className="text-[#121117] font-normal">
-                    Drahomanov National Pedagogical University
-                  </div>
-                  <div className="text-[#4d4c5c] font-normal">
-                    Master’s degree
-                  </div>
-                  <div className="flex flex-row items-center text-[#067560] font-semibold gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      focusable="false"
-                      className="h-4 w-4 fill-[#067560]"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M13.97 2.715a3 3 0 0 0-3.94 0l-1.142.995a3 3 0 0 1-1.43.688l-1.489.273a3 3 0 0 0-2.456 3.08l.065 1.513a3 3 0 0 1-.353 1.547l-.715 1.334a3 3 0 0 0 .877 3.842l1.223.892a3 3 0 0 1 .99 1.24l.597 1.391a3 3 0 0 0 3.55 1.71l1.46-.4a3 3 0 0 1 1.586 0l1.46.4a3 3 0 0 0 3.55-1.71l.598-1.39a3 3 0 0 1 .989-1.241l1.223-.892a3 3 0 0 0 .877-3.842l-.715-1.334a3 3 0 0 1-.353-1.547l.065-1.513a3 3 0 0 0-2.456-3.08l-1.49-.273a3 3 0 0 1-1.43-.688l-1.14-.995Zm1.878 6.815a1 1 0 0 0-1.696-1.06l-2.977 4.763L9.8 11.4a1 1 0 1 0-1.6 1.2l2.25 3a1 1 0 0 0 1.648-.07z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    Diploma verified
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row pt-4 gap-6">
-                <div className="text-[#4d4c5c] font-normal">2015 — 2018</div>
-                <div className="flex flex-col">
-                  <div className="text-[#121117] font-normal">
-                    Drahomanov National Pedagogical University
-                  </div>
-                  <div className="text-[#4d4c5c] font-normal">
-                    Master’s degree
-                  </div>
-                  <div className="flex flex-row items-center text-[#067560] font-semibold gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      focusable="false"
-                      className="h-4 w-4 fill-[#067560]"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M13.97 2.715a3 3 0 0 0-3.94 0l-1.142.995a3 3 0 0 1-1.43.688l-1.489.273a3 3 0 0 0-2.456 3.08l.065 1.513a3 3 0 0 1-.353 1.547l-.715 1.334a3 3 0 0 0 .877 3.842l1.223.892a3 3 0 0 1 .99 1.24l.597 1.391a3 3 0 0 0 3.55 1.71l1.46-.4a3 3 0 0 1 1.586 0l1.46.4a3 3 0 0 0 3.55-1.71l.598-1.39a3 3 0 0 1 .989-1.241l1.223-.892a3 3 0 0 0 .877-3.842l-.715-1.334a3 3 0 0 1-.353-1.547l.065-1.513a3 3 0 0 0-2.456-3.08l-1.49-.273a3 3 0 0 1-1.43-.688l-1.14-.995Zm1.878 6.815a1 1 0 0 0-1.696-1.06l-2.977 4.763L9.8 11.4a1 1 0 1 0-1.6 1.2l2.25 3a1 1 0 0 0 1.648-.07z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    Diploma verified
-                  </div>
-                </div>
-              </div>
+              {resumetab === "certificate"
+                ? certificateData.map((cert) => (
+                    <div className="flex flex-row pt-4 gap-6">
+                      <div className="text-[#4d4c5c] font-normal">
+                        {cert.startYear} — {cert.endYear}
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <div className="text-[#121117] font-normal">
+                          {cert.certificateName}
+                        </div>
+                        <div className="text-[#4d4c5c] font-normal">
+                        {cert.certificateDescription}
+                        </div>
+                        <div className="flex flex-row items-center text-[#067560] font-semibold gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                            className="h-4 w-4 fill-[#067560]"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M13.97 2.715a3 3 0 0 0-3.94 0l-1.142.995a3 3 0 0 1-1.43.688l-1.489.273a3 3 0 0 0-2.456 3.08l.065 1.513a3 3 0 0 1-.353 1.547l-.715 1.334a3 3 0 0 0 .877 3.842l1.223.892a3 3 0 0 1 .99 1.24l.597 1.391a3 3 0 0 0 3.55 1.71l1.46-.4a3 3 0 0 1 1.586 0l1.46.4a3 3 0 0 0 3.55-1.71l.598-1.39a3 3 0 0 1 .989-1.241l1.223-.892a3 3 0 0 0 .877-3.842l-.715-1.334a3 3 0 0 1-.353-1.547l.065-1.513a3 3 0 0 0-2.456-3.08l-1.49-.273a3 3 0 0 1-1.43-.688l-1.14-.995Zm1.878 6.815a1 1 0 0 0-1.696-1.06l-2.977 4.763L9.8 11.4a1 1 0 1 0-1.6 1.2l2.25 3a1 1 0 0 0 1.648-.07z"
+                              clipRule="evenodd"
+                            ></path>
+                          </svg>
+                          Diploma verified
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                : educationData?.map((edu) => (
+                  <div className="flex flex-row pt-4 gap-6">
+                      <div className="text-[#4d4c5c] font-normal">
+                        {edu.startYear} — {edu.endYear}
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <div className="text-[#121117] font-normal">
+                          {edu.location}
+                        </div>
+                        <div className="text-[#4d4c5c] font-normal">
+                        {edu.title}
+                        </div>
+                        <div className="flex flex-row items-center text-[#067560] font-semibold gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                            className="h-4 w-4 fill-[#067560]"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M13.97 2.715a3 3 0 0 0-3.94 0l-1.142.995a3 3 0 0 1-1.43.688l-1.489.273a3 3 0 0 0-2.456 3.08l.065 1.513a3 3 0 0 1-.353 1.547l-.715 1.334a3 3 0 0 0 .877 3.842l1.223.892a3 3 0 0 1 .99 1.24l.597 1.391a3 3 0 0 0 3.55 1.71l1.46-.4a3 3 0 0 1 1.586 0l1.46.4a3 3 0 0 0 3.55-1.71l.598-1.39a3 3 0 0 1 .989-1.241l1.223-.892a3 3 0 0 0 .877-3.842l-.715-1.334a3 3 0 0 1-.353-1.547l.065-1.513a3 3 0 0 0-2.456-3.08l-1.49-.273a3 3 0 0 1-1.43-.688l-1.14-.995Zm1.878 6.815a1 1 0 0 0-1.696-1.06l-2.977 4.763L9.8 11.4a1 1 0 1 0-1.6 1.2l2.25 3a1 1 0 0 0 1.648-.07z"
+                              clipRule="evenodd"
+                            ></path>
+                          </svg>
+                          Diploma verified
+                        </div>
+                      </div>
+                    </div>
+                ))}
+
             </div>
           </div>
         </div>
@@ -441,11 +506,11 @@ const TutorDetail = () => {
           </div>
         </div>
       </div>
-      {/* <div className="sticky top-[88px] flex mt-[48px] flex-col w-[40%] h-fit p-6 border-2 border-black rounded-lg gap-6">
+      <div className="sticky top-[88px] flex mt-[48px] flex-col w-[40%] h-fit p-6 border-2 border-black rounded-lg gap-6">
         <div className="relative w-full overflow-hidden pt-[56.25%] rounded-md">
           <iframe
             className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
-            src="https://www.youtube.com/embed/phuiiNCxRMg?si=Sf0dc7lVBDz-SCjb"
+            src={`https://www.youtube.com/embed/${extractVideoID(informationData?.videoUrl)}`}
             title="YouTube video player"
             frameBorder="0"
             allow=""
@@ -468,7 +533,7 @@ const TutorDetail = () => {
         <div className="flex justify-center font-medium px-5 py-3 bg-[#ffffff] text-black shadow-button rounded-lg border-2 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none duration-500">
           Nhắn tin
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
