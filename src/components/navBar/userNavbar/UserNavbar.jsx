@@ -5,10 +5,17 @@ import ava from "../../../assets/DefaultAva.png";
 import notify from "../../../assets/notify.png";
 import { CiHeart } from "react-icons/ci";
 import { CiWallet } from "react-icons/ci";
+import { useAuth } from "../../../hooks/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import * as UserAPI from "../../../api/UserAPI";
 
 const UserNavbar = ({ data }) => {
   const [openProfile, setOpenProfile] = useState(false);
   const role = localStorage.getItem("role");
+
+  const { user } = useAuth();
+  const userId = user?.decodedToken?.UserId;
+
   const studentMenu = [
     { path: "Trang cá Nhân", route: "/settings/profile" },
     { path: "Bài học của tôi", route: "/my-lessons" },
@@ -44,6 +51,31 @@ const UserNavbar = ({ data }) => {
       setOpenNoti(false);
     }
   });
+
+  const {
+    data: walletData,
+    isLoading: isWalletLoading,
+    isError: isWalletError,
+    error,
+  } = useQuery({
+    queryKey: ["wallet", userId],
+    queryFn: () => UserAPI.getWallet(userId),
+  });
+
+  if (isWalletLoading) {
+    return <div>...Loading</div>;
+  }
+
+  if (isWalletError) {
+    return <div>{error.message}</div>;
+  }
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
 
   const logout = () => {
     localStorage.clear();
@@ -131,10 +163,13 @@ const UserNavbar = ({ data }) => {
             <CiHeart className="size-6 object-cover self-center hover:text-theme cursor-pointer" />
           </Link>
 
-          <div className="flex justify-center items-center gap-2 cursor-pointer hover:text-theme">
+          <Link
+            to="/settings/wallet"
+            className="flex justify-center items-center gap-2 cursor-pointer hover:text-theme"
+          >
             <CiWallet className="size-6 object-cover self-center" />
-            <div>200$</div>
-          </div>
+            <div>{formatCurrency(walletData?.amount)}</div>
+          </Link>
         </div>
       )}
     </div>

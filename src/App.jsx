@@ -7,7 +7,7 @@ import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SettingPage from "./pages/settings/SettingPage";
 import ProfilePage from "./pages/settings/ProfilePage";
-import WalletPage from "./pages/settings/WalletPage";
+import WalletPage from "./pages/settings/wallet/WalletPage";
 import UpgradePage from "./pages/settings/UpgradePage";
 import LoginPage from "./pages/LoginPage";
 import ShowNavbar from "./components/navBar/ShowNavbar";

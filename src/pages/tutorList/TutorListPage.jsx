@@ -27,10 +27,17 @@ const TutorListPage = () => {
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
 
+  console.log("list", data);
+
   const filteredData = data?.results?.filter((item) => {
-    const matchesName = item.tutorName.toLowerCase().includes(searchUser.toLowerCase());
-    const matchesSubject = selectedSubject ? item.subjects.some(subject => subject.title === selectedSubject) : true;
-    return matchesName && matchesSubject;
+    const matchesName = item.tutorName
+      .toLowerCase()
+      .includes(searchUser.toLowerCase());
+    const matchesSubject = selectedSubject
+      ? item.subjects.some((subject) => subject.title === selectedSubject)
+      : true;
+    const status = item.status === 1;
+    return matchesName && matchesSubject && status;
   });
 
   const sortedData = filteredData?.sort((a, b) => {
@@ -40,8 +47,12 @@ const TutorListPage = () => {
       case "priceLowToHigh":
         return a.pricePerHour - b.pricePerHour;
       case "bestRating":
-        const avgRatingA = a.ratings.reduce((acc, rating) => acc + rating.score, 0) / (a.ratings.length || 1);
-        const avgRatingB = b.ratings.reduce((acc, rating) => acc + rating.score, 0) / (b.ratings.length || 1);
+        const avgRatingA =
+          a.ratings.reduce((acc, rating) => acc + rating.score, 0) /
+          (a.ratings.length || 1);
+        const avgRatingB =
+          b.ratings.reduce((acc, rating) => acc + rating.score, 0) /
+          (b.ratings.length || 1);
         return avgRatingB - avgRatingA;
       default:
         return 0;

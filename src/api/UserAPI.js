@@ -144,8 +144,23 @@ export const updateUserProfile = async (data) => {
 
 export const getWallet = async (UserId) => {
   const token = localStorage.getItem("token");
-  const decode = jwtDecode(token)
-  const response = await fetch(`${BASE_API_LINK}/Wallet/get/wallet/user/${UserId}`, {
+  const response = await fetch(`${BASE_API_LINK}/Wallet/get/user/${UserId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
+
+export const getLastTransaction = async (walletId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${BASE_API_LINK}/Wallet/get/last-transaction/${walletId}`, {
     headers: {
       "Authorization": `Bearer ${token}`
     }

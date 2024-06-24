@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as UserAPI from "../../api/UserAPI";
+import * as UserAPI from "../../../api/UserAPI";
 import { toast } from "react-toastify";
 import DepositModal from "./DepositModal";
 import WithdrawalModal from "./WithdrawalModal";
-import { useAuth } from "../../hooks/AuthContext";
+import { useAuth } from "../../../hooks/AuthContext";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
-import { FaArrowDown, FaArrowUp, FaPlus, FaMinus, FaBan } from "react-icons/fa";
+import Pagination from "./Pagination";
+import WalletPageContent from "./WalletPageContent";
+import WalletPageFilter from "./WalletPageFilter";
 
 const WalletPage = () => {
   const queryClient = useQueryClient();
 
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
-  const [transactionId, setTransactionId] = useState();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(5);
+  const [sortOption, setSortOption] = useState("");
+  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
   const location = useLocation();
   const values = queryString.parse(location.search);
@@ -22,19 +28,36 @@ const WalletPage = () => {
   const { user } = useAuth();
   const userId = user.decodedToken.UserId;
 
-  const { data: walletData, isLoading: isWalletLoading } = useQuery({
+  const {
+    data: walletData,
+    isLoading: isWalletLoading,
+    isError: isWalletError,
+  } = useQuery({
     queryKey: ["wallet", userId],
     queryFn: () => UserAPI.getWallet(userId),
   });
 
-  const { data: transactions, isLoading: isTransactionsLoading } = useQuery({
+  const {
+    data: lastTransaction,
+    isLoading: isLastTransactionLoading,
+    isError: isLastTransactionError,
+  } = useQuery({
+    queryKey: ["lastTransaction", userId],
+    queryFn: () => UserAPI.getLastTransaction(walletData?.walletId),
+    enabled: !!walletData,
+  });
+
+  const {
+    data: transactions,
+    isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+  } = useQuery({
     queryKey: ["transactions", walletData?.walletId],
-    queryFn: () => UserAPI.getWalletTransaction(walletData.walletId),
+    queryFn: () => UserAPI.getWalletTransaction(walletData?.walletId),
     enabled: !!walletData,
   });
 
   useEffect(() => {
-    console.log('val',values);
     const update = {
       transactionId: values?.vnp_OrderInfo,
       choice: 3,
@@ -51,12 +74,12 @@ const WalletPage = () => {
   const updatePayment = useMutation({
     mutationFn: UserAPI.updateTransaction,
     onSuccess: async () => {
-      toast.success("Nạp tiền thành công!");
+      toast.success("Giao dịch thành công!");
       await queryClient.invalidateQueries("wallet");
       await queryClient.invalidateQueries("transactions");
     },
     onError: (error) => {
-      toast.error("Nạp tiền thất bại!");
+      toast.error("Giao dịch thất bại!");
       console.log(error.message);
     },
   });
@@ -88,10 +111,6 @@ const WalletPage = () => {
     await walletTransaction.mutateAsync(data);
   };
 
-  if (isWalletLoading || isTransactionsLoading) {
-    return <div>Loading...</div>;
-  }
-
   const handleWithdraw = async (amount) => {
     const data = {
       amount: parseInt(amount, 10),
@@ -106,8 +125,12 @@ const WalletPage = () => {
     await walletTransaction.mutateAsync(data);
   };
 
-  if (isWalletLoading || isTransactionsLoading) {
+  if (isWalletLoading || isTransactionsLoading || isLastTransactionLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (isWalletError || isTransactionsError || isLastTransactionError) {
+    return <div>{error.message}</div>;
   }
 
   const formatCurrency = (amount) => {
@@ -115,6 +138,59 @@ const WalletPage = () => {
       style: "currency",
       currency: "VND",
     }).format(amount);
+  };
+
+  const filterByDateRange = (transactions, startDate, endDate) => {
+    if (!startDate || !endDate) return transactions;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return transactions.filter((transaction) => {
+      const date = new Date(transaction.createdAt);
+      return date >= start && date <= end;
+    });
+  };
+
+  // Pagination
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+
+  const filteredTransactions = filterByDateRange(
+    transactions,
+    dateRange.startDate,
+    dateRange.endDate
+  );
+
+  const sortedData = filteredTransactions?.sort((a, b) => {
+    switch (sortOption) {
+      case "amountHighToLow":
+        return b.amount - a.amount;
+      case "amountLowToHigh":
+        return a.amount - b.amount;
+      default:
+        return 0;
+    }
+  });
+
+  const currentPosts = sortedData?.slice(indexOfFirstPost, indexOfLastPost);
+
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+  };
+
+  const handleDateChange = (event) => {
+    setDateRange({
+      ...dateRange,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const paginate = (pageNumber) => {
+    if (
+      pageNumber > 0 &&
+      pageNumber <= Math.ceil(transactions?.length / postsPerPage)
+    ) {
+      setCurrentPage(pageNumber);
+    }
   };
 
   return (
@@ -126,7 +202,7 @@ const WalletPage = () => {
             <div className="text-2xl font-semibold">Total Balance</div>
             <div>
               <div className="text-green-500 text-2xl font-semibold tracking-widest">
-                +2.000.000
+                {formatCurrency(lastTransaction?.amount)}
               </div>
               <div className="text-sm text-gray-400">
                 Lần giao dịch gần nhất
@@ -166,107 +242,24 @@ const WalletPage = () => {
       <div>
         <div className="flex flex-row justify-between items-center mb-9">
           <div className="font-semibold text-2xl">Thống kê giao dịch</div>
-          <div className="transition ease-in-out delay-150 border-2  border-black rounded-lg text-black py-1 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-theme hover:text-white duration-300 cursor-pointer">
-            ...
+          <div className="flex gap-5">
+            <WalletPageFilter 
+              onSortChange={handleSortChange} 
+              onDateChange={handleDateChange} 
+              dateRange={dateRange}
+            />
           </div>
         </div>
-        <div className="overflow-x-auto mb-10">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
-                >
-                  NO
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
-                >
-                  Số tiền
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
-                >
-                  Loại giao dịch
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left font-semibold text-black uppercase tracking-wider"
-                >
-                  Thời gian
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {transactions.map((transaction, index) => (
-                <tr key={transaction.walletTransactionId}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {transaction.note === "Nạp tiền vào tài khoản" &&
-                    transaction.status === 0 ? (
-                      <div className="flex gap-1 items-center text-green-400">
-                        <FaPlus /> {formatCurrency(transaction.amount)}
-                      </div>
-                    ) : transaction.note === "Nạp tiền vào tài khoản" &&
-                      transaction.status === 1 ? (
-                      <div className="flex gap-1 items-center text-orange-400">
-                        <FaPlus /> {formatCurrency(transaction.amount)}
-                      </div>
-                    ) : transaction.note === "Rút tiền từ tài khoản" &&
-                      transaction.status === 0 ? (
-                      <div className="flex gap-1 items-center text-red-400">
-                        <FaMinus /> {formatCurrency(transaction.amount)}
-                      </div>
-                    ) : transaction.note === "Rút tiền từ tài khoản" &&
-                      transaction.status === 1 ? (
-                      <div className="flex gap-1 items-center text-orange-400">
-                        <FaMinus /> {formatCurrency(transaction.amount)}
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {transaction.note === "Nạp tiền vào tài khoản" &&
-                    transaction.status === 0 ? (
-                      <div className="flex gap-1 items-center">
-                        <FaArrowDown className="text-green-400" />{" "}
-                        {transaction.note}
-                      </div>
-                    ) : transaction.note === "Nạp tiền vào tài khoản" &&
-                      transaction.status === 1 ? (
-                      <div className="flex gap-1 items-center">
-                        <FaArrowDown className="text-orange-400" />{" "}
-                        {transaction.note} thất bại
-                      </div>
-                    ) : transaction.note === "Rút tiền từ tài khoản" &&
-                      transaction.status === 0 ? (
-                      <div className="flex gap-1 items-center">
-                        <FaArrowUp className="text-red-400" />{" "}
-                        {transaction.note}
-                      </div>
-                    ) : transaction.note === "Rút tiền từ tài khoản" &&
-                      transaction.status === 1 ? (
-                      <div className="flex gap-1 items-center">
-                        <FaArrowUp className="text-orange-400" />{" "}
-                        {transaction.note} thất bại
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(transaction.createdAt).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="overflow-x-auto mb-10 flex flex-col items-center">
+          <WalletPageContent currentPosts={currentPosts} />
+          <div>
+            <Pagination
+              postsPerPage={postsPerPage}
+              totalPosts={sortedData?.length}
+              paginate={paginate}
+              currentPage={currentPage}
+            />
+          </div>
         </div>
       </div>
 
