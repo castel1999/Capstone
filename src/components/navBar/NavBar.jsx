@@ -5,17 +5,23 @@ import { useQuery } from "@tanstack/react-query";
 import * as UserAPI from "../../api/UserAPI";
 import UserNavbar from "./userNavbar/UserNavbar";
 import Loading from "../../utils/Loading";
+import { jwtDecode } from "jwt-decode";
 
 const NavBar = () => {
   const Logged = localStorage.getItem("token") !== null;
   const currUser = localStorage.getItem("role");
+  const [token, setToken] = useState();
+
+  useEffect(() => {
+    if (Logged) setToken(jwtDecode(localStorage.getItem("token")));
+  }, [Logged]);
 
   const navigate = useNavigate();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["getCurrentUser"],
     queryFn: UserAPI.getCurrentUser,
-    enabled: Logged, // Enable the query only if the user is logged in
+    enabled: Logged,
   });
 
   if (isLoading) {
@@ -79,16 +85,37 @@ const NavBar = () => {
               Về chúng tôi
             </NavLink>
 
-            <NavLink
-              to="/become-tutor"
-              className={({ isActive }) =>
-                isActive
-                  ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
-                  : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
-              }
-            >
-              Trở thành gia sư
-            </NavLink>
+            {currUser === "Student" ||
+            (currUser === "Tutor" &&
+              (token.TutorStatus === "2" || token.TutorStatus === "0")) ? (
+              <NavLink
+                to="/become-tutor"
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                    : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+                }
+              >
+                Trở thành gia sư
+              </NavLink>
+            ) : (
+              ""
+            )}
+
+            {currUser === "Tutor" && token.TutorStatus === "1" ? (
+              <NavLink
+                to="/tutor-management"
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                    : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+                }
+              >
+                Quản lý hồ sơ
+              </NavLink>
+            ) : (
+              ""
+            )}
           </div>
         )}
 

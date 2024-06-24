@@ -5,16 +5,17 @@ import { NavLink } from "react-router-dom";
 const Timetable = (props) => {
   const currUser = localStorage.getItem("role");
   const current = new moment();
+  const data = props.data;
   const selectedTime = props.selectedTime === null ? "" : props.selectedTime;
   const setSelectedTime = props?.setSelectedTime;
   const [calendarDate, setCalendarDate] = useState(new moment());
   const [dayOfWeek, setDayOfWeek] = useState([]);
 
+  console.log(data);
+
   useEffect(() => {
     initDayOfWeek(calendarDate);
   }, []);
-
-  console.log(current.diff(calendarDate, "day"));
 
   const initDayOfWeek = (calendarDate) => {
     const tempRow = [];
@@ -22,6 +23,28 @@ const Timetable = (props) => {
       tempRow.push(calendarDate.clone().day(i));
     }
     setDayOfWeek(tempRow);
+  };
+
+  const generateTimeOptions = (startTime, endTime) => {
+    const options = [];
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+
+    for (let hour = startHour; hour <= endHour; hour++) {
+      for (
+        let minute = hour === startHour ? startMinute : 0;
+        minute < 60;
+        minute += 30
+      ) {
+        if (hour === endHour && minute > endMinute) break;
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(time);
+      }
+    }
+
+    return options;
   };
 
   const moveToNextWeek = () => {
@@ -121,41 +144,33 @@ const Timetable = (props) => {
             <div className="flex justify-center flex-col">
               {current.diff(day, "day") <= 0 ? (
                 <>
-                  <div
-                    to={currUser === null ? "/login" : "/payment"}
-                    className={`flex justify-center underline font-medium cursor-pointer ${
-                      selectedTime?.time === "3:30" &&
-                      selectedTime?.day === day?.format("ddd")
-                        ? "border-2 border-black rounded-lg py-3"
-                        : "py-[14px]"
-                    }`}
-                    onClick={() => {
-                      setSelectedTime({
-                        day: day?.format("ddd"),
-                        time: "3:30",
-                      });
-                    }}
-                  >
-                    3:30
-                  </div>
-
-                  <div
-                    to={currUser === null ? "/login" : "/payment"}
-                    className={`flex justify-center underline font-medium cursor-pointer ${
-                      selectedTime?.time === "23:30" &&
-                      selectedTime?.day === day?.format("ddd")
-                        ? "border-2 border-black rounded-lg py-3"
-                        : "py-[14px]"
-                    }`}
-                    onClick={() => {
-                      setSelectedTime({
-                        day: day?.format("ddd"),
-                        time: "23:30",
-                      });
-                    }}
-                  >
-                    23:30
-                  </div>
+                  {data?.map((timeRange) =>
+                    timeRange.dayOfWeek === day.isoWeekday() + 1 ||
+                    timeRange.dayOfWeek + 8 === day.isoWeekday() + 1
+                      ? generateTimeOptions(
+                          timeRange.startTime,
+                          timeRange.endTime
+                        ).map((slot) => (
+                          <div
+                            to={currUser === null ? "/login" : "/payment"}
+                            className={`flex justify-center underline font-medium cursor-pointer ${
+                              selectedTime?.time === slot &&
+                              selectedTime?.day === day?.format("ddd")
+                                ? "border-2 border-black rounded-lg py-3"
+                                : "py-[14px]"
+                            }`}
+                            onClick={() => {
+                              setSelectedTime({
+                                day: day?.format("ddd"),
+                                time: slot,
+                              });
+                            }}
+                          >
+                            {slot}
+                          </div>
+                        ))
+                      : ""
+                  )}
                 </>
               ) : (
                 ""
