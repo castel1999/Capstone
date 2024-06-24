@@ -199,7 +199,7 @@ const WalletPage = () => {
       <div className="mb-6 w-fit">
         <div className="flex flex-row gap-5 border-2 border-black rounded-lg justify-center">
           <div className="flex flex-col gap-2 px-5 py-7">
-            <div className="text-2xl font-semibold">Total Balance</div>
+            <div className="text-2xl font-semibold">Tổng số tiền</div>
             <div>
               <div className="text-green-500 text-2xl font-semibold tracking-widest">
                 {lastTransaction?formatCurrency(lastTransaction?.amount):formatCurrency(0)}
