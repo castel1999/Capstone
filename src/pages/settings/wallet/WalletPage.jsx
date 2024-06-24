@@ -129,8 +129,8 @@ const WalletPage = () => {
     return <div>Loading...</div>;
   }
 
-  if (isWalletError || isTransactionsError || isLastTransactionError) {
-    return <div>{error.message}</div>;
+  if (isWalletError || isTransactionsError) {
+    return ;
   }
 
   const formatCurrency = (amount) => {
@@ -202,7 +202,7 @@ const WalletPage = () => {
             <div className="text-2xl font-semibold">Total Balance</div>
             <div>
               <div className="text-green-500 text-2xl font-semibold tracking-widest">
-                {formatCurrency(lastTransaction?.amount)}
+                {lastTransaction?formatCurrency(lastTransaction?.amount):formatCurrency(0)}
               </div>
               <div className="text-sm text-gray-400">
                 Lần giao dịch gần nhất
