@@ -270,3 +270,18 @@ export const confirmOTP = async (data) => {
 
   return responseBody;
 };
+
+// Get Notification By UserId
+export const getNotification = async (UserId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${BASE_API_LINK}/Notification/get/${UserId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
