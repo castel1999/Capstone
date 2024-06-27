@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import chatIcon from "../../assets/chat.svg";
+import chatIconV2 from "../../assets/chatV2.svg";
 import hideIcon from "../../assets/delete.svg";
 import dot from "../../assets/dot.svg";
 import send from "../../assets/send.svg";
@@ -37,10 +38,10 @@ const Chat = () => {
     url: "",
   })
   const { chatId, user, changeChat, isCurrentUserBlocked, isRecieverBlocked, setPermanentChatId } = useChatStore();
-  console.log(chatId, user);
+
   useEffect(() => {
-    if (currentUser) {
-      const unsub = onSnapshot(doc(db, "userchats", currentUser.userID), (doc) => {
+    if (user) {
+      const unsub = onSnapshot(doc(db, "userchats", user.userID), (doc) => {
         setChat(doc.data());
       });
       return () => {
@@ -170,7 +171,7 @@ const Chat = () => {
   return (
     <>
       {logged && role !== "Admin" && role !== "Moderator" ? (
-        <div className="fixed right-4 bottom-4 z-[50]">
+        <div className="fixed right-4  bottom-4 z-[50]">
           {!showChat ? (
             <div
               className="h-fit w-fit rounded-lg bg-white cursor-pointer border-solid border-2 border-black shadow-button hover:translate-x-1 hover:translate-y-1 hover:shadow-none ease-out duration-500"
@@ -185,11 +186,11 @@ const Chat = () => {
               </div>
             </div>
           ) : (
-            <div className="h-[500px] w-[850px] shadow-lg flex flex-col rounded-lg border-solid border-2 border-black">
-              <div className="flex flex-row w-full h-[10%] justify-between px-[10px] pt-[9px] pb-[5px] bg-[#f5f5f5] rounded-t-lg ">
+            <div className="h-[600px] w-[850px] shadow-lg flex flex-col rounded-lg border-solid border-2 border-grey-300">
+              <div className="flex flex-row w-full h-[10%] justify-between px-[10px] pt-[9px] pb-[5px] bg-theme rounded-t-lg ">
                 <div className="flex flex-row items-center justify-center gap-2 ">
-                  <img className="h-6 w-6 " src={chatIcon} />
-                  <div className="font-medium">Tin nhắn</div>
+                  <img className="h-6 w-6 " src={chatIconV2} />
+                  <div className="font-bold text-white">Tin nhắn</div>
                 </div>
                 <div className="flex flex-row items-center">
                   <div
@@ -199,7 +200,7 @@ const Chat = () => {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
-                      className="w-6 h-6 fill-black hover:fill-white"
+                      className="w-6 h-6 fill-white hover:fill-black"
                     >
                       <path
                         fillRule="evenodd"
@@ -211,7 +212,7 @@ const Chat = () => {
                 </div>
               </div>
               <div className="h-[90%] w-full flex flex-row bg-white rounded-lg">
-                <div className="flex flex-col h-full w-[35%] p-1 border-t-2 border-r-2  border-solid border-black overflow-y-auto">
+                <div className="flex flex-col h-full w-[35%] p-1 border-t-2 border-r-2  border-solid border-grey-300 overflow-y-auto">
                   {Array.isArray(chatLists) ? chatLists.map((chat) => (
                     <div key={chat.id} onClick={() => handleOponentClick(chat)} className="h-fit w-full flex flex-row px-2 py-1 gap-2 items-center hover:bg-gray-200 active:bg-gray-100 rounded-lg">
                       <img
@@ -233,7 +234,7 @@ const Chat = () => {
                     </div>
                   )) : <div />}
                 </div>
-                <div className="w-[65%] relative flex flex-col border-t-2 border-solid border-black">
+                <div className="w-[65%] relative flex flex-col border-t-2 border-solid border-grey-300">
                   <div className="flex flex-row w-full h-[15%] justify-between px-[10px] pt-[9px] pb-[5px] bg-[#DDDDDD] bg-opacity-20 border-b border-gray-300 rounded-t-lg">
                     <div className="flex items-center">
                       <img
@@ -300,7 +301,7 @@ const Chat = () => {
                               </div>
                               <div
                                 className={`${isCurrentUser
-                                  ? 'message-owner flex-end w-full text-lg px-4 py-2 bg-purple-700 text-white rounded-t-xl rounded-bl-xl rounded-br-none flex justify-end'
+                                  ? 'message-owner flex-end w-full text-lg px-4 py-2 bg-theme text-white rounded-t-xl rounded-bl-xl rounded-br-none flex justify-end'
                                   : 'hidden'
                                   }`}
                               >
@@ -313,7 +314,7 @@ const Chat = () => {
                     })}
                   </div>
                   {/* Input Site */}
-                  <div className="flex flex-row h-1/10 w-full px-3 py-2 border-t-2 border-black gap-3 ">
+                  <div className="flex flex-row h-1/10 w-full px-3 py-2 border-t-2 border-grey-300 gap-3 ">
                     <label className="flex align-items-center">
                       <img src={gallery} />
                       <input type="file" hidden />
