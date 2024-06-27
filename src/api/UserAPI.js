@@ -285,3 +285,20 @@ export const getNotification = async (UserId) => {
   }
   return responseBody;
 };
+
+// Make Unread and Read Notification
+// Make Unread and Read Notification
+export const makeReadNotification = async (data) => {
+  const { userId, notificationId } = data;
+  const response = await fetch(`${BASE_API_LINK}/Notification/update/${userId}/${notificationId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+}
