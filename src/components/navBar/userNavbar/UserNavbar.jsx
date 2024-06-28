@@ -20,7 +20,7 @@ const UserNavbar = ({ data }) => {
 
   const studentMenu = [
     { path: "Trang cá Nhân", route: "/vn/settings/profile" },
-    { path: "Bài học của tôi", route: "/vn/my-lessons" },
+    { path: "Bài học của tôi", route: "/vn/my-lessons/lessons" },
     { path: "Giáo viên Yêu thích", route: "/favorite" },
   ];
   const TutorMenu = [{ path: "Trang cá Nhân", route: "/vn/settings/profile" }];

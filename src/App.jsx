@@ -37,6 +37,8 @@ import TutorRequestAdmin from "./pages/admin/TutorRequestAdmin";
 import TutorRequestDetail from "./pages/admin/TutorRequestDetail/TutorRequestDetail";
 import Payment from "./pages/Payment";
 import TutorManagement from "./pages/tutorManagement/TutorManagement";
+import LessonsPage from "./pages/myLesson/LessonsPage";
+import CalendarPage from "./pages/myLesson/CalendarPage";
 
 function App() {
   return (
@@ -69,7 +71,10 @@ function App() {
 
           <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
             <Route path="/vn">
-              <Route path="my-lessons" element={<MylessonPage />} />
+              <Route path="my-lessons" element={<MylessonPage />}>
+                <Route path="lessons" element={<LessonsPage />} />
+                <Route path="calendar" element={<CalendarPage />} />
+              </Route>
               <Route path="settings" element={<SettingPage />}>
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="email" element={<EmailPage />} />

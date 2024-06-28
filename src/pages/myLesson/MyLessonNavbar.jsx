@@ -13,7 +13,7 @@ const MyLessonNavbar = () => {
               : "p-2 hover:bg-gray-100 rounded-lg"
           }
         >
-          My lessons
+          Buổi học của tôi
         </NavLink>
         <NavLink
           to="/vn/settings/profile"
@@ -23,7 +23,7 @@ const MyLessonNavbar = () => {
               : "p-2 hover:bg-gray-100 rounded-lg"
           }
         >
-          Settings
+          Cài đặt tài khoản
         </NavLink>
       </div>
     </div>
