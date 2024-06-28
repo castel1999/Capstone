@@ -40,66 +40,44 @@ const WalletPageContent = ({ currentPosts }) => {
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
         {currentPosts.map((transaction, index) => (
-          <tr key={transaction.walletTransactionId}>
-            {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {index + 1}
-            </td> */}
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {transaction.note === "Nạp tiền vào tài khoản" &&
-              transaction.status === 0 ? (
-                <div className="flex gap-1 items-center text-green-400">
-                  <FaPlus /> {formatCurrency(transaction.amount)}
-                </div>
-              ) : transaction.note === "Nạp tiền vào tài khoản" &&
-                transaction.status === 1 ? (
-                <div className="flex gap-1 items-center text-orange-400">
-                  <FaPlus /> {formatCurrency(transaction.amount)}
-                </div>
-              ) : transaction.note === "Rút tiền từ tài khoản" &&
-                transaction.status === 0 ? (
-                <div className="flex gap-1 items-center text-red-400">
-                  <FaMinus /> {formatCurrency(transaction.amount)}
-                </div>
-              ) : transaction.note === "Rút tiền từ tài khoản" &&
-                transaction.status === 1 ? (
-                <div className="flex gap-1 items-center text-orange-400">
-                  <FaMinus /> {formatCurrency(transaction.amount)}
-                </div>
-              ) : (
-                ""
-              )}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {transaction.note === "Nạp tiền vào tài khoản" &&
-              transaction.status === 0 ? (
-                <div className="flex gap-1 items-center">
-                  <FaArrowDown className="text-green-400" /> {transaction.note}
-                </div>
-              ) : transaction.note === "Nạp tiền vào tài khoản" &&
-                transaction.status === 1 ? (
-                <div className="flex gap-1 items-center">
-                  <FaArrowDown className="text-orange-400" /> {transaction.note}{" "}
-                  thất bại
-                </div>
-              ) : transaction.note === "Rút tiền từ tài khoản" &&
-                transaction.status === 0 ? (
-                <div className="flex gap-1 items-center">
-                  <FaArrowUp className="text-red-400" /> {transaction.note}
-                </div>
-              ) : transaction.note === "Rút tiền từ tài khoản" &&
-                transaction.status === 1 ? (
-                <div className="flex gap-1 items-center">
-                  <FaArrowUp className="text-orange-400" /> {transaction.note}{" "}
-                  thất bại
-                </div>
-              ) : (
-                ""
-              )}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {new Date(transaction.createdAt).toLocaleString()}
-            </td>
-          </tr>
+          <>
+            {transaction.status === 0 ? (
+              <tr key={index}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {transaction.note === "Nạp tiền vào tài khoản" ? (
+                    <div className="flex gap-1 items-center text-green-400">
+                      <FaPlus /> {formatCurrency(transaction.amount)}
+                    </div>
+                  ) : transaction.note === "Rút tiền từ tài khoản" ? (
+                    <div className="flex gap-1 items-center text-red-400">
+                      <FaMinus /> {formatCurrency(transaction.amount)}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {transaction.note === "Nạp tiền vào tài khoản" ? (
+                    <div className="flex gap-1 items-center">
+                      <FaArrowDown className="text-green-400" />
+                      {transaction.note}
+                    </div>
+                  ) : transaction.note === "Rút tiền từ tài khoản" ? (
+                    <div className="flex gap-1 items-center">
+                      <FaArrowUp className="text-red-400" /> {transaction.note}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {new Date(transaction.createdAt).toLocaleString()}
+                </td>
+              </tr>
+            ) : (
+              ""
+            )}
+          </>
         ))}
       </tbody>
     </table>

@@ -38,16 +38,6 @@ const WalletPage = () => {
   });
 
   const {
-    data: lastTransaction,
-    isLoading: isLastTransactionLoading,
-    isError: isLastTransactionError,
-  } = useQuery({
-    queryKey: ["lastTransaction", userId],
-    queryFn: () => UserAPI.getLastTransaction(walletData?.walletId),
-    enabled: !!walletData,
-  });
-
-  const {
     data: transactions,
     isLoading: isTransactionsLoading,
     isError: isTransactionsError,
@@ -90,10 +80,12 @@ const WalletPage = () => {
       window.location.href = data?.paymentUrl;
     },
     onError: (error) => {
-      if (error.status === 400 || error.status === 500) {
+      if (error.status === 400) {
         toast.error("Nạp tối thiểu 10.000 VND và tối đa 10.000.000 VND");
+      }else if (error.status === 500){
+        toast.error("Lỗi server")
       }
-      console.log(error.message);
+      console.log(error);
     },
   });
 
@@ -103,7 +95,7 @@ const WalletPage = () => {
       redirectUrl:
         "http://localhost:5173/settings/wallet" ||
         "https://capstone-snowy-one.vercel.app/settings/wallet",
-      senderId: "7CCB26A5-7224-4185-E553-08DC7C73F8C7",
+      senderId: import.meta.env.VITE_ADMIN_WALLET,
       receiverId: `${walletData?.walletId}`,
       choice: 1,
     };
@@ -118,19 +110,19 @@ const WalletPage = () => {
         "http://localhost:5173/settings/wallet" ||
         "https://capstone-snowy-one.vercel.app/settings/wallet",
       senderId: `${walletData?.walletId}`,
-      receiverId: "7CCB26A5-7224-4185-E553-08DC7C73F8C7",
+      receiverId: import.meta.env.VITE_ADMIN_WALLET,
       choice: 2,
     };
 
     await walletTransaction.mutateAsync(data);
   };
 
-  if (isWalletLoading || isTransactionsLoading || isLastTransactionLoading) {
+  if (isWalletLoading || isTransactionsLoading) {
     return <div>Loading...</div>;
   }
 
   if (isWalletError || isTransactionsError) {
-    return ;
+    return <div>Error occurred while fetching data</div>;
   }
 
   const formatCurrency = (amount) => {
@@ -202,10 +194,10 @@ const WalletPage = () => {
             <div className="text-2xl font-semibold">Tổng số tiền</div>
             <div>
               <div className="text-green-500 text-2xl font-semibold tracking-widest">
-                {lastTransaction?formatCurrency(lastTransaction?.amount):formatCurrency(0)}
+                {/* {lastTransaction ? formatCurrency(lastTransaction?.amount) : "new"} */}
               </div>
               <div className="text-sm text-gray-400">
-                Lần giao dịch gần nhất
+                {/* Lần giao dịch gần nhất */}
               </div>
             </div>
             <div className="flex flex-row gap-5">
@@ -214,20 +206,21 @@ const WalletPage = () => {
                   ...Processing
                 </div>
               ) : (
-                <div
-                  onClick={() => setIsDepositOpen(true)}
-                  className="transition ease-in-out delay-150 border-2 bg-theme border-black rounded-lg text-white py-1 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-green-500 hover:text-white duration-300 cursor-pointer"
-                >
-                  Nạp tiền
-                </div>
+                <>
+                  <div
+                    onClick={() => setIsDepositOpen(true)}
+                    className="transition ease-in-out delay-150 border-2 bg-theme border-black rounded-lg text-white py-1 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-green-500 hover:text-white duration-300 cursor-pointer"
+                  >
+                    Nạp tiền
+                  </div>
+                  <div
+                    onClick={() => setIsWithdrawalOpen(true)}
+                    className="transition ease-in-out delay-150 border-2  border-black rounded-lg text-black py-1 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-red-500 hover:text-white duration-300 cursor-pointer"
+                  >
+                    Rút tiền
+                  </div>
+                </>
               )}
-
-              <div
-                onClick={() => setIsWithdrawalOpen(true)}
-                className="transition ease-in-out delay-150 border-2  border-black rounded-lg text-black py-1 px-4 mb-4 shadow-[rgba(0,0,0,1)_4px_5px_4px_0px] hover:-translate-x-[-6px] hover:-translate-y-[-6px] hover:shadow-none hover:bg-red-500 hover:text-white duration-300 cursor-pointer"
-              >
-                Rút tiền
-              </div>
             </div>
           </div>
           <div className="flex flex-col justify-center bg-theme pr-3 pl-12 rounded-l-full">
@@ -243,9 +236,9 @@ const WalletPage = () => {
         <div className="flex flex-row justify-between items-center mb-9">
           <div className="font-semibold text-2xl">Thống kê giao dịch</div>
           <div className="flex gap-5">
-            <WalletPageFilter 
-              onSortChange={handleSortChange} 
-              onDateChange={handleDateChange} 
+            <WalletPageFilter
+              onSortChange={handleSortChange}
+              onDateChange={handleDateChange}
               dateRange={dateRange}
             />
           </div>
@@ -267,11 +260,15 @@ const WalletPage = () => {
         isOpen={isDepositOpen}
         onClose={() => setIsDepositOpen(false)}
         onSubmit={handleDeposit}
+        isLoading = {walletTransaction.isPending}
+        isUpdate = {updatePayment.isPending}
       />
       <WithdrawalModal
         isOpen={isWithdrawalOpen}
         onClose={() => setIsWithdrawalOpen(false)}
         onSubmit={handleWithdraw}
+        isLoading = {walletTransaction.isPending}
+        isUpdate = {updatePayment.isPending}
       />
     </div>
   );

@@ -204,7 +204,7 @@ export const walletTransaction = async (data) => {
 
   if (!response.ok) {
     const error = new Error(responseBody.message);
-    error.status = response.status; // Add status code to error object
+    error.status = response.status; 
     throw error;
   }
 
