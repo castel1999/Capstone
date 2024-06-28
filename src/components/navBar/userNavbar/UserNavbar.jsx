@@ -19,11 +19,11 @@ const UserNavbar = ({ data }) => {
   const userId = user?.decodedToken?.UserId;
 
   const studentMenu = [
-    { path: "Trang cá Nhân", route: "/settings/profile" },
-    { path: "Bài học của tôi", route: "/my-lessons" },
+    { path: "Trang cá Nhân", route: "/vn/settings/profile" },
+    { path: "Bài học của tôi", route: "/vn/my-lessons" },
     { path: "Giáo viên Yêu thích", route: "/favorite" },
   ];
-  const TutorMenu = [{ path: "Trang cá Nhân", route: "/settings/profile" }];
+  const TutorMenu = [{ path: "Trang cá Nhân", route: "/vn/settings/profile" }];
 
   let menu = [];
   if (role === "Student") menu = studentMenu;

@@ -14,6 +14,7 @@ const TutorListPage = () => {
   const [searchUser, setSearchUser] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [priceRange, setPriceRange] = useState([10000, 100000]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["tutorListData"],
@@ -36,8 +37,10 @@ const TutorListPage = () => {
     const matchesSubject = selectedSubject
       ? item.subjects.some((subject) => subject.title === selectedSubject)
       : true;
+    const withinPriceRange = 
+      item.pricePerHour >= priceRange[0] && item.pricePerHour <= priceRange[1];
     const status = item.status === 1;
-    return matchesName && matchesSubject && status;
+    return matchesName && matchesSubject && withinPriceRange && status;
   });
 
   const sortedData = filteredData?.sort((a, b) => {
@@ -73,6 +76,10 @@ const TutorListPage = () => {
     setSortOption(event.target.value);
   };
 
+  const handlePriceChange = (event, newValue) => {
+    setPriceRange(newValue);
+  };
+
   const paginate = (pageNumber) => {
     if (
       pageNumber > 0 &&
@@ -89,6 +96,8 @@ const TutorListPage = () => {
           onSearchChange={handleSearchInput}
           onSubjectChange={handleSubjectFilter}
           onSortChange={handleSortChange}
+          onPriceChange={handlePriceChange}
+          priceRange={priceRange}
         />
       </div>
       <div className="flex-1">

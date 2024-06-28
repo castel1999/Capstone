@@ -68,14 +68,16 @@ function App() {
           </Route>
 
           <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
-            <Route path="/settings" element={<SettingPage />}>
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="email" element={<EmailPage />} />
-              <Route path="reset-pass" element={<ResetPassPage />} />
-              <Route path="wallet" element={<WalletPage />} />
-              <Route path="upgrade" element={<UpgradePage />} />
+            <Route path="/vn">
+              <Route path="my-lessons" element={<MylessonPage />} />
+              <Route path="settings" element={<SettingPage />}>
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="email" element={<EmailPage />} />
+                <Route path="reset-pass" element={<ResetPassPage />} />
+                <Route path="wallet" element={<WalletPage />} />
+                <Route path="upgrade" element={<UpgradePage />} />
+              </Route>
             </Route>
-            <Route path="/my-lessons" element={<MylessonPage />} />
             <Route path="/favorite" element={<FavoritePage />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/tutor-registration" element={<TutorRegistration />} />

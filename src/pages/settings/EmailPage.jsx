@@ -71,13 +71,13 @@ const EmailPage = () => {
             type="text"
             defaultValue={data?.email}
             readOnly
-            className="max-w-[476px] border-2 border-black rounded-lg py-2 px-4 w-full outline-none cursor-not-allowed"
+            className="max-w-[370px] border-2 border-black rounded-lg py-2 px-4 w-full outline-none cursor-not-allowed"
           />
           {data?.emailConfirmed === false ? (
             <div>
               <div
                 onClick={() => handleOpenModel(getOtp)}
-                className="border border-black rounded-lg py-2 px-3 cursor-pointer hover:bg-green-400 hover:text-white"
+                className="w-fit border-2 border-black rounded-lg py-2 px-3 cursor-pointer hover:bg-green-400 hover:text-white"
               >
                 Xác thực
               </div>
