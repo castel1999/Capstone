@@ -90,7 +90,7 @@ function App() {
           </Route>
 
           <Route element={<PrivateRoute allowedRoles={["Tutor"]} />}>
-            <Route path="/tutor-management" element={<TutorManagement />} />
+            {/* <Route path="/tutor-management" element={<TutorManagement />} /> */}
           </Route>
 
           <Route
