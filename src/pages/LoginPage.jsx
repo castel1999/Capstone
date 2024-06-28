@@ -22,6 +22,7 @@ import { signInWithPopup } from "firebase/auth";
 import { avatar } from "@material-tailwind/react";
 import { useUserStore } from "../lib/useUserStore";
 import LoadingVerTwo from "../utils/LoadingVer2";
+import { get } from "firebase/database";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -118,15 +119,6 @@ const LoginPage = () => {
           // Check if the 'userchats' document exists before updating it
           const userChatsRef = doc(db, 'userchats', userData.userID);
           const userChatsSnap = await getDoc(userChatsRef);
-          if (!userChatsSnap.exists()) {
-            await setDoc(userChatsRef, {
-              chats: [],
-            });
-          }
-          await setDoc(doc(db, "users", userData.userID), userData);
-          await setDoc(doc(db, "userchats", userData.userID), {
-            chats: [],
-          });
         } else {
           console.log("Không lấy được thông tin user");
         }
@@ -165,9 +157,7 @@ const LoginPage = () => {
       try {
         // Get User data from API
         const currentUserInfo = await apiClient.getCurrentUser(); // Sử dụng hàm getCurrentUser để lấy thông tin user
-        console.log(currentUserInfo);
         if (currentUserInfo) {
-          // Save or update data user into FireStore
           const userData = {
             userID: data.userId,
             avatar: currentUserInfo.value.imageUrl || "",
@@ -175,11 +165,10 @@ const LoginPage = () => {
             lastLogin: serverTimestamp(),
             blockedUser: [],
           };
-          await setDoc(doc(db, "users", userData.userID), userData);
-          await setDoc(doc(db, "userchats", userData.userID), {
-            chats: [],
-          });
-          console.log(curr);
+          await setDoc(doc(db, 'users', userData.userID), userData, { merge: true });
+          // Kiểm tra và cập nhật dữ liệu chat của người dùng
+          const userChatsRef = doc(db, "userchats", userData.userID);
+          const userChatsSnap = await getDoc(userChatsRef);
         } else {
           console.log("Không lấy được thông tin user");
         }

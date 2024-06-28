@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import ErrorPopup from "../../utils/ErrorPopup";
 import moment from "moment";
+import { useAuth } from "../../hooks/AuthContext";
 
 const ProfilePage = () => {
   const data = useOutletContext();
@@ -24,6 +25,7 @@ const ProfilePage = () => {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [avatarURL, setAvatarURL] = useState(data?.imageUrl);
+  const { user } = useAuth();
 
   const phoneRegExp =
     /^(?:\+84|0)(?:[1-9][0-9]{8}|(?:2|3|4|5|6|7|8|9)[0-9]{7,8})$/;
@@ -106,7 +108,7 @@ const ProfilePage = () => {
   const onSubmit = (formData) => {
     const { email, ...rest } = formData;
     const completeData = {
-      id: localStorage.getItem("userID"),
+      id: user.decodedToken.UserId,
       imageUrl: avatarURL,
       dateOfBirth: moment(formData.dateOfBirth, "YYYY-MM-DD").format(
         "DD-MM-YYYY"
@@ -119,20 +121,6 @@ const ProfilePage = () => {
 
   return (
     <form className="">
-      <div className="flex flex-row justify-center gap-10 my-5">
-        <div className="flex flex-col gap-2 justify-center items-center border border-gray-300 rounded-lg px-10 py-3">
-          <div className="font-bold text-gray-400">Tổng tiền đã nạp</div>
-          <div className="text-theme text-4xl">0đ</div>
-        </div>
-        <div className="flex flex-col gap-2 justify-center items-center border border-gray-300 rounded-lg px-10 py-3">
-          <div className="font-bold text-gray-400">Tổng tiền đã nạp</div>
-          <div className="text-theme text-4xl">0đ</div>
-        </div>
-        <div className="flex flex-col gap-2 justify-center items-center border border-gray-300 rounded-lg px-10 py-3">
-          <div className="font-bold text-gray-400">Tổng tiền đã nạp</div>
-          <div className="text-theme text-4xl">0đ</div>
-        </div>
-      </div>
       <div className="flex flex-col gap-6 p-3 max-w-[500px]">
         <div className="text-3xl font-bold">Thông tin cá nhân</div>
 

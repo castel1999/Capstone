@@ -7,7 +7,7 @@ import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SettingPage from "./pages/settings/SettingPage";
 import ProfilePage from "./pages/settings/ProfilePage";
-import WalletPage from "./pages/settings/WalletPage";
+import WalletPage from "./pages/settings/wallet/WalletPage";
 import UpgradePage from "./pages/settings/UpgradePage";
 import LoginPage from "./pages/LoginPage";
 import ShowNavbar from "./components/navBar/ShowNavbar";
@@ -37,6 +37,8 @@ import TutorRequestAdmin from "./pages/admin/TutorRequestAdmin";
 import TutorRequestDetail from "./pages/admin/TutorRequestDetail/TutorRequestDetail";
 import Payment from "./pages/Payment";
 import TutorManagement from "./pages/tutorManagement/TutorManagement";
+import LessonsPage from "./pages/myLesson/LessonsPage";
+import CalendarPage from "./pages/myLesson/CalendarPage";
 
 function App() {
   return (
@@ -68,14 +70,19 @@ function App() {
           </Route>
 
           <Route element={<PrivateRoute allowedRoles={["Student", "Tutor"]} />}>
-            <Route path="/settings" element={<SettingPage />}>
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="email" element={<EmailPage />} />
-              <Route path="reset-pass" element={<ResetPassPage />} />
-              <Route path="wallet" element={<WalletPage />} />
-              <Route path="upgrade" element={<UpgradePage />} />
+            <Route path="/vn">
+              <Route path="my-lessons" element={<MylessonPage />}>
+                <Route path="lessons" element={<LessonsPage />} />
+                <Route path="calendar" element={<CalendarPage />} />
+              </Route>
+              <Route path="settings" element={<SettingPage />}>
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="email" element={<EmailPage />} />
+                <Route path="reset-pass" element={<ResetPassPage />} />
+                <Route path="wallet" element={<WalletPage />} />
+                <Route path="upgrade" element={<UpgradePage />} />
+              </Route>
             </Route>
-            <Route path="/my-lessons" element={<MylessonPage />} />
             <Route path="/favorite" element={<FavoritePage />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/tutor-registration" element={<TutorRegistration />} />

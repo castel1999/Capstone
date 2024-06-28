@@ -144,8 +144,23 @@ export const updateUserProfile = async (data) => {
 
 export const getWallet = async (UserId) => {
   const token = localStorage.getItem("token");
-  const decode = jwtDecode(token)
-  const response = await fetch(`${BASE_API_LINK}/Wallet/get/wallet/user/${UserId}`, {
+  const response = await fetch(`${BASE_API_LINK}/Wallet/get/user/${UserId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
+
+export const getLastTransaction = async (walletId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${BASE_API_LINK}/Wallet/get/last-transaction/${walletId}`, {
     headers: {
       "Authorization": `Bearer ${token}`
     }
@@ -189,7 +204,7 @@ export const walletTransaction = async (data) => {
 
   if (!response.ok) {
     const error = new Error(responseBody.message);
-    error.status = response.status; // Add status code to error object
+    error.status = response.status; 
     throw error;
   }
 
@@ -255,3 +270,35 @@ export const confirmOTP = async (data) => {
 
   return responseBody;
 };
+
+// Get Notification By UserId
+export const getNotification = async (UserId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${BASE_API_LINK}/Notification/get/${UserId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+};
+
+// Make Unread and Read Notification
+// Make Unread and Read Notification
+export const makeReadNotification = async (data) => {
+  const { userId, notificationId } = data;
+  const response = await fetch(`${BASE_API_LINK}/Notification/update/${userId}/${notificationId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const responseBody = await response.json();
+  if (!response.ok) {
+    throw new Error(responseBody.message);
+  }
+  return responseBody;
+}

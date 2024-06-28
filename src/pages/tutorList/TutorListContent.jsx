@@ -6,6 +6,7 @@ import defaultAvatar from "../../assets/avatar.png";
 import CloseIcon from "@mui/icons-material/Close";
 import { FaStar } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
+import { IoBookOutline } from "react-icons/io5";
 import Loading from "../../utils/LoadingVer2";
 import { useAuth } from "../../hooks/AuthContext";
 import { useUserStore } from "../../lib/useUserStore";
@@ -24,6 +25,7 @@ import { db } from "../../firebase";
 import { doc } from "firebase/firestore";
 import dAva from "../../assets/DefaultAva.png";
 import Chat from "../../components/chat/Chat";
+
 const TutorListContent = ({ data }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -33,9 +35,11 @@ const TutorListContent = ({ data }) => {
   const { currentUser, isLoading, fetchCurrentUser } = useUserStore();
   const [userChats, setUserChats] = useState([]);
   const { setShowChat } = useAuth();
+  const [isShowMap, setIsShowMap] = useState({});
+
   // Kiểm tra chats thay đổi
   useEffect(() => {
-    let unsubscribe = () => { };
+    let unsubscribe = () => {};
 
     if (currentUser) {
       const userChatsDocRef = doc(db, "userchats", currentUser.userID);
@@ -54,16 +58,15 @@ const TutorListContent = ({ data }) => {
   const isReceiverInChats = (chats, receiverId) => {
     return chats?.some((chat) => chat.receiverId === receiverId);
   };
+
   const token = localStorage.getItem("token");
   const handleChat = async (tutor) => {
     setSelectedTutor(tutor);
     if (!token) {
       navigate("/login");
-    }
-    else if (isReceiverInChats(userChats, selectedTutor.userId)) {
+    } else if (isReceiverInChats(userChats, tutor.userId)) {
       setShowChat(true);
-    }
-    else {
+    } else {
       setIsLoadingModal(true);
       setSelectedTutor(tutor);
       setIsOpen(true);
@@ -71,12 +74,15 @@ const TutorListContent = ({ data }) => {
       setIsLoadingModal(false);
     }
   };
+
   const handleRent = (tutorId) => {
     navigate(`/tutor-detail/${tutorId}`);
   };
+
   const handleClose = () => {
     setIsOpen(false);
   };
+
   // Handle Send First Message
   const handleSendMessage = async () => {
     const chatRef = collection(db, "chats");
@@ -85,13 +91,11 @@ const TutorListContent = ({ data }) => {
       const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
         createAt: serverTimestamp(),
-        messages: arrayUnion(
-          {
-            senderId: currentUser.userID,
-            text: message,
-            createdAt: new Date(),
-          }
-        )
+        messages: arrayUnion({
+          senderId: currentUser.userID,
+          text: message,
+          createdAt: new Date(),
+        }),
       });
       await updateDoc(doc(userChatsRef, selectedTutor.userId), {
         chats: arrayUnion({
@@ -131,8 +135,16 @@ const TutorListContent = ({ data }) => {
     }
   }, [isLoading]);
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+
   const lorem =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sodales, urna sed efficitur sodales, diam justo finibus erat, vel vestibulum odio sapien ut turpis. Mauris tincidunt finibus velit vel lobortis. Curabitur nisi purus, convallis quis nisi eget, feugiat tincidunt nisi. Nunc fringilla, velit sed dignissim blandit, mi arcu rutrum dui, ut elementum leo neque at nisl. Vestibulum semper tortor libero, at molestie eros ullamcorper at. Nam molestie dictum augue, nec scelerisque ipsum mattis quis. Pellentesque in urna sit amet ante cursus finibus eu quis sapien. Proin venenatis interdum tortor in scelerisque. Donec vitae ornare sapien. Morbi convallis dictum suscipit.";
+
   return (
     <div className="flex flex-col gap-5">
       {Array.isArray(data) && data.length > 0 ? (
@@ -152,31 +164,60 @@ const TutorListContent = ({ data }) => {
               <div className="flex flex-row gap-1 font-semibold text-2xl">
                 {item?.tutorName}
               </div>
-              <div className="flex flex-row items-center gap-2 text-sm text-gray-400">
+              <div className="flex flex-row items-center gap-2 text-sm text-gray-700">
+                <IoBookOutline className="text-base" />
                 {item?.subjects?.map((item) => item?.title).join(", ")}
               </div>
-              <div className="line-clamp-4">
-                {item?.description === null ? lorem : item?.description}
-              </div>
+              {isShowMap[index] ? (
+                <>
+                  <div className="">
+                    {lorem}
+                  </div>
+                  <div
+                    onClick={() => setIsShowMap((prev) => ({ ...prev, [index]: false }))}
+                    className="font-bold underline cursor-pointer"
+                  >
+                    Ẩn bớt
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="line-clamp-4">
+                    {lorem}
+                  </div>
+                  <div
+                    onClick={() => setIsShowMap((prev) => ({ ...prev, [index]: true }))}
+                    className="font-bold underline cursor-pointer"
+                  >
+                    Hiển thị thêm
+                  </div>
+                </>
+              )}
             </div>
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-row">
-                <div className="flex flex-row gap-7 justify-center items-center">
-                  <div className="font-semibold text-2xl w-16">
-                    {item?.ratings.length === 0 ? (
-                      "New"
-                    ) : (
-                      <div>
-                        <FaStar /> {item?.ratings}
+            <div className="flex flex-col justify-between gap-3">
+              <div className="flex flex-row gap-3">
+                <div className="font-semibold text-2xl w-16">
+                  {item?.ratings.length === 0 ? (
+                    <div className="flex flex-col">
+                      <div className="font-semibold text-2xl ">New</div>
+                      <div className="text-sm font-normal text-gray-500">
+                        Tutor
                       </div>
-                    )}
+                    </div>
+                  ) : (
+                    <div>
+                      <FaStar /> {item?.ratings}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col w-20">
+                  <div className="font-semibold text-2xl ">
+                    {formatCurrency(item?.pricePerHour)}
                   </div>
-                  <div className="font-semibold text-2xl w-20">
-                    ${item?.pricePerHour}
-                  </div>
-                  <div className="font-semibold text-2xl w-10">
-                    <CiHeart />
-                  </div>
+                  <div className="text-sm text-gray-500">50 phút/buổi</div>
+                </div>
+                <div className="font-semibold text-2xl w-10 ml-10">
+                  <CiHeart />
                 </div>
               </div>
               <div className="flex flex-col gap-3 text-center mt-10">
@@ -270,4 +311,5 @@ const TutorListContent = ({ data }) => {
     </div>
   );
 };
+
 export default TutorListContent;

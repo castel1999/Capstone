@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import * as UserAPI from "../../api/UserAPI";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../../utils/Loading";
+import SettingNavBar from "./SettingNavBar";
 
 const SettingPage = () => {
   const { data, isLoading, isError, error } = useQuery({
@@ -24,12 +25,16 @@ const SettingPage = () => {
   }
   return (
     <div>
-      <div className="flex gap-10 p-5">
+      <div className="w-full">
         <div>
-          <SideBar data={data?.value} />
+          <SettingNavBar />
         </div>
-        <div className="flex-1">
-          <Outlet context={data?.value} />
+        <div className="flex p-5 gap-28">
+          <SideBar />
+
+          <div className="flex-1">
+            <Outlet context={data?.value} />
+          </div>
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ const TutorListPage = () => {
   const [searchUser, setSearchUser] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [priceRange, setPriceRange] = useState([10000, 100000]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["tutorListData"],
@@ -27,10 +28,19 @@ const TutorListPage = () => {
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
 
+  console.log("list", data);
+
   const filteredData = data?.results?.filter((item) => {
-    const matchesName = item.tutorName.toLowerCase().includes(searchUser.toLowerCase());
-    const matchesSubject = selectedSubject ? item.subjects.some(subject => subject.title === selectedSubject) : true;
-    return matchesName && matchesSubject;
+    const matchesName = item.tutorName
+      .toLowerCase()
+      .includes(searchUser.toLowerCase());
+    const matchesSubject = selectedSubject
+      ? item.subjects.some((subject) => subject.title === selectedSubject)
+      : true;
+    const withinPriceRange = 
+      item.pricePerHour >= priceRange[0] && item.pricePerHour <= priceRange[1];
+    const status = item.status === 1;
+    return matchesName && matchesSubject && withinPriceRange && status;
   });
 
   const sortedData = filteredData?.sort((a, b) => {
@@ -40,8 +50,12 @@ const TutorListPage = () => {
       case "priceLowToHigh":
         return a.pricePerHour - b.pricePerHour;
       case "bestRating":
-        const avgRatingA = a.ratings.reduce((acc, rating) => acc + rating.score, 0) / (a.ratings.length || 1);
-        const avgRatingB = b.ratings.reduce((acc, rating) => acc + rating.score, 0) / (b.ratings.length || 1);
+        const avgRatingA =
+          a.ratings.reduce((acc, rating) => acc + rating.score, 0) /
+          (a.ratings.length || 1);
+        const avgRatingB =
+          b.ratings.reduce((acc, rating) => acc + rating.score, 0) /
+          (b.ratings.length || 1);
         return avgRatingB - avgRatingA;
       default:
         return 0;
@@ -62,6 +76,10 @@ const TutorListPage = () => {
     setSortOption(event.target.value);
   };
 
+  const handlePriceChange = (event, newValue) => {
+    setPriceRange(newValue);
+  };
+
   const paginate = (pageNumber) => {
     if (
       pageNumber > 0 &&
@@ -78,6 +96,8 @@ const TutorListPage = () => {
           onSearchChange={handleSearchInput}
           onSubjectChange={handleSubjectFilter}
           onSortChange={handleSortChange}
+          onPriceChange={handlePriceChange}
+          priceRange={priceRange}
         />
       </div>
       <div className="flex-1">
