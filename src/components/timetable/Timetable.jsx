@@ -11,8 +11,6 @@ const Timetable = (props) => {
   const [calendarDate, setCalendarDate] = useState(new moment());
   const [dayOfWeek, setDayOfWeek] = useState([]);
 
-  console.log(data);
-
   useEffect(() => {
     initDayOfWeek(calendarDate);
   }, []);

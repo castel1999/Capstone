@@ -79,6 +79,7 @@ function App() {
             <Route path="/favorite" element={<FavoritePage />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/tutor-registration" element={<TutorRegistration />} />
+            <Route path="/tutor-management" element={<TutorManagement />} />
           </Route>
 
           <Route element={<PrivateRoute allowedRoles={["Tutor"]} />}>

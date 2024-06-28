@@ -8,13 +8,13 @@ const TutorManagement = () => {
   const [selectedTab, setSelectedTab] = useState("lessons");
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex flex-row w-full gap-8 bg-[#32363A] px-12 py-4 text-[#898F97]">
+    <div className="flex flex-col w-full" style={{ height: 'calc(100vh - 90px)' }}>
+      <div className="flex flex-row w-full font-semibold border-b-2 border-[#eeeeee]">
         <div
           className={
             selectedTab === "lessons"
-              ? "text-white border-b-2 border-white"
-              : "cursor-pointer"
+              ? "border-b-4 py-4 px-6 border-theme"
+              : "cursor-pointer py-4 px-6"
           }
           onClick={() => setSelectedTab("lessons")}
         >
@@ -23,8 +23,8 @@ const TutorManagement = () => {
         <div
           className={
             selectedTab === "calendar"
-              ? "text-white border-b-2 border-white"
-              : "cursor-pointer"
+              ? "border-b-4 py-4 px-6 border-theme"
+              : "cursor-pointer py-4 px-6"
           }
           onClick={() => setSelectedTab("calendar")}
         >
@@ -33,8 +33,8 @@ const TutorManagement = () => {
         <div
           className={
             selectedTab === "statistic"
-              ? "text-white border-b-2 border-white"
-              : "cursor-pointer"
+              ? "border-b-4 py-4 px-6 border-theme"
+              : "cursor-pointer py-4 px-6"
           }
           onClick={() => setSelectedTab("statistic")}
         >
@@ -43,8 +43,8 @@ const TutorManagement = () => {
         <div
           className={
             selectedTab === "profile"
-              ? "text-white border-b-2 border-white"
-              : "cursor-pointer"
+              ? "border-b-4 py-4 px-6 border-theme"
+              : "cursor-pointer py-4 px-6"
           }
           onClick={() => setSelectedTab("profile")}
         >
