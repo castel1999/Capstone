@@ -102,7 +102,7 @@ const NavBar = () => {
               ""
             )}
 
-            {currUser === "Tutor" && token.TutorStatus === "1" ? (
+            {/* {currUser === "Tutor" && token.TutorStatus === "1" ? (
               <NavLink
                 to="/tutor-management"
                 className={({ isActive }) =>
@@ -115,7 +115,17 @@ const NavBar = () => {
               </NavLink>
             ) : (
               ""
-            )}
+            )} */}
+            <NavLink
+                to="/tutor-management"
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-theme text-white rounded-lg self-center p-3 font-semibold"
+                    : "transition ease-in-out delay-150 rounded-lg p-3 cursor-pointer self-center font-semibold hover:text-white hover:bg-theme hover:-translate-y-0 hover:scale-110"
+                }
+              >
+                Quản lý hồ sơ
+              </NavLink>
           </div>
         )}
 
