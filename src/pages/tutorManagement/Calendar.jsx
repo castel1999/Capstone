@@ -1,5 +1,6 @@
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 const Calendar = () => {
   const [calendarDate, setCalendarDate] = useState(new moment());
@@ -8,9 +9,10 @@ const Calendar = () => {
   const [section, setSection] = useState("Morning");
   const [showModal, setShowModal] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [lesson, setLesson] = useState({
-    day: "29",
-    time: "11:00",
+    day: new moment(),
+    time: "06:00",
     name: "Anna",
   });
   const [rescheduleDetails, setRescheduleDetails] = useState({
@@ -28,17 +30,18 @@ const Calendar = () => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
         setShowModal(false);
         setShowRescheduleModal(false);
+        setShowCancelModal(false);
       }
     };
 
-    if (showModal || showRescheduleModal) {
+    if (showModal || showRescheduleModal || showCancelModal) {
       document.addEventListener("mousedown", handleCloseModal);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleCloseModal);
     };
-  }, [showModal, showRescheduleModal]);
+  }, [showModal, showRescheduleModal, showCancelModal]);
 
   const modalRef = useRef();
 
@@ -57,10 +60,10 @@ const Calendar = () => {
 
   const moveToPreviousWeek = () => {
     setCalendarDate(calendarDate.clone().subtract(1, "week"));
-    initDayOfWeek(calendarDate.clone().add(1, "week"));
+    initDayOfWeek(calendarDate.clone().subtract(1, "week"));
   };
 
-  const generateTimeOptions = (section) => {
+  const generateTimeSectionOptions = (section) => {
     const options = [];
 
     for (let hour = 0; hour < 24; hour++) {
@@ -81,6 +84,19 @@ const Calendar = () => {
     return options;
   };
 
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(time);
+      }
+    }
+    return options;
+  };
+
   const handleOnDrag = (e) => {
     // e.dataTransfer.setData("lessonType", lesson);
   };
@@ -98,18 +114,55 @@ const Calendar = () => {
   const handleReschedule = () => {
     setLesson((prev) => ({
       ...prev,
-      day: rescheduleDetails.newDay.format("DD"),
+      day: rescheduleDetails.newDay,
       time: rescheduleDetails.newTime,
     }));
     setShowRescheduleModal(false);
+    toast.success("Đổi lịch học thành công !");
+  };
+
+  const handleCancel = () => {
+    setLesson({
+      day: null,
+      time: null,
+      name: "",
+    });
+    setShowCancelModal(false);
+    toast.success("Hủy lịch học thành công !");
+  };
+
+  const handleDateChange = (e) => {
+    const newDay = moment(e.target.value, "YYYY-MM-DD");
+    setRescheduleDetails((prevDetails) => ({
+      ...prevDetails,
+      newDay,
+    }));
+  };
+
+  const addMinutesToTime = (timeString, minutesToAdd) => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes + minutesToAdd);
+
+    const updatedHours = date.getHours().toString().padStart(2, '0');
+    const updatedMinutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${updatedHours}:${updatedMinutes}`;
   };
 
   return (
-    <div className="flex flex-row h-full" style={{ height: "calc(100vh - 152px)" }}>
+    <div
+      className="flex flex-row h-full"
+      style={{ height: "calc(100vh - 152px)" }}
+    >
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-          <div ref={modalRef} className="flex flex-col bg-white p-5 rounded-lg shadow-lg w-[40%] h-[80%]">
-            <div className="flex flex-row justify-between items-center w-full flex-[0.1] border-b">
+          <div
+            ref={modalRef}
+            className="flex flex-col bg-white p-5 rounded-lg shadow-lg w-fit h-fit gap-5"
+          >
+            <div className="flex flex-row justify-between items-center flex-[0.1] border-b">
               <div className="flex flex-row h-full gap-3 items-center border-b-2 border-theme">
                 <div className="font-semibold text-[20px]">Buổi học</div>
               </div>
@@ -132,13 +185,112 @@ const Calendar = () => {
                 </svg>
               </div>
             </div>
+
+            <div className="flex flex-row items-center gap-5">
+              <div className="flex flex-col gap-1">
+                <input
+                  className="px-[14px] py-[10px] h-[50px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                  type="date"
+                  min={current.format("YYYY-MM-DD")}
+                  value={rescheduleDetails.newDay.format("YYYY-MM-DD")}
+                  onChange={handleDateChange}
+                />
+                <div className="text-[#7B7A86]">
+                  {lesson.day.format("dddd")}
+                </div>
+              </div>
+
+              <div className="flex flex-row gap-5 justify-between">
+                <div className="flex flex-col gap-1">
+                  <select
+                    className={
+                      "px-[14px] py-[10px] h-[50px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    }
+                    value={rescheduleDetails.newTime}
+                    onChange={(e) =>
+                      setRescheduleDetails((prevDetails) => ({
+                        ...prevDetails,
+                        newTime: e.target.value,
+                      }))
+                    }
+                  >
+                    {generateTimeOptions().map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="text-[#7B7A86]">50 phút</div>
+                </div>
+                <img
+                  className="h-10 mt-1"
+                  src="https://cdn-icons-png.flaticon.com/512/545/545682.png "
+                  alt=""
+                  title=""
+                ></img>
+                <div className="flex flex-col gap-1">
+                  <select
+                    className={
+                      "px-[14px] py-[10px] h-[50px] border-2 rounded-lg focus:outline-none focus:ring-0 focus:border-[#6B48F2] hover:border-black"
+                    }
+                    value={"10:50"}
+                    disabled
+                  >
+                    <option>{addMinutesToTime(rescheduleDetails.newTime, 50)}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-row items-center gap-4">
+              <img
+                className="h-6 w-6"
+                src="https://cdn-icons-png.flaticon.com/512/456/456212.png "
+                alt=""
+                title=""
+              />
+              <img
+                className="w-10 h-10 rounded-lg"
+                src={
+                  "https://firebasestorage.googleapis.com/v0/b/capstone-c0906.appspot.com/o/defaultAva%2FDefaultAva.png?alt=media&token=7f4275d1-05c3-41ca-9ec4-091800bb5895"
+                }
+              />
+              <div className="text-[18px]">Anna</div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <a href="https://meet.google.com/" target="_blank" className="text-center border-2 border-black p-2 rounded-md text-white font-semibold bg-theme hover:bg-[rgb(142,116,242)]">
+                Vào lớp học
+              </a>
+
+              <button
+                className="border-2 border-black p-2 rounded-md font-semibold hover:bg-[#E4E4E6]"
+                onClick={() => {
+                  setShowModal(false);
+                  setShowRescheduleModal(true);
+                }}
+              >
+                Đổi lịch học
+              </button>
+
+              <button className="border-2 border-black p-2 rounded-md text-white font-semibold bg-[#C8170E] hover:bg-[rgb(237,53,44)]"
+                      onClick={() => {
+                        setShowModal(false);
+                        setShowCancelModal(true);
+                      }}>
+                Hủy lịch học
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {showRescheduleModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-          <div ref={modalRef} className="flex flex-col bg-white p-5 rounded-lg shadow-lg w-[40%] h-fit">
+          <div
+            ref={modalRef}
+            className="flex flex-col bg-white p-5 rounded-lg shadow-lg w-fit h-fit"
+          >
             <div className="flex flex-row justify-between items-center w-full flex-[0.1] border-b">
               <div className="flex flex-row h-full gap-3 items-center border-b-2 border-theme">
                 <div className="font-semibold text-[20px]">Đổi lịch học</div>
@@ -163,22 +315,99 @@ const Calendar = () => {
               </div>
             </div>
             <div className="mt-4">
-              Chuyển lịch học từ <span className="font-semibold">{lesson.time} {lesson.day}</span> sang <span className="font-semibold">{rescheduleDetails.newTime} {rescheduleDetails.newDay.format("DD")}</span>
+              Chuyển lịch học từ{" "}
+              <span className="font-semibold">
+                {lesson.time} {lesson.day.format("DD-MM-YYYY")}
+              </span>{" "}
+              sang{" "}
+              <span className="font-semibold">
+                {rescheduleDetails.newTime}{" "}
+                {rescheduleDetails.newDay.format("DD-MM-YYYY")}
+              </span>
             </div>
             <div className="flex flex-col mt-4">
-              <label htmlFor="reason" className="font-medium mb-2">Lý do đổi lịch học:</label>
+              <label htmlFor="reason" className="font-medium mb-2">
+                Lý do đổi lịch học:
+              </label>
               <textarea
                 id="reason"
                 className="border border-gray-300 p-2 rounded-md"
                 rows="4"
                 value={rescheduleDetails.reason}
-                onChange={(e) => setRescheduleDetails({ ...rescheduleDetails, reason: e.target.value })}
+                onChange={(e) =>
+                  setRescheduleDetails({
+                    ...rescheduleDetails,
+                    reason: e.target.value,
+                  })
+                }
               />
               <button
                 className="mt-4 border-2 border-black p-2 rounded-md font-semibold hover:bg-[#E4E4E6]"
                 onClick={handleReschedule}
               >
-                Confirm Reschedule
+                Đổi lịch học
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+          <div
+            ref={modalRef}
+            className="flex flex-col bg-white p-5 rounded-lg shadow-lg w-fit h-fit"
+          >
+            <div className="flex flex-row justify-between items-center w-full flex-[0.1] border-b">
+              <div className="flex flex-row h-full gap-3 items-center border-b-2 border-theme">
+                <div className="font-semibold text-[20px]">Hủy lịch học</div>
+              </div>
+              <div
+                className="p-2 bg-white hover:bg-[rgba(18,17,23,.06)] rounded-lg"
+                onClick={() => setShowCancelModal(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                  className="h-6 w-6"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.207 5.793a1 1 0 0 0-1.414 1.414L10.586 12l-4.793 4.793a1 1 0 1 0 1.414 1.414L12 13.414l4.793 4.793a1 1 0 0 0 1.414-1.414L13.414 12l4.793-4.793a1 1 0 0 0-1.414-1.414L12 10.586z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+            <div className="mt-4">
+              Bạn có chắc chắn muốn hủy buổi học vào{" "}
+              <span className="font-semibold">
+                {lesson.time} {lesson.day.format("DD-MM-YYYY")}
+              </span>?
+            </div>
+            <div className="flex flex-col mt-4">
+              <label htmlFor="reason" className="font-medium mb-2">
+                Lý do hủy lịch học:
+              </label>
+              <textarea
+                id="reason"
+                className="border border-gray-300 p-2 rounded-md"
+                rows="4"
+                value={rescheduleDetails.reason}
+                onChange={(e) =>
+                  setRescheduleDetails({
+                    ...rescheduleDetails,
+                    reason: e.target.value,
+                  })
+                }
+              />
+              <button
+                className="mt-4 border-2 border-black p-2 rounded-md font-semibold hover:bg-[#E4E4E6]"
+                onClick={handleCancel}
+              >
+                Hủy lịch học
               </button>
             </div>
           </div>
@@ -326,7 +555,8 @@ const Calendar = () => {
                   <th
                     key={day.format("DD")}
                     className={`flex-1 font-normal py-3 border border-[#DEDEE2]  ${
-                      current.format("DD") === day?.format("DD")
+                      current.diff(day, "days") === 0 &&
+                      day?.format("DD") === current.format("DD")
                         ? "border-b-4 border-b-[#0046CF] text-[#0046CF]"
                         : ""
                     }`}
@@ -337,7 +567,7 @@ const Calendar = () => {
               </tr>
             </thead>
             <tbody>
-              {generateTimeOptions(section).map((time) => (
+              {generateTimeSectionOptions(section).map((time) => (
                 <tr key={time}>
                   <th className="flex-1 font-normal py-3 border border-[#DEDEE2] text-[14px]">
                     {time}
@@ -349,11 +579,19 @@ const Calendar = () => {
                       onDrop={(e) => handleOnDrop(e, day, time)}
                       onDragOver={handleOnDragOver}
                     >
-                      {day?.format("DD") === lesson.day && time === lesson.time ? (
+                      {day?.format("DD") === lesson?.day?.format("DD") &&
+                      time === lesson.time ? (
                         <div
                           className="w-full h-full p-1 cursor-pointer rounded-lg text-white bg-[#004835]"
                           draggable
-                          onClick={() => setShowModal(true)}
+                          onClick={() => {
+                            setShowModal(true);
+                            setRescheduleDetails((prevDetails) => ({
+                              ...prevDetails,
+                              newDay: lesson.day,
+                              newTime: lesson.time,
+                            }));
+                          }}
                           onDragStart={(e) => handleOnDrag}
                         >
                           {lesson.name}
