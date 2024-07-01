@@ -18,7 +18,7 @@ const TutorManagement = () => {
           }
           onClick={() => setSelectedTab("lessons")}
         >
-          My lessons
+          Lớp học của tôi
         </div>
         <div
           className={
@@ -28,7 +28,7 @@ const TutorManagement = () => {
           }
           onClick={() => setSelectedTab("calendar")}
         >
-          Calendar
+          Lịch trình
         </div>
         <div
           className={
@@ -38,7 +38,7 @@ const TutorManagement = () => {
           }
           onClick={() => setSelectedTab("statistic")}
         >
-          Statistic
+          Thống kê
         </div>
         <div
           className={
@@ -48,7 +48,7 @@ const TutorManagement = () => {
           }
           onClick={() => setSelectedTab("profile")}
         >
-          My profile
+          Hồ sơ của tôi
         </div>
       </div>
 
